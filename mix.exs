@@ -3,9 +3,10 @@ defmodule Json.Mixfile do
 
   def project do
     [ app: :json,
-      version: "0.0.1",
+      version: "0.0.1.dev",
       elixir: "~> 0.9.4-dev",
-      deps: deps ]
+      deps: deps,
+      source_url: "https://github.com/cblage/elixir-json" ]
   end
 
   # Configuration for the OTP application
