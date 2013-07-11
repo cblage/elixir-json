@@ -14,4 +14,37 @@ defmodule JsonTest do
       Json.decode("{\"result\": \"this is awesome\"}") \
       == [result: "this is awesome"]
   end
+
+  test "typeof tuple" do
+    assert JsonType.typeof({:tuple, "woot"}) == :array
+  end
+
+  test "typeof string" do
+    assert JsonType.typeof("woot") == :string
+  end
+
+  test "typeof number" do
+    assert JsonType.typeof(5) == :number
+  end
+
+  test "typeof nil" do
+    assert JsonType.typeof(nil) == :null
+  end
+
+  test "typeof false" do
+    assert JsonType.typeof(false) == :boolean
+  end
+  
+  test "typeof true" do
+    assert JsonType.typeof(true) == :boolean
+  end
+
+  test "typeof list" do
+    assert JsonType.typeof([1, 2, 3]) == :array
+  end
+  
+  test "typeof keyword" do
+    assert JsonType.typeof([ name: "Carlos", city: "New York", likes: "Programming" ]) == :object
+  end
+
 end
