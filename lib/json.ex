@@ -1,0 +1,2 @@
+defmodule Json do
+end
