@@ -1,7 +1,7 @@
 defmodule Json do
 
   def encode(item) do
-    JsonType.encode(item)
+    ElixirToJson.encode(item)
   end
 
   def decode(item) do

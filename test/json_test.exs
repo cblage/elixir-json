@@ -22,35 +22,35 @@ defmodule JsonTest do
   end
 
   test "typeof tuple" do
-    assert JsonType.typeof({:tuple, "woot"}) == :array
+    assert ElixirToJson.typeof({:tuple, "woot"}) == :array
   end
 
   test "typeof string" do
-    assert JsonType.typeof("woot") == :string
+    assert ElixirToJson.typeof("woot") == :string
   end
 
   test "typeof number" do
-    assert JsonType.typeof(5) == :number
+    assert ElixirToJson.typeof(5) == :number
   end
 
   test "typeof nil" do
-    assert JsonType.typeof(nil) == :null
+    assert ElixirToJson.typeof(nil) == :null
   end
 
   test "typeof false" do
-    assert JsonType.typeof(false) == :boolean
+    assert ElixirToJson.typeof(false) == :boolean
   end
   
   test "typeof true" do
-    assert JsonType.typeof(true) == :boolean
+    assert ElixirToJson.typeof(true) == :boolean
   end
 
   test "typeof list" do
-    assert JsonType.typeof([1, 2, 3]) == :array
+    assert ElixirToJson.typeof([1, 2, 3]) == :array
   end
   
   test "typeof keyword" do
-    assert JsonType.typeof([ name: "Carlos", city: "New York", likes: "Programming" ]) == :object
+    assert ElixirToJson.typeof([ name: "Carlos", city: "New York", likes: "Programming" ]) == :object
   end
 
 end

@@ -1,4 +1,4 @@
-defprotocol JsonType do
+defprotocol ElixirToJson do
   
   @moduledoc """
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.
@@ -12,18 +12,18 @@ defprotocol JsonType do
 
 end
 
-defimpl JsonType, for: Tuple do
+defimpl ElixirToJson, for: Tuple do
   def encode(item) do
       tuple_to_list(item)
-        |>JsonType.encode
+        |>ElixirToJson.encode
   end
 
   def typeof(_) do
-    JsonType.typeof([]) # same as for arrays
+    ElixirToJson.typeof([]) # same as for arrays
   end
 end
 
-defimpl JsonType, for: List do
+defimpl ElixirToJson, for: List do
   
   def encode([]) do 
     "[]"
@@ -51,7 +51,7 @@ defimpl JsonType, for: List do
   end
 
   defp _encode_keyword_item({key, object}) do 
-    "\"#{key}\":" <>  JsonType.encode(object)
+    "\"#{key}\":" <>  ElixirToJson.encode(object)
   end
 
   defp _encode_list([], accumulator) when  is_bitstring(accumulator) do 
@@ -59,11 +59,11 @@ defimpl JsonType, for: List do
   end
 
   defp _encode_list([head|tail], "") do 
-    _encode_list(tail, JsonType.encode(head))
+    _encode_list(tail, ElixirToJson.encode(head))
   end
 
   defp _encode_list([head|tail], accumulator) when is_bitstring(accumulator) do 
-    _encode_list(tail, accumulator <> "," <> JsonType.encode(head))
+    _encode_list(tail, accumulator <> "," <> ElixirToJson.encode(head))
   end
 
   def typeof([]) do 
@@ -79,7 +79,7 @@ defimpl JsonType, for: List do
   end
 end
 
-defimpl JsonType, for: Number do
+defimpl ElixirToJson, for: Number do
   def encode(item) do 
     "#{item}" # doesnt encode all cases properly
   end
@@ -89,7 +89,7 @@ defimpl JsonType, for: Number do
   end
 end
 
-defimpl JsonType,  for: Record do
+defimpl ElixirToJson,  for: Record do
   def encode(record) do 
     inspect(record) # failing implementation
   end
@@ -99,7 +99,7 @@ defimpl JsonType,  for: Record do
   end
 end
 
-defimpl JsonType, for: [Atom, BitString] do
+defimpl ElixirToJson, for: [Atom, BitString] do
    def encode(false) do
     "false"
   end
@@ -129,7 +129,7 @@ defimpl JsonType, for: [Atom, BitString] do
   end
 end
   
-defimpl JsonType, for: [Any] do
+defimpl ElixirToJson, for: [Any] do
   def encode(item) do 
     inspect(item) # very wrong implementation
   end
