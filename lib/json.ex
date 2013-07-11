@@ -1,11 +1,11 @@
 defmodule Json do
 
   def encode(item) do
-    "{\"result\": \"this will be json\"}"
+    JsonType.encode(item)
   end
 
   def decode(item) do
-    [result: "this will be a elixir result"]
+    raise "not implemented"
   end
 
 end
