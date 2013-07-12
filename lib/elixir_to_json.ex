@@ -91,7 +91,8 @@ end
 
 defimpl ElixirToJson,  for: Record do
   def encode(record) do 
-    raise "encoding Record not implemented"
+    record.to_keywords
+        |>ElixirToJson.encode
   end
 
   def typeof(_) do 
