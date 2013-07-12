@@ -91,7 +91,7 @@ end
 
 defimpl ElixirToJson,  for: Record do
   def encode(record) do 
-    inspect(record) # failing implementation
+    raise "not implemented"
   end
 
   def typeof(_) do 
