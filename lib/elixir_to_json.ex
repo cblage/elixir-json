@@ -24,7 +24,7 @@ defimpl ElixirToJson, for: Tuple do
 end
 
 defimpl ElixirToJson, for: List do
-  
+
   def encode([]) do 
     "[]"
   end
@@ -47,11 +47,11 @@ defimpl ElixirToJson, for: List do
   end
   
   defp _encode_keyword([head|tail], accumulator) when is_bitstring(accumulator) do 
-      _encode_keyword(tail, accumulator <> "," <> _encode_keyword_item(head))
+    _encode_keyword(tail, accumulator <> "," <> _encode_keyword_item(head))
   end
 
   defp _encode_keyword_item({key, object}) do 
-    "\"#{key}\":" <>  ElixirToJson.encode(object)
+    JsonEncoder.encode_string(key) <> ":" <>  ElixirToJson.encode(object)
   end
 
   defp _encode_list([], accumulator) when  is_bitstring(accumulator) do 
@@ -80,23 +80,12 @@ defimpl ElixirToJson, for: List do
 end
 
 defimpl ElixirToJson, for: Number do
-  def encode(item) do 
-    "#{item}" # doesnt encode all cases properly
+  def encode(number) do 
+    JsonEncoder.encode_number(number)
   end
 
   def typeof(_) do 
     :number
-  end
-end
-
-defimpl ElixirToJson,  for: Record do
-  def encode(record) do 
-    record.to_keywords
-        |>ElixirToJson.encode
-  end
-
-  def typeof(_) do 
-    :object
   end
 end
 
@@ -114,7 +103,7 @@ defimpl ElixirToJson, for: [Atom, BitString] do
   end
 
   def encode(atom_or_bitstring) when is_atom(atom_or_bitstring) or is_bitstring(atom_or_bitstring) do 
-    "\"#{atom_or_bitstring}\"" # doesnt escape / encode anything
+    JsonEncoder.encode_string(atom_or_bitstring)
   end
 
   def typeof(boolean) when is_boolean(boolean) do
@@ -129,10 +118,22 @@ defimpl ElixirToJson, for: [Atom, BitString] do
     :string
   end
 end
-  
+
+
+defimpl ElixirToJson,  for: Record do
+  def encode(record) do 
+    record.to_keywords
+        |>ElixirToJson.encode
+  end
+
+  def typeof(_) do 
+    :object
+  end
+end
+
 defimpl ElixirToJson, for: [Any] do
-  def encode(item) do 
-    raise "encoding Any not implemented"
+  def encode(_) do 
+    JsonEncoder.encode_string("[Elixir.Any]")
   end
 
   def typeof(_) do
