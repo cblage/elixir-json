@@ -52,7 +52,7 @@ defimpl JSON.Encode, for: List do
     JSON.Encode.to_json(key) <> ":" <>  JSON.Encode.to_json(object)
   end
 
-  defp _list_to_json([], accumulator) when  is_bitstring(accumulator) do 
+  defp _list_to_json([], accumulator) when is_bitstring(accumulator) do 
     accumulator
   end
 
