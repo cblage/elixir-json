@@ -1,10 +1,10 @@
-defmodule Json do
+defmodule JSON do
 
   def encode(item) do
-    ElixirToJson.encode(item)
+    JSON.Encode.to_json(item)
   end
 
-  def decode(item) do
+  def decode(_) do
     raise "not implemented"
   end
 
