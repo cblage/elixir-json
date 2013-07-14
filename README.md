@@ -1,6 +1,6 @@
 # JSON
 
-This library aims to provider a natively implemented JSON encoder and decoder for Elixir. 
+This library aims to provide a natively implemented JSON encoder and decoder for Elixir. 
 
 This library is still in alpha and should probably not be used in production environments. 
 
