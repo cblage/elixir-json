@@ -8,7 +8,7 @@ defmodule JsonTest do
       JSON.encode([result: "this will be a elixir result"]) \
       == "{\"result\":\"this will be a elixir result\"}"
   end
-  
+
   test "convert keyword with charlist into correct JSON" do
     assert \
       JSON.encode([result: 'this will not be a string']) \
@@ -22,10 +22,10 @@ defmodule JsonTest do
   end
 
 
-  test "convert JSON into correct keyword" do
+  test "convert JSON object into correct keyword" do
     assert \
       JSON.decode("{\"result\": \"this is awesome\"}") \
-      == [result: "this is awesome"]
+      == { :ok, [result: "this is awesome"] }
   end
 
 
