@@ -27,6 +27,12 @@ defmodule JsonTest do
       == { :ok, "" }
   end
 
+  test "convert JSON string into a string" do
+    assert \
+      JSON.decode("\"this îs å sìmple string\"") \
+      == { :ok, "this îs å sìmple string" }
+  end
+
   test "convert JSON object into correct keyword" do
     assert \
       JSON.decode("{\"result\": \"this is awesome\"}") \
