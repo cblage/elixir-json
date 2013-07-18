@@ -12,7 +12,7 @@ defmodule JSON.Decode do
   end
 
   def from_json("{}") do 
-    []
+    HashDict.new
   end
 
   def from_json(bitstring) when is_bitstring(bitstring) do
