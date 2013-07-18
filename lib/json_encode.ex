@@ -4,15 +4,36 @@ defprotocol JSON.Encode do
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.
   """
 
-  def to_json(item)
+  
+  @doc """
+  Returns a JSON string representation of the Elixir term
 
-  def typeof(item)
+  ## Examples
+
+      iex> JSON.Encode.to_json([result: "this will be a elixir result"]) 
+      "{\"result\":\"this will be a elixir result\"}"
+      
+  """
+  @spec to_json(term) :: bitstring
+  def to_json(term)
+
+  @doc """
+  Returns an atom that reprsents the JSON type for the term
+
+  ## Examples
+
+      iex> JSON.Encode.typeof([result: "this will be a elixir result"]) 
+      :object
+      
+  """
+  @spec typeof(term) :: atom
+  def typeof(term)
 
 end
 
 defimpl JSON.Encode, for: Tuple do
-  def to_json(item) do
-      tuple_to_list(item)
+  def to_json(term) do
+      tuple_to_list(term)
         |>JSON.Encode.to_json
   end
 
@@ -41,14 +62,14 @@ defimpl JSON.Encode, for: List do
   end
 
   defp keyword_to_json([head|tail], "") do 
-    keyword_to_json(tail, keyword_item_to_json(head))
+    keyword_to_json(tail, keyword_term_to_json(head))
   end
   
   defp keyword_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
-    keyword_to_json(tail, accumulator <> "," <> keyword_item_to_json(head))
+    keyword_to_json(tail, accumulator <> "," <> keyword_term_to_json(head))
   end
 
-  defp keyword_item_to_json({key, object}) do 
+  defp keyword_term_to_json({key, object}) do 
     JSON.Encode.to_json(key) <> ":" <>  JSON.Encode.to_json(object)
   end
 
