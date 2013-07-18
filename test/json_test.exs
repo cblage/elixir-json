@@ -8,7 +8,7 @@ defmodule JsonTest do
       JSON.encode([result: "this will be a elixir result"]) \
       == "{\"result\":\"this will be a elixir result\"}"
   end
-  
+
   test "convert keyword with charlist into correct JSON" do
     assert \
       JSON.encode([result: 'this will not be a string']) \
@@ -21,11 +21,22 @@ defmodule JsonTest do
       == "{\"this_is_null\":null,\"this_is_false\":false,\"this_is_a_number\":1234,\"this_is_an_array\":[\"a\",\"b\",\"c\"],\"this_is_a_subobject\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}}}"
   end
 
+  test "convert JSON empty string into an empty string" do
+    assert \
+      JSON.decode("\"\"") \
+      == { :ok, "" }
+  end
 
-  test "convert JSON into correct keyword" do
+  test "convert JSON string into a string" do
+    assert \
+      JSON.decode("\"this îs å sìmple string\"") \
+      == { :ok, "this îs å sìmple string" }
+  end
+
+  test "convert JSON object into correct keyword" do
     assert \
       JSON.decode("{\"result\": \"this is awesome\"}") \
-      == [result: "this is awesome"]
+      == { :ok, [result: "this is awesome"] }
   end
 
 

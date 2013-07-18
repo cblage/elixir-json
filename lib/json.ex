@@ -4,8 +4,9 @@ defmodule JSON do
     JSON.Encode.to_json(item)
   end
 
-  def decode(_) do
-    raise "not implemented"
-  end
+  @doc """
+  Decode a String to an Erlang object
+  """
+  def decode(json_string), do: JSON.Decode.decode(json_string)
 
 end
