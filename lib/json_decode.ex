@@ -16,19 +16,19 @@ defmodule JSON.Decode do
   end
 
   def from_json(bitstring) when is_bitstring(bitstring) do
-    accept_root_token(bitstring)
+    accept_root(bitstring)
   end
 
   #Accepts anything considered a root token (object or array for now)
-  defp accept_root_token(bitstring) do
-    {root_token, remaining_bitstring} = consume_whitespace(bitstring) |> process_root_token
+  defp accept_root(bitstring) do
+    {root, remaining_bitstring} = consume_whitespace(bitstring) |> process_root_token
                                           
     #remaining_bitstring should be empty due to being in the root context otherwise this is invalid json
     if ("" !== consume_whitespace(remaining_bitstring)) do 
       raise UnexpectedTokenError, token: remaining_bitstring
     end
 
-    root_token
+    root
   end
 
    defp process_root_token(<< "{" , tail :: binary >>) do
