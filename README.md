@@ -2,11 +2,9 @@
 
 This library aims to provide a natively implemented JSON encoder and decoder for Elixir. 
 
-This library is still in alpha and should probably not be used in production environments. 
-
 At this point, only JSON.encode is fully implemented.
 
-JSON.decode will become available at some point :)
+JSON.decode is being actively developed in the [json_decode branch](https://github.com/cblage/elixir-json/tree/json_decode)
 
 All contributions are welcome.
 
