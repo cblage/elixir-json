@@ -61,11 +61,11 @@ defmodule JSON.Decode do
     bitstring
   end
 
-  defp accept_string_token(<< "\"" , tail :: binary >>) do
+  defp process_string_token(<< "\"" , tail :: binary >>) do
     accept_string(tail, "")
   end
 
-  defp accept_string_token(<< token :: utf8, _ >>) do
+  defp process_string_token(<< token :: utf8, _ >>) do
     raise UnexpectedTokenError, token: token
   end
 
