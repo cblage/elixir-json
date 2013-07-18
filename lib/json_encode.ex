@@ -160,7 +160,7 @@ defimpl JSON.Encode, for: BitString do
     end
   end
 
-  defp zero_pad_string_recursive(string, iterations_left) when is_bitstring(string and is_number(iterations_left) and iterations_left > 0 ) do
+  defp zero_pad_string_recursive(string, iterations_left) when is_bitstring(string) and is_number(iterations_left) and iterations_left > 0 do
     zero_pad_string_recursive("0" <> string, iterations_left - 1)
   end
 
