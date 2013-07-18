@@ -29,39 +29,39 @@ defimpl JSON.Encode, for: List do
 
   def to_json(list) do 
     if (Keyword.keyword? list) do
-      "{#{_keyword_to_json(list, "")}}"
+      "{#{keyword_to_json(list, "")}}"
     else 
-      "[#{_list_to_json(list, "")}]"
+      "[#{list_to_json(list, "")}]"
     end
   end
   
 
-  defp _keyword_to_json([], accumulator) when is_bitstring(accumulator) do 
+  defp keyword_to_json([], accumulator) when is_bitstring(accumulator) do 
     accumulator
   end
 
-  defp _keyword_to_json([head|tail], "") do 
-    _keyword_to_json(tail, _keyword_item_to_json(head))
+  defp keyword_to_json([head|tail], "") do 
+    keyword_to_json(tail, keyword_item_to_json(head))
   end
   
-  defp _keyword_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
-    _keyword_to_json(tail, accumulator <> "," <> _keyword_item_to_json(head))
+  defp keyword_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
+    keyword_to_json(tail, accumulator <> "," <> keyword_item_to_json(head))
   end
 
-  defp _keyword_item_to_json({key, object}) do 
+  defp keyword_item_to_json({key, object}) do 
     JSON.Encode.to_json(key) <> ":" <>  JSON.Encode.to_json(object)
   end
 
-  defp _list_to_json([], accumulator) when is_bitstring(accumulator) do 
+  defp list_to_json([], accumulator) when is_bitstring(accumulator) do 
     accumulator
   end
 
-  defp _list_to_json([head|tail], "") do 
-    _list_to_json(tail, JSON.Encode.to_json(head))
+  defp list_to_json([head|tail], "") do 
+    list_to_json(tail, JSON.Encode.to_json(head))
   end
 
-  defp _list_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
-    _list_to_json(tail, accumulator <> "," <> JSON.Encode.to_json(head))
+  defp list_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
+    list_to_json(tail, accumulator <> "," <> JSON.Encode.to_json(head))
   end
 
   def typeof([]) do 
@@ -119,52 +119,52 @@ end
 
 defimpl JSON.Encode, for: BitString do
   def to_json(bitstring) do 
-    "\"" <> _encode_binary_recursive(bitstring, "") <> "\""
+    "\"" <> encode_binary_recursive(bitstring, "") <> "\""
   end
 
-  defp _encode_binary_recursive(<< head :: utf8, tail :: binary >>, accumulator) do
-    _encode_binary_recursive(tail, accumulator <> _encode_binary_character(head))
+  defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, accumulator) do
+    encode_binary_recursive(tail, accumulator <> encode_binary_character(head))
   end
 
-  defp _encode_binary_recursive(<<>>, accumulator) do
+  defp encode_binary_recursive(<<>>, accumulator) do
     accumulator
   end
 
-  defp  _encode_binary_character(?"),   do: "\\\""
-  defp  _encode_binary_character(?\b),  do: "\\b"
-  defp  _encode_binary_character(?\f),  do: "\\f"
-  defp  _encode_binary_character(?\n),  do: "\\n"
-  defp  _encode_binary_character(?\r),  do: "\\r"
-  defp  _encode_binary_character(?\t),  do: "\\t"
-  defp  _encode_binary_character(?/),   do: "\\/"
-  defp  _encode_binary_character('\\'), do: "\\\\"
+  defp encode_binary_character(?"),   do: "\\\""
+  defp encode_binary_character(?\b),  do: "\\b"
+  defp encode_binary_character(?\f),  do: "\\f"
+  defp encode_binary_character(?\n),  do: "\\n"
+  defp encode_binary_character(?\r),  do: "\\r"
+  defp encode_binary_character(?\t),  do: "\\t"
+  defp encode_binary_character(?/),   do: "\\/"
+  defp encode_binary_character('\\'), do: "\\\\"
   
   #Anything else < ' ', ascii space = 32
-  defp  _encode_binary_character(char) when is_number(char) and char < 32, do: "\u#{_encode_hexadecimal_unicode_control_character(char)}"
+  defp encode_binary_character(char) when is_number(char) and char < 32, do: "\u#{encode_hexadecimal_unicode_control_character(char)}"
 
   #anything else besides these control characters
-  defp  _encode_binary_character(char) when is_number(char), do: <<char>>
+  defp encode_binary_character(char) when is_number(char), do: <<char>>
 
 
-  defp _encode_hexadecimal_unicode_control_character(char) when is_number(char) do 
+  defp encode_hexadecimal_unicode_control_character(char) when is_number(char) do 
     integer_to_binary(char, 16)
-      |> _zero_pad_string(4)
+      |> zero_pad_string(4)
   end
 
-  defp _zero_pad_string(string, desired_length) when is_bitstring(string) and is_number(desired_length) and desired_length > 0 do
+  defp zero_pad_string(string, desired_length) when is_bitstring(string) and is_number(desired_length) and desired_length > 0 do
     string_length = String.length(string)
     if (string_length >= desired_length) do 
       string
     else 
-      _zero_pad_string_recursive(string, string_length - desired_length)
+      zero_pad_string_recursive(string, string_length - desired_length)
     end
   end
 
-  defp _zero_pad_string_recursive(string, iterations_left) when is_bitstring(string and is_number(iterations_left) and iterations_left > 0 ) do
-    _zero_pad_string_recursive("0" <> string, iterations_left - 1)
+  defp zero_pad_string_recursive(string, iterations_left) when is_bitstring(string and is_number(iterations_left) and iterations_left > 0 ) do
+    zero_pad_string_recursive("0" <> string, iterations_left - 1)
   end
 
-  defp _zero_pad_string_recursive(string, 0) when is_bitstring(string) do
+  defp zero_pad_string_recursive(string, 0) when is_bitstring(string) do
     string
   end
 
