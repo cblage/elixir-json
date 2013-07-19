@@ -1,8 +1,4 @@
 defmodule JSON.Decode do
-
-  #32 = ascii space, cleaner than using "? ", I think
-  @acii_space 32
-
   defexception UnexpectedTokenError, token: nil do
     def message(exception) do
       "Invalid JSON - unexpected token >>#{exception.token}<<"
@@ -25,10 +21,10 @@ defmodule JSON.Decode do
 
   #Accepts anything considered a root token (object or array for now)
   defp accept_root(bitstring) do
-    {root, remaining_bitstring} = consume_whitespace(bitstring) |> process_root_token
+    {root, remaining_bitstring} = String.lstrip(bitstring) |> process_root_token
                                           
     #remaining_bitstring should be empty due to being in the root context otherwise this is invalid json
-    unless "" === consume_whitespace(remaining_bitstring) do 
+    unless "" === String.strip(remaining_bitstring) do 
       raise UnexpectedTokenError, token: remaining_bitstring
     end
 
@@ -55,14 +51,6 @@ defmodule JSON.Decode do
     raise "not implemented"
   end
 
-  defp consume_whitespace(<< token :: utf8, tail :: binary>>) when token in [?\t, ?\r, ?\n, @ascii_space] do
-    consume_whitespace(tail)
-  end
-
-  defp consume_whitespace(bitstring) when is_bitstring(bitstring) do
-    bitstring
-  end
-
   defp process_string_token(<< ?" , tail :: binary >>) do
     accept_string(tail, "")
   end
@@ -79,6 +67,4 @@ defmodule JSON.Decode do
   defp accept_string(<<>>, _) do
     raise UnexpectedEndOfBufferError
   end
-
 end
-
