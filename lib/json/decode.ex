@@ -31,7 +31,7 @@ defmodule JSON.Decode do
     root
   end
 
-   defp process_root_token(<< ?{ , tail :: binary >>) do
+  defp process_root_token(<< ?{ , tail :: binary >>) do
     accept_object(tail)    
   end
 
