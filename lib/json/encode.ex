@@ -45,41 +45,13 @@ defimpl JSON.Encode, for: List do
   end
 
   def to_json(list) do 
-    if (Keyword.keyword? list) do
-      "{#{keyword_to_json(list, "")}}"
-    else 
-      "[#{list_to_json(list, "")}]"
+    if Keyword.keyword? list do 
+      "{" <> Enum.map_join(list, ",", fn {key, object} -> JSON.Encode.to_json(key) <> ":" <>  JSON.Encode.to_json(object) end) <> "}"
+    else
+      "[" <> Enum.map_join(list, ",", JSON.Encode.to_json(&1)) <> "]"
     end
   end
   
-
-  defp keyword_to_json([], accumulator) when is_bitstring(accumulator) do 
-    accumulator
-  end
-
-  defp keyword_to_json([head|tail], "") do 
-    keyword_to_json(tail, keyword_term_to_json(head))
-  end
-  
-  defp keyword_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
-    keyword_to_json(tail, accumulator <> "," <> keyword_term_to_json(head))
-  end
-
-  defp keyword_term_to_json({key, object}) do 
-    JSON.Encode.to_json(key) <> ":" <>  JSON.Encode.to_json(object)
-  end
-
-  defp list_to_json([], accumulator) when is_bitstring(accumulator) do 
-    accumulator
-  end
-
-  defp list_to_json([head|tail], "") do 
-    list_to_json(tail, JSON.Encode.to_json(head))
-  end
-
-  defp list_to_json([head|tail], accumulator) when is_bitstring(accumulator) do 
-    list_to_json(tail, accumulator <> "," <> JSON.Encode.to_json(head))
-  end
 
   def typeof([]) do 
     :array
