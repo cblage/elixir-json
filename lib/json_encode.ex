@@ -33,12 +33,11 @@ end
 
 defimpl JSON.Encode, for: Tuple do
   def to_json(term) do
-      tuple_to_list(term)
-        |>JSON.Encode.to_json
+      tuple_to_list(term) |> JSON.Encode.to_json
   end
 
   def typeof(_) do
-    JSON.Encode.typeof([]) # same as for lists
+    :array
   end
 end
 
@@ -139,8 +138,11 @@ defimpl JSON.Encode, for: Atom do
 end
 
 defimpl JSON.Encode, for: BitString do
+  #32 = ascii space, cleaner than using "? ", I think
+  @acii_space 32
+
   def to_json(bitstring) do 
-    "\"" <> encode_binary_recursive(bitstring, "") <> "\""
+    <<?">> <> encode_binary_recursive(bitstring, "") <> <<?">>
   end
 
   defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, accumulator) do
@@ -159,34 +161,23 @@ defimpl JSON.Encode, for: BitString do
   defp encode_binary_character(?\t),  do: "\\t"
   defp encode_binary_character(?/),   do: "\\/"
   defp encode_binary_character('\\'), do: "\\\\"
-  
-  #Anything else < ' ', ascii space = 32
-  defp encode_binary_character(char) when is_number(char) and char < 32, do: "\u#{encode_hexadecimal_unicode_control_character(char)}"
+  defp encode_binary_character(char) when is_number(char) and char < @acii_space, do: "\u#{encode_hexadecimal_unicode_control_character(char)}"
 
-  #anything else besides these control characters
+  #anything else besides these control characters, just let it through
   defp encode_binary_character(char) when is_number(char), do: <<char>>
 
 
   defp encode_hexadecimal_unicode_control_character(char) when is_number(char) do 
-    integer_to_binary(char, 16)
-      |> zero_pad_string(4)
+    integer_to_binary(char, 16) |> zero_pad_string(4)
   end
 
   defp zero_pad_string(string, desired_length) when is_bitstring(string) and is_number(desired_length) and desired_length > 0 do
-    string_length = String.length(string)
-    if (string_length >= desired_length) do 
+    needed_padding_characters = String.length(string) - desired_length
+    if needed_padding_characters > 0 do
+      String.duplicate("0", needed_padding_characters) <>  string
+    else
       string
-    else 
-      zero_pad_string_recursive(string, string_length - desired_length)
     end
-  end
-
-  defp zero_pad_string_recursive(string, iterations_left) when is_bitstring(string) and is_number(iterations_left) and iterations_left > 0 do
-    zero_pad_string_recursive("0" <> string, iterations_left - 1)
-  end
-
-  defp zero_pad_string_recursive(string, 0) when is_bitstring(string) do
-    string
   end
 
   def typeof(_) do
@@ -194,10 +185,9 @@ defimpl JSON.Encode, for: BitString do
   end
 end
 
-defimpl JSON.Encode,  for: Record do
+defimpl JSON.Encode, for: Record do
   def to_json(record) do 
-    record.to_keywords
-      |>JSON.Encode.to_json
+    record.to_keywords |> JSON.Encode.to_json
   end
 
   def typeof(_) do 
@@ -205,8 +195,8 @@ defimpl JSON.Encode,  for: Record do
   end
 end
 
-defimpl JSON.Encode, for: [Any] do
-
+#TODO: maybe this should return the result of "inspect?"
+defimpl JSON.Encode, for: Any do
   @any_to_json "[Elixir.Any]"
 
   def to_json(_) do 
