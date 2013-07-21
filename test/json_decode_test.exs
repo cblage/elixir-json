@@ -36,6 +36,10 @@ defmodule JSONDecodeTest do
     decodes "string with quotes", "\"I said, \\\"Hi.\\\"\"", "I said, \"Hi.\""
     decodes "string with solidi", "\"\\/ \\\\\"", "/ \\"
 
+    decodes "string with control characters",
+            "\"tab\\tnewline\\ncarriage return\\rform feed\\fend\"",
+            "tab\tnewline\ncarriage return\rform feed\fend"
+
     decodes "positive integer", "1337", 1337
     decodes "positive float", "13.37", 13.37
     decodes "negative integer", "-1337", -1337

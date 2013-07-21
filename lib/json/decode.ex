@@ -142,6 +142,13 @@ defmodule JSON.Decode do
   # String Parsing
 
   defp consume_string(<< ?\\, c, rest :: binary >>, acc) do
+    c = case c do
+      ?f -> "\f"
+      ?n -> "\n"
+      ?r -> "\r"
+      ?t -> "\t"
+      _  -> c
+    end
     consume_string rest, [ c | acc ]
   end
 
