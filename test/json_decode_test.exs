@@ -72,6 +72,8 @@ defmodule JSONDecodeTest do
     cannot_decode "unterminated string", "\"Not a full string",
                   JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
 
+    cannot_decode "number with trailing .", "889.foo", JSON.Decode.UnexpectedTokenError, %r{foo}
+
     cannot_decode "open brace", "{", JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
 
     cannot_decode "bad object", "{foo", JSON.Decode.UnexpectedTokenError, %r{foo}

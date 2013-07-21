@@ -136,7 +136,7 @@ defmodule JSON.Decode do
   end
 
   defp consume_fractional(n, _, << m, rest :: binary >>) when not m in ?0..?9 do
-    { n, rest }
+    { n, << m, rest :: binary >> }
   end
 
   # String Parsing
