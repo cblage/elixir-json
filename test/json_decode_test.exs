@@ -10,6 +10,16 @@ defmodule JSONDecodeTest do
         end
       end
     end
+
+    defmacro cannot_decode(name, input, exception, message) do
+      quote do
+        test "cannot decode " <> unquote(name) do
+          assert_raise unquote(exception), unquote(message), fn ->
+            JSON.decode!(unquote(input))
+          end
+        end
+      end
+    end
   end
 
   defmodule Cases do
@@ -37,6 +47,11 @@ defmodule JSONDecodeTest do
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
     decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ",\
                             [nil, [false, "five"], [3, true]]
+
+    cannot_decode "unterminated object", "{\"foo\":\"bar\"",
+                  JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+    cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
+                  JSON.Decode.UnexpectedTokenError, %r{bar}
   end
 
 end

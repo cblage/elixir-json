@@ -55,8 +55,16 @@ defmodule JSON.Decode do
 
   defp consume_object_contents(<< ?", rest :: binary >>, acc) do
     { key, rest } = consume_string(rest, [])
-    << ?:, rest :: binary >> = String.lstrip(rest)
-    rest = String.lstrip(rest)
+
+    case String.lstrip(rest) do
+      << ?:, rest :: binary >> ->
+        rest = String.lstrip(rest)
+      <<>> ->
+        raise UnexpectedEndOfBufferError
+      _ ->
+        raise UnexpectedTokenError, token: rest
+    end
+
     { value, rest } = consume_value(rest)
     acc = HashDict.put(acc, key, value)
     rest = String.lstrip(rest)
@@ -67,7 +75,19 @@ defmodule JSON.Decode do
         consume_object_contents(rest, acc)
       << ?}, rest :: binary >> ->
         { acc, rest }
+      <<>> ->
+        raise UnexpectedEndOfBufferError
+      _ ->
+        raise UnexpectedTokenError, token: rest
     end
+  end
+
+  defp consume_object_contents("") do
+    raise UnexpectedEndOfBufferError
+  end
+
+  defp consume_object_contents(json) do
+    raise UnexpectedTokenError, token: json
   end
 
   def consume_value(<< ?", rest :: binary >>) do
