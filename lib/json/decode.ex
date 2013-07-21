@@ -8,15 +8,35 @@ defmodule JSON.Decode do
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
   def from_json(s) when is_binary(s) do
-    { result, rest } = consume_value(s)
-    unless "" == rest do
+    { result, rest } = consume_value(String.lstrip(s))
+    unless "" == String.rstrip(rest) do
       raise UnexpectedTokenError, token: rest
     end
     result
   end
 
-  def consume_value("[]") do
-    { [], "" }
+  # Array Parsing
+
+  def consume_value(<< ?[, rest :: binary >>) do
+    consume_array_contents(String.lstrip(rest), [])
+  end
+
+  defp consume_array_contents(<< ?], after_close :: binary >>, acc) do
+    { Enum.reverse(acc), after_close }
+  end
+
+  defp consume_array_contents(json, acc) do
+    { value, after_value } = consume_value(String.lstrip(json))
+    acc = [ value | acc ]
+    after_value = String.lstrip(after_value)
+
+    case after_value do
+      << ?,, after_comma :: binary >> ->
+        after_comma = String.lstrip(after_comma)
+        consume_array_contents(after_comma, acc)
+      << ?], after_close :: binary >> ->
+        { Enum.reverse(acc), after_close }
+    end
   end
 
   def consume_value("{}") do
@@ -49,6 +69,10 @@ defmodule JSON.Decode do
   defp consume_number(n, << ?., rest :: binary >>) do
     { fractional, tail } = consume_fractional(0, 10.0, rest)
     { n + fractional, tail }
+  end
+
+  defp consume_number(n, << m, rest :: binary >>) when not m in ?0..?9 do
+    { n, << m, rest :: binary >> }
   end
 
   defp consume_fractional(n, power, << m, rest :: binary >>) when m in ?0..?9 do
