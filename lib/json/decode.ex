@@ -4,14 +4,14 @@ defmodule JSON.Decode do
       "Invalid JSON - unexpected token >>#{exception.token}<<"
     end
   end
-  
+
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
-  
-  def from_json("[]") do 
+
+  def from_json("[]") do
     []
   end
 
-  def from_json("{}") do 
+  def from_json("{}") do
     HashDict.new
   end
 
@@ -22,9 +22,9 @@ defmodule JSON.Decode do
   #Accepts anything considered a root token (object or array for now)
   defp accept_root(bitstring) do
     {root, remaining_bitstring} = String.lstrip(bitstring) |> process_root_token
-                                          
+
     #remaining_bitstring should be empty due to being in the root context otherwise this is invalid json
-    unless "" === String.strip(remaining_bitstring) do 
+    unless "" === String.strip(remaining_bitstring) do
       raise UnexpectedTokenError, token: remaining_bitstring
     end
 
@@ -32,7 +32,7 @@ defmodule JSON.Decode do
   end
 
   defp process_root_token(<< ?{ , tail :: binary >>) do
-    accept_object(tail)    
+    accept_object(tail)
   end
 
   defp process_root_token(<< ?[ , tail :: binary >>) do
@@ -43,11 +43,11 @@ defmodule JSON.Decode do
     raise UnexpectedTokenError, token: token
   end
 
-  defp accept_object(bitstring) when is_bitstring(bitstring) do 
+  defp accept_object(bitstring) when is_bitstring(bitstring) do
     raise "not implemented"
   end
-  
-  defp accept_list(bitstring) when is_bitstring(bitstring) do 
+
+  defp accept_list(bitstring) when is_bitstring(bitstring) do
     raise "not implemented"
   end
 
@@ -63,7 +63,7 @@ defmodule JSON.Decode do
   defp accept_string(?", accumulator) do
     accumulator
   end
-  
+
   defp accept_string(<<>>, _) do
     raise UnexpectedEndOfBufferError
   end
