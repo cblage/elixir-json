@@ -43,8 +43,31 @@ defmodule JSON.Decode do
     end
   end
 
-  def consume_value("{}") do
-    { HashDict.new, "" }
+  # Object Parsing
+
+  def consume_value(<< ?{, rest :: binary >>) do
+    consume_object_contents(String.lstrip(rest), HashDict.new)
+  end
+
+  defp consume_object_contents(<< ?}, rest :: binary >>, acc) do
+    { acc, rest }
+  end
+
+  defp consume_object_contents(<< ?", rest :: binary >>, acc) do
+    { key, rest } = consume_string(rest, [])
+    << ?:, rest :: binary >> = String.lstrip(rest)
+    rest = String.lstrip(rest)
+    { value, rest } = consume_value(rest)
+    acc = HashDict.put(acc, key, value)
+    rest = String.lstrip(rest)
+
+    case rest do
+      << ?,, rest :: binary >> ->
+        rest = String.lstrip(rest)
+        consume_object_contents(rest, acc)
+      << ?}, rest :: binary >> ->
+        { acc, rest }
+    end
   end
 
   def consume_value(<< ?", rest :: binary >>) do
