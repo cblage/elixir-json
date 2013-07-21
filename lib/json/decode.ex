@@ -7,44 +7,60 @@ defmodule JSON.Decode do
 
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
-  def from_json("[]") do
-    []
+  def from_json(s) when is_binary(s) do
+    { result, rest } = consume_value(s)
+    unless "" == rest do
+      raise UnexpectedTokenError, token: rest
+    end
+    result
   end
 
-  def from_json("{}") do
-    HashDict.new
+  def consume_value("[]") do
+    { [], "" }
   end
 
-  def from_json(<< ?", rest :: binary >>) do
-    accept_string(rest, [])
+  def consume_value("{}") do
+    { HashDict.new, "" }
   end
 
-  def from_json(<< ?-, m, rest :: binary >>) when m in ?0..?9 do
-    -1 * accept_number(m - ?0, rest)
+  def consume_value(<< ?", rest :: binary >>) do
+    consume_string(rest, [])
   end
 
-  def from_json(<< m, rest :: binary >>) when m in ?0..?9 do
-    accept_number m - ?0, rest
+  # Number Parsing
+
+  def consume_value(<< ?-, m, rest :: binary >>) when m in ?0..?9 do
+    { number, tail } = consume_number(m - ?0, rest)
+    { -1 * number, tail }
   end
 
-  defp accept_number(n, << m, rest :: binary >>) when m in ?0..?9 do
-    accept_number(n * 10 + m - ?0, rest)
+  def consume_value(<< m, rest :: binary >>) when m in ?0..?9 do
+    consume_number m - ?0, rest
   end
 
-  defp accept_number(n, <<>>) do
-    n
+  defp consume_number(n, << m, rest :: binary >>) when m in ?0..?9 do
+    consume_number(n * 10 + m - ?0, rest)
   end
 
-  defp accept_number(n, << ?., rest :: binary >>) do
-    n + accept_fractional(0, 10.0, rest)
+  defp consume_number(n, "") do
+    { n, "" }
   end
 
-  defp accept_fractional(n, power, << m, rest :: binary >>) when m in ?0..?9 do
-    accept_fractional(n + (m - ?0) / power, power * 10, rest)
+  defp consume_number(n, << ?., rest :: binary >>) do
+    { fractional, tail } = consume_fractional(0, 10.0, rest)
+    { n + fractional, tail }
   end
 
-  defp accept_fractional(n, power, <<>>) do
-    n
+  defp consume_fractional(n, power, << m, rest :: binary >>) when m in ?0..?9 do
+    consume_fractional(n + (m - ?0) / power, power * 10, rest)
+  end
+
+  defp consume_fractional(n, power, "") do
+    { n, "" }
+  end
+
+  defp consume_fractional(n, power, << m, rest :: binary >>) when not m in ?0..?9 do
+    { n, rest }
   end
 
   #Accepts anything considered a root token (object or array for now)
@@ -79,17 +95,19 @@ defmodule JSON.Decode do
     raise "not implemented"
   end
 
+  # String Parsing
+
   # Stop condition for proper end of string
-  defp accept_string(<< ?" >>, accumulator) do
-    to_binary(Enum.reverse(accumulator))
+  defp consume_string(<< ?", rest :: binary >>, accumulator) do
+    { to_binary(Enum.reverse(accumulator)), rest }
   end
 
   # Never found a closing ?"
-  defp accept_string(<<>>, _) do
+  defp consume_string(<<>>, _) do
     raise UnexpectedEndOfBufferError
   end
 
-  defp accept_string(<< x, rest :: binary >>, accumulator) do
-    accept_string(rest, [ x | accumulator ])
+  defp consume_string(<< x, rest :: binary >>, accumulator) do
+    consume_string(rest, [ x | accumulator ])
   end
 end
