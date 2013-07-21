@@ -18,11 +18,11 @@ defmodule JSON.Decode do
     result
   end
 
-  def consume_value("null"  <> rest), do: { nil,   rest }
-  def consume_value("true"  <> rest), do: { true,  rest }
-  def consume_value("false" <> rest), do: { false, rest }
+  defp consume_value("null"  <> rest), do: { nil,   rest }
+  defp consume_value("true"  <> rest), do: { true,  rest }
+  defp consume_value("false" <> rest), do: { false, rest }
 
-  def consume_value(s) when is_binary(s) do
+  defp consume_value(s) when is_binary(s) do
     case s do
       << ?[, rest :: binary >> ->
         consume_array_contents(lstrip(rest), [])
