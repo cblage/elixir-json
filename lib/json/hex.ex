@@ -1,10 +1,11 @@
 defmodule JSON.Hex do
 
+  @valid List.concat [Enum.to_list(?0..?9), Enum.to_list(?a..?f), Enum.to_list(?A..?F)]
+
   def is_hex?(""), do: true
 
   def is_hex?(<< c, rest :: binary >>) do
-    valid = List.concat [Enum.to_list(?0..?9), Enum.to_list(?a..?f), Enum.to_list(?A..?F)]
-    Enum.member?(valid, c) && is_hex?(rest)
+    Enum.member?(@valid, c) && is_hex?(rest)
   end
 
   def to_integer(s) do
