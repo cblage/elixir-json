@@ -51,7 +51,7 @@ defmodule JSONDecodeTest do
 
     decodes "empty object", "{}", HashDict.new
     decodes "simple object", "{\"result\": \"this is awesome\"}",\
-                  HashDict.put(HashDict.new, "result", "this is awesome")
+                  HashDict.new([ { "result", "this is awesome" } ])
 
     decodes "empty array", "  [   ] ", []
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
