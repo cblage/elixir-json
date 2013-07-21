@@ -48,6 +48,26 @@ defmodule JSONDecodeTest do
     decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ",\
                             [nil, [false, "five"], [3, true]]
 
+    decodes "complex object",
+            "{
+              \"name\": \"Rafaëlla\",
+              \"active\": true,
+              \"children\": [
+                { \"name\": \"Søren\" },
+                { \"name\": \"Éloise\" }
+              ]
+             }",
+             HashDict.new([
+              { "name", "Rafaëlla" },
+              { "active", true },
+              { "children", [
+                HashDict.new([ { "name", "Søren" } ]),
+                HashDict.new([ { "name", "Éloise" } ])
+              ] }
+            ])
+
+    cannot_decode "unterminated string", "\"Not a full string",
+                  JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
     cannot_decode "unterminated object", "{\"foo\":\"bar\"",
                   JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
     cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
