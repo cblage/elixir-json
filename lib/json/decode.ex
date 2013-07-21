@@ -60,8 +60,6 @@ defmodule JSON.Decode do
         consume_array_contents(after_comma, acc)
       << ?], after_close :: binary >> ->
         { Enum.reverse(acc), after_close }
-      << ?", rest :: binary >> ->
-        consume_string(rest, [])
     end
   end
 
