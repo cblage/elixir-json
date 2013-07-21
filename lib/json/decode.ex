@@ -141,6 +141,10 @@ defmodule JSON.Decode do
 
   # String Parsing
 
+  defp consume_string(<< ?\\, c, rest :: binary >>, acc) do
+    consume_string rest, [ c | acc ]
+  end
+
   # Stop condition for proper end of string
   defp consume_string(<< ?", rest :: binary >>, accumulator) do
     { to_binary(Enum.reverse(accumulator)), rest }

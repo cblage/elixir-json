@@ -33,6 +33,8 @@ defmodule JSONDecodeTest do
     decodes "empty string", "\"\"", ""
     decodes "simple string", "\"this is a string\"", "this is a string"
     decodes "unicode string", "\"µ¥ ß†®îñ©\"",  "µ¥ ß†®îñ©"
+    decodes "string with quotes", "\"I said, \\\"Hi.\\\"\"", "I said, \"Hi.\""
+    decodes "string with solidi", "\"\\/ \\\\\"", "/ \\"
 
     decodes "positive integer", "1337", 1337
     decodes "positive float", "13.37", 13.37
