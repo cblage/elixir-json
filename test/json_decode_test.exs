@@ -33,6 +33,8 @@ defmodule JSONDecodeTest do
 
     decodes "empty array", "  [   ] ", []
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
+    decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ",\
+                            [nil, [false, "five"], [3, true]]
   end
 
 end
