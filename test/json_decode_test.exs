@@ -40,6 +40,10 @@ defmodule JSONDecodeTest do
             "\"tab\\tnewline\\ncarriage return\\rform feed\\fend\"",
             "tab\tnewline\ncarriage return\rform feed\fend"
 
+    decodes "string with unicode escape",
+            "\"star -> \\u272d <- star\"",
+            "star -> ✭ <- star"
+
     decodes "positive integer", "1337", 1337
     decodes "positive float", "13.37", 13.37
     decodes "negative integer", "-1337", -1337
@@ -77,6 +81,9 @@ defmodule JSONDecodeTest do
 
     cannot_decode "unterminated string", "\"Not a full string",
                   JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+
+    cannot_decode "string with bad Unicode escape", "bzzt: \\u27qp wrong",
+                  JSON.Decode.UnexpectedTokenError, %r{qp}
 
     cannot_decode "number with trailing .", "889.foo", JSON.Decode.UnexpectedTokenError, %r{foo}
 

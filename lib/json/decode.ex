@@ -147,6 +147,9 @@ defmodule JSON.Decode do
       ?n -> "\n"
       ?r -> "\r"
       ?t -> "\t"
+      ?u ->
+        { char, rest } = consume_unicode_escape(rest)
+        char
       _  -> c
     end
     consume_string rest, [ c | acc ]
@@ -155,6 +158,14 @@ defmodule JSON.Decode do
   # Stop condition for proper end of string
   defp consume_string(<< ?", rest :: binary >>, accumulator) do
     { to_binary(Enum.reverse(accumulator)), rest }
+  end
+
+  defp consume_unicode_escape(<< a, b, c, d, rest :: binary >>) do
+    s = << a, b, c, d >>
+    unless JSON.Hex.is_hex?(s) do
+      raise UnexpectedTokenError, token: s
+    end
+    { << JSON.Hex.to_integer(s) :: utf8 >>, rest }
   end
 
   # Never found a closing ?"
