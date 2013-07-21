@@ -35,6 +35,18 @@ defmodule JSON.Decode do
     n
   end
 
+  defp accept_number(n, << ?., rest :: binary >>) do
+    n + accept_fractional(0, 10.0, rest)
+  end
+
+  defp accept_fractional(n, power, << m, rest :: binary >>) when m in ?0..?9 do
+    accept_fractional(n + (m - ?0) / power, power * 10, rest)
+  end
+
+  defp accept_fractional(n, power, <<>>) do
+    n
+  end
+
   #Accepts anything considered a root token (object or array for now)
   defp accept_root(bitstring) do
     {root, remaining_bitstring} = String.lstrip(bitstring) |> process_root_token
