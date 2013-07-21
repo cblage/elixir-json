@@ -19,11 +19,28 @@ defmodule JSON.Decode do
   def consume_value("true"  <> rest), do: { true,  rest }
   def consume_value("false" <> rest), do: { false, rest }
 
-  # Array Parsing
-
-  def consume_value(<< ?[, rest :: binary >>) do
-    consume_array_contents(String.lstrip(rest), [])
+  def consume_value(s) when is_binary(s) do
+    case s do
+      << ?[, rest :: binary >> ->
+        consume_array_contents(String.lstrip(rest), [])
+      << ?{, rest :: binary >> ->
+        consume_object_contents(String.lstrip(rest), HashDict.new)
+      << ?-, m, rest :: binary >> when m in ?0..?9 ->
+        { number, tail } = consume_number(m - ?0, rest)
+        { -1 * number, tail }
+      << m, rest :: binary >> when m in ?0..?9 ->
+        consume_number m - ?0, rest
+      << ?", rest :: binary >> ->
+        consume_string rest, []
+      _ ->
+        if String.length(s) == 0 do
+          raise UnexpectedEndOfBufferError
+        end
+        raise UnexpectedTokenError, token: s
+    end
   end
+
+  # Array Parsing
 
   defp consume_array_contents(<< ?], after_close :: binary >>, acc) do
     { Enum.reverse(acc), after_close }
@@ -40,14 +57,12 @@ defmodule JSON.Decode do
         consume_array_contents(after_comma, acc)
       << ?], after_close :: binary >> ->
         { Enum.reverse(acc), after_close }
+      << ?", rest :: binary >> ->
+        consume_string(rest, [])
     end
   end
 
   # Object Parsing
-
-  def consume_value(<< ?{, rest :: binary >>) do
-    consume_object_contents(String.lstrip(rest), HashDict.new)
-  end
 
   defp consume_object_contents(<< ?}, rest :: binary >>, acc) do
     { acc, rest }
@@ -90,20 +105,7 @@ defmodule JSON.Decode do
     raise UnexpectedTokenError, token: json
   end
 
-  def consume_value(<< ?", rest :: binary >>) do
-    consume_string(rest, [])
-  end
-
   # Number Parsing
-
-  def consume_value(<< ?-, m, rest :: binary >>) when m in ?0..?9 do
-    { number, tail } = consume_number(m - ?0, rest)
-    { -1 * number, tail }
-  end
-
-  def consume_value(<< m, rest :: binary >>) when m in ?0..?9 do
-    consume_number m - ?0, rest
-  end
 
   defp consume_number(n, << m, rest :: binary >>) when m in ?0..?9 do
     consume_number(n * 10 + m - ?0, rest)
@@ -148,13 +150,5 @@ defmodule JSON.Decode do
 
   defp consume_string(<< x, rest :: binary >>, accumulator) do
     consume_string(rest, [ x | accumulator ])
-  end
-
-  def consume_value(s) do
-    if String.length(s) == 0 do
-      raise UnexpectedEndOfBufferError
-    end
-
-    raise UnexpectedTokenError, token: s
   end
 end
