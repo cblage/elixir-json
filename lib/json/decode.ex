@@ -149,4 +149,12 @@ defmodule JSON.Decode do
   defp consume_string(<< x, rest :: binary >>, accumulator) do
     consume_string(rest, [ x | accumulator ])
   end
+
+  def consume_value(s) do
+    if String.length(s) == 0 do
+      raise UnexpectedEndOfBufferError
+    end
+
+    raise UnexpectedTokenError, token: s
+  end
 end
