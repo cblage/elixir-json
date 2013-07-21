@@ -19,6 +19,10 @@ defmodule JSON.Decode do
     accept_string(rest, [])
   end
 
+  def from_json(<< ?-, m, rest :: binary >>) when m in ?0..?9 do
+    -1 * accept_number(m - ?0, rest)
+  end
+
   def from_json(<< m, rest :: binary >>) when m in ?0..?9 do
     accept_number m - ?0, rest
   end
