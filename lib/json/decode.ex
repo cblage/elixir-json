@@ -15,8 +15,8 @@ defmodule JSON.Decode do
     HashDict.new
   end
 
-  def from_json(bitstring) when is_bitstring(bitstring) do
-    accept_root(bitstring)
+  def from_json(<< ?", rest :: binary >>) do
+    accept_string(rest, [])
   end
 
   #Accepts anything considered a root token (object or array for now)
@@ -51,20 +51,17 @@ defmodule JSON.Decode do
     raise "not implemented"
   end
 
-  defp process_string_token(<< ?" , tail :: binary >>) do
-    accept_string(tail, "")
+  # Stop condition for proper end of string
+  defp accept_string(<< ?" >>, accumulator) do
+    to_binary(Enum.reverse(accumulator))
   end
 
-  defp process_string_token(<< token :: utf8, _ >>) do
-    raise UnexpectedTokenError, token: token
-  end
-
-  #Stop condition for proper end of string
-  defp accept_string(?", accumulator) do
-    accumulator
-  end
-
+  # Never found a closing ?"
   defp accept_string(<<>>, _) do
     raise UnexpectedEndOfBufferError
+  end
+
+  defp accept_string(<< x, rest :: binary >>, accumulator) do
+    accept_string(rest, [ x | accumulator ])
   end
 end
