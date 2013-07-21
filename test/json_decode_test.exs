@@ -68,10 +68,17 @@ defmodule JSONDecodeTest do
 
     cannot_decode "bad literal", "nul",
                   JSON.Decode.UnexpectedTokenError, %r{nul}
+
     cannot_decode "unterminated string", "\"Not a full string",
                   JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+
+    cannot_decode "open brace", "{", JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+
+    cannot_decode "bad object", "{foo", JSON.Decode.UnexpectedTokenError, %r{foo}
+
     cannot_decode "unterminated object", "{\"foo\":\"bar\"",
                   JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+
     cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
                   JSON.Decode.UnexpectedTokenError, %r{bar}
   end

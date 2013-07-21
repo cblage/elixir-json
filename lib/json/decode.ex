@@ -82,11 +82,11 @@ defmodule JSON.Decode do
     end
   end
 
-  defp consume_object_contents("") do
+  defp consume_object_contents("", _) do
     raise UnexpectedEndOfBufferError
   end
 
-  defp consume_object_contents(json) do
+  defp consume_object_contents(json, _) do
     raise UnexpectedTokenError, token: json
   end
 
@@ -126,11 +126,11 @@ defmodule JSON.Decode do
     consume_fractional(n + (m - ?0) / power, power * 10, rest)
   end
 
-  defp consume_fractional(n, power, "") do
+  defp consume_fractional(n, _, "") do
     { n, "" }
   end
 
-  defp consume_fractional(n, power, << m, rest :: binary >>) when not m in ?0..?9 do
+  defp consume_fractional(n, _, << m, rest :: binary >>) when not m in ?0..?9 do
     { n, rest }
   end
 
