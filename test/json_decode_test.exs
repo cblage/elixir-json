@@ -1,63 +1,34 @@
 Code.require_file "test_helper.exs", __DIR__
 
 defmodule JSONDecodeTest do
-  use ExUnit.Case
 
-  test "convert JSON string into correct Elixir string" do
-    assert \
-      JSON.decode(" \"this is a string\" ") \
-      == "this is a string"
+  defmodule DSL do
+    defmacro decodes(name, input, output) do
+      quote do
+        test "decodes " <> unquote(name) do
+          assert JSON.decode(unquote(input)) == {:ok, unquote(output)}
+        end
+      end
+    end
   end
 
-  test "convert a positive JSON integer into correct Elixir number" do
-    assert \
-      JSON.decode(" 1337 ") \
-      == 1337
-  end
+  defmodule Cases do
+    use ExUnit.Case
+    import JSONDecodeTest.DSL
 
-  test "convert a positive JSON float into correct Elixir number" do
-    assert \
-      JSON.decode(" 13.37 ") \
-      == 13.37
-  end
+    decodes "empty string", "\"\"", ""
+    decodes "simple string", "\"this is a string\"", "this is a string"
 
-  test "convert a negative JSON integer into correct Elixir number" do
-    assert \
-      JSON.decode(" -1337 ") \
-      == -1337
-  end
+    decodes "positive integer", "1337", 1337
+    decodes "positive float", "13.37", 13.37
+    decodes "negative integer", "-1337", -1337
+    decodes "negative float", "-13.37", -13.37
 
-  test "convert a negative JSON float into correct Elixir number" do
-    assert \
-      JSON.decode(" -13.37 ") \
-      == -1337
-  end
+    decodes "empty object", "{}", HashDict.new
+    decodes "simple object", "{\"result\": \"this is awesome\"}", [result: "this is awesome"]
 
-  test "convert JSON object into correct Elixir keyword" do
-    assert \
-      JSON.decode("{\"result\": \"this is awesome\"}") \
-      == [result: "this is awesome"]
+    decodes "empty array", "[]", []
+    decodes "simple array", "[ 1, 2, 3, 4 ]", [ 1, 2, 3, 4 ]
   end
-
-  test "convert JSON array into correct Elixir array" do
-    assert \
-      JSON.decode("[1, 2, 3, 4]") \
-      == [1, 2, 3, 4]
-  end
-
-  test "convert JSON empty array into correct Elixir empty array" do
-    assert \
-      JSON.decode("[]") \
-      == []
-  end
-  
-  #Maybe this should be empty tuple?
-  test "convert JSON empty object into correct Elixir empty array" do
-    assert \
-      JSON.decode("{}") \
-      == []
-  end
-
-
 
 end
