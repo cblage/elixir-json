@@ -19,6 +19,18 @@ defmodule JSON.Decode do
     accept_string(rest, [])
   end
 
+  def from_json(<< m, rest :: binary >>) when m in ?0..?9 do
+    accept_number m - ?0, rest
+  end
+
+  defp accept_number(n, << m, rest :: binary >>) when m in ?0..?9 do
+    accept_number(n * 10 + m - ?0, rest)
+  end
+
+  defp accept_number(n, <<>>) do
+    n
+  end
+
   #Accepts anything considered a root token (object or array for now)
   defp accept_root(bitstring) do
     {root, remaining_bitstring} = String.lstrip(bitstring) |> process_root_token
