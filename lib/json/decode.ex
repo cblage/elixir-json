@@ -15,6 +15,10 @@ defmodule JSON.Decode do
     result
   end
 
+  def consume_value("null"  <> rest), do: { nil,   rest }
+  def consume_value("true"  <> rest), do: { true,  rest }
+  def consume_value("false" <> rest), do: { false, rest }
+
   # Array Parsing
 
   def consume_value(<< ?[, rest :: binary >>) do

@@ -16,6 +16,10 @@ defmodule JSONDecodeTest do
     use ExUnit.Case
     import JSONDecodeTest.DSL
 
+    decodes "null",  "null",  nil
+    decodes "true",  "true",  true
+    decodes "false", "false", false
+
     decodes "empty string", "\"\"", ""
     decodes "simple string", "\"this is a string\"", "this is a string"
 
