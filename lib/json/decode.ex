@@ -1,4 +1,7 @@
 defmodule JSON.Decode do
+
+  import String, only: [lstrip: 1, rstrip: 1]
+
   defexception UnexpectedTokenError, token: nil do
     def message(exception) do
       "Invalid JSON - unexpected token >>#{exception.token}<<"
@@ -8,8 +11,8 @@ defmodule JSON.Decode do
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
   def from_json(s) when is_binary(s) do
-    { result, rest } = consume_value(String.lstrip(s))
-    unless "" == String.rstrip(rest) do
+    { result, rest } = consume_value(lstrip(s))
+    unless "" == rstrip(rest) do
       raise UnexpectedTokenError, token: rest
     end
     result
@@ -22,9 +25,9 @@ defmodule JSON.Decode do
   def consume_value(s) when is_binary(s) do
     case s do
       << ?[, rest :: binary >> ->
-        consume_array_contents(String.lstrip(rest), [])
+        consume_array_contents(lstrip(rest), [])
       << ?{, rest :: binary >> ->
-        consume_object_contents(String.lstrip(rest), HashDict.new)
+        consume_object_contents(lstrip(rest), HashDict.new)
       << ?-, m, rest :: binary >> when m in ?0..?9 ->
         { number, tail } = consume_number(m - ?0, rest)
         { -1 * number, tail }
@@ -47,13 +50,13 @@ defmodule JSON.Decode do
   end
 
   defp consume_array_contents(json, acc) do
-    { value, after_value } = consume_value(String.lstrip(json))
+    { value, after_value } = consume_value(lstrip(json))
     acc = [ value | acc ]
-    after_value = String.lstrip(after_value)
+    after_value = lstrip(after_value)
 
     case after_value do
       << ?,, after_comma :: binary >> ->
-        after_comma = String.lstrip(after_comma)
+        after_comma = lstrip(after_comma)
         consume_array_contents(after_comma, acc)
       << ?], after_close :: binary >> ->
         { Enum.reverse(acc), after_close }
@@ -71,9 +74,9 @@ defmodule JSON.Decode do
   defp consume_object_contents(<< ?", rest :: binary >>, acc) do
     { key, rest } = consume_string(rest, [])
 
-    case String.lstrip(rest) do
+    case lstrip(rest) do
       << ?:, rest :: binary >> ->
-        rest = String.lstrip(rest)
+        rest = lstrip(rest)
       <<>> ->
         raise UnexpectedEndOfBufferError
       _ ->
@@ -82,11 +85,11 @@ defmodule JSON.Decode do
 
     { value, rest } = consume_value(rest)
     acc = HashDict.put(acc, key, value)
-    rest = String.lstrip(rest)
+    rest = lstrip(rest)
 
     case rest do
       << ?,, rest :: binary >> ->
-        rest = String.lstrip(rest)
+        rest = lstrip(rest)
         consume_object_contents(rest, acc)
       << ?}, rest :: binary >> ->
         { acc, rest }
