@@ -18,6 +18,8 @@ defmodule JSON.Decode do
     result
   end
 
+  # consume_value: binary -> { nil | true | false | List | HashDict | binary, binary }
+
   defp consume_value("null"  <> rest), do: { nil,   rest }
   defp consume_value("true"  <> rest), do: { true,  rest }
   defp consume_value("false" <> rest), do: { false, rest }
@@ -25,16 +27,16 @@ defmodule JSON.Decode do
   defp consume_value(s) when is_binary(s) do
     case s do
       << ?[, rest :: binary >> ->
-        consume_array_contents(lstrip(rest), [])
+        consume_array_contents { [], lstrip(rest) }
       << ?{, rest :: binary >> ->
-        consume_object_contents(lstrip(rest), HashDict.new)
+        consume_object_contents { HashDict.new, lstrip(rest) }
       << ?-, m, rest :: binary >> when m in ?0..?9 ->
-        { number, tail } = consume_number(m - ?0, rest)
-        { -1 * number, tail }
+        { number, rest } = consume_number { m - ?0, rest }
+        { -1 * number, rest }
       << m, rest :: binary >> when m in ?0..?9 ->
-        consume_number m - ?0, rest
+        consume_number { m - ?0, rest }
       << ?", rest :: binary >> ->
-        consume_string rest, []
+        consume_string { [], rest }
       _ ->
         if String.length(s) == 0 do
           raise UnexpectedEndOfBufferError
@@ -45,11 +47,13 @@ defmodule JSON.Decode do
 
   # Array Parsing
 
-  defp consume_array_contents(<< ?], after_close :: binary >>, acc) do
+  ## consume_array_contents: { List, binary } -> { List, binary }
+
+  defp consume_array_contents { acc, << ?], after_close :: binary >> } do
     { Enum.reverse(acc), after_close }
   end
 
-  defp consume_array_contents(json, acc) do
+  defp consume_array_contents { acc, json } do
     { value, after_value } = consume_value(lstrip(json))
     acc = [ value | acc ]
     after_value = lstrip(after_value)
@@ -57,20 +61,22 @@ defmodule JSON.Decode do
     case after_value do
       << ?,, after_comma :: binary >> ->
         after_comma = lstrip(after_comma)
-        consume_array_contents(after_comma, acc)
+        consume_array_contents { acc, after_comma }
       << ?], after_close :: binary >> ->
-        { Enum.reverse(acc), after_close }
+        consume_array_contents { acc, << ?], after_close :: binary >> }
     end
   end
 
   # Object Parsing
 
-  defp consume_object_contents(<< ?}, rest :: binary >>, acc) do
+  ## consume_object_contents: { Dict, binary } -> { Dict, binary }
+
+  defp consume_object_contents { acc, << ?}, rest :: binary >> } do
     { acc, rest }
   end
 
-  defp consume_object_contents(<< ?", rest :: binary >>, acc) do
-    { key, rest } = consume_string(rest, [])
+  defp consume_object_contents { acc, << ?", rest :: binary >> } do
+    { key, rest } = consume_string { [], rest }
 
     case lstrip(rest) do
       << ?:, rest :: binary >> ->
@@ -88,9 +94,9 @@ defmodule JSON.Decode do
     case rest do
       << ?,, rest :: binary >> ->
         rest = lstrip(rest)
-        consume_object_contents(rest, acc)
+        consume_object_contents {acc, rest}
       << ?}, rest :: binary >> ->
-        { acc, rest }
+        consume_object_contents { acc, << ?}, rest :: binary >> }
       <<>> ->
         raise UnexpectedEndOfBufferError
       _ ->
@@ -98,80 +104,76 @@ defmodule JSON.Decode do
     end
   end
 
-  defp consume_object_contents("", _) do
+  defp consume_object_contents { _, "" }  do
     raise UnexpectedEndOfBufferError
   end
 
-  defp consume_object_contents(json, _) do
+  defp consume_object_contents { _, json } do
     raise UnexpectedTokenError, token: json
   end
 
   # Number Parsing
 
-  defp consume_number(n, << m, rest :: binary >>) when m in ?0..?9 do
-    consume_number(n * 10 + m - ?0, rest)
-  end
+  ## consume_number: { Number, binary } -> { Number, binary }
 
-  defp consume_number(n, "") do
+  defp consume_number { n, "" } do
     { n, "" }
   end
 
-  defp consume_number(n, << ?., rest :: binary >>) do
-    { fractional, tail } = consume_fractional(0, 10.0, rest)
-    { n + fractional, tail }
+  defp consume_number { n, << next_char, rest :: binary >> } do
+    case next_char do
+      x when x in ?0..?9 ->
+        consume_number { n * 10 + next_char - ?0, rest }
+      ?. ->
+        { fractional, tail } = consume_fractional({ 0, rest }, 10.0)
+        { n + fractional, tail }
+      _ ->
+        { n, << next_char, rest :: binary >> }
+    end
   end
 
-  defp consume_number(n, << m, rest :: binary >>) when not m in ?0..?9 do
-    { n, << m, rest :: binary >> }
-  end
-
-  defp consume_fractional(n, power, << m, rest :: binary >>) when m in ?0..?9 do
-    consume_fractional(n + (m - ?0) / power, power * 10, rest)
-  end
-
-  defp consume_fractional(n, _, "") do
+  defp consume_fractional { n, "" }, _ do
     { n, "" }
   end
 
-  defp consume_fractional(n, _, << m, rest :: binary >>) when not m in ?0..?9 do
-    { n, << m, rest :: binary >> }
+  defp consume_fractional { n, << next_char, rest :: binary >> }, power do
+    case next_char do
+      m when m in ?0..?9 ->
+        consume_fractional { n + (next_char - ?0) / power, rest }, power * 10
+      _ ->
+        { n, << next_char, rest :: binary >> }
+    end
   end
 
   # String Parsing
 
-  defp consume_string(<< ?\\, c, rest :: binary >>, acc) do
-    c = case c do
-      ?f -> "\f"
-      ?n -> "\n"
-      ?r -> "\r"
-      ?t -> "\t"
-      ?u ->
-        { char, rest } = consume_unicode_escape(rest)
-        char
-      _  -> c
+  ## consume_number: { List, binary } -> { List | binary, binary }
+
+  defp consume_string { _, "" } do
+    raise UnexpectedEndOfBufferError
+  end
+
+  defp consume_string { acc, json } do
+    case json do
+      << ?\\, ?f,  rest :: binary >> -> consume_string { [ "\f" | acc ], rest }
+      << ?\\, ?n,  rest :: binary >> -> consume_string { [ "\n" | acc ], rest }
+      << ?\\, ?r,  rest :: binary >> -> consume_string { [ "\r" | acc ], rest }
+      << ?\\, ?t,  rest :: binary >> -> consume_string { [ "\t" | acc ], rest }
+      << ?\\, ?",  rest :: binary >> -> consume_string { [ ?"   | acc ], rest }
+      << ?\\, ?\\, rest :: binary >> -> consume_string { [ ?\\  | acc ], rest }
+      << ?\\, ?/,  rest :: binary >> -> consume_string { [ ?/   | acc ], rest }
+      << ?\\, ?u,  rest :: binary >> -> consume_string consume_unicode_escape({ acc, rest })
+      << ?",       rest :: binary >> -> { to_binary(Enum.reverse(acc)), rest }
+      << c,        rest :: binary >> -> consume_string { [ c | acc ], rest }
     end
-    consume_string rest, [ c | acc ]
   end
 
-  # Stop condition for proper end of string
-  defp consume_string(<< ?", rest :: binary >>, accumulator) do
-    { to_binary(Enum.reverse(accumulator)), rest }
-  end
-
-  defp consume_unicode_escape(<< a, b, c, d, rest :: binary >>) do
+  defp consume_unicode_escape { acc, << a, b, c, d, rest :: binary >> } do
     s = << a, b, c, d >>
     unless JSON.Hex.is_hex?(s) do
       raise UnexpectedTokenError, token: s
     end
-    { << JSON.Hex.to_integer(s) :: utf8 >>, rest }
+    { [ << JSON.Hex.to_integer(s) :: utf8 >> | acc ], rest }
   end
 
-  # Never found a closing ?"
-  defp consume_string(<<>>, _) do
-    raise UnexpectedEndOfBufferError
-  end
-
-  defp consume_string(<< x, rest :: binary >>, accumulator) do
-    consume_string(rest, [ x | accumulator ])
-  end
 end
