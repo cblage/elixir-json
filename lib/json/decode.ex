@@ -11,11 +11,26 @@ defmodule JSON.Decode do
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
   def from_json(s) when is_binary(s) do
-    { result, rest } = consume_value(lstrip(s))
-    unless "" == rstrip(rest) do
-      raise UnexpectedTokenError, token: rest
+    case consume_value(lstrip(s)) do
+      { :unexpected_token, tok } -> { :unexpected_token, tok }
+      { :unexpected_end_of_buffer, "" } -> { :unexpected_end_of_buffer, "" }
+      { value, rest } ->
+        case rstrip(rest) do
+          "" -> { :ok, value }
+          _  -> { :unexpected_token, rest }
+        end
     end
-    result
+  end
+
+  def from_json!(s) when is_binary(s) do
+    case from_json(s) do
+      { :unexpected_token, tok } ->
+        raise JSON.Decode.UnexpectedTokenError, token: tok
+      { :unexpected_end_of_buffer, _ } ->
+        raise JSON.Decode.UnexpectedEndOfBufferError
+      { :ok, value } ->
+        value
+    end
   end
 
   # consume_value: binary -> { nil | true | false | List | HashDict | binary, binary }
@@ -38,9 +53,9 @@ defmodule JSON.Decode do
         consume_string { [], rest }
       _ ->
         if String.length(s) == 0 do
-          raise UnexpectedEndOfBufferError
+          { :unexpected_end_of_buffer, "" }
         end
-        raise UnexpectedTokenError, token: s
+        { :unexpected_token, s }
     end
   end
 
@@ -81,9 +96,9 @@ defmodule JSON.Decode do
       << ?:, rest :: binary >> ->
         rest = lstrip(rest)
       <<>> ->
-        raise UnexpectedEndOfBufferError
+        { :unexpected_end_of_buffer, "" }
       _ ->
-        raise UnexpectedTokenError, token: rest
+        { :unexpected_token, rest }
     end
 
     { value, rest } = consume_value(rest)
@@ -97,26 +112,34 @@ defmodule JSON.Decode do
       << ?}, rest :: binary >> ->
         consume_object_contents { acc, << ?}, rest :: binary >> }
       <<>> ->
-        raise UnexpectedEndOfBufferError
+        { :unexpected_end_of_buffer, "" }
       _ ->
-        raise UnexpectedTokenError, token: rest
+        { :unexpected_token, rest }
     end
   end
 
   defp consume_object_contents { _, "" }  do
-    raise UnexpectedEndOfBufferError
+    { :unexpected_end_of_buffer, "" }
   end
 
   defp consume_object_contents { _, json } do
-    raise UnexpectedTokenError, token: json
+    { :unexpected_token, json }
   end
 
   # String Parsing
 
   ## consume_number: { List, binary } -> { List | binary, binary }
 
+  defp consume_string { :unexpected_token, s } do
+    { :unexpected_token, s }
+  end
+
+  defp consume_string { :unexpected_end_of_buffer, s } do
+    { :unexpected_end_of_buffer, s }
+  end
+
   defp consume_string { _, "" } do
-    raise UnexpectedEndOfBufferError
+    { :unexpected_end_of_buffer, "" }
   end
 
   defp consume_string { acc, json } do
@@ -137,8 +160,9 @@ defmodule JSON.Decode do
   defp consume_unicode_escape { acc, << a, b, c, d, rest :: binary >> } do
     s = << a, b, c, d >>
     case JSON.Numeric.to_integer_from_hex(s) do
-      :error -> raise UnexpectedTokenError, token: s
-      { n, _ } -> { [ << n :: utf8 >> | acc ], rest }
+      { n, "" } -> { [ << n :: utf8 >> | acc ], rest }
+      { _, s  } -> { :unexpected_token, s }
+      :error    -> { :unexpected_token, s }
     end
   end
 

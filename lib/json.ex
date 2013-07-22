@@ -25,17 +25,13 @@ defmodule JSON do
 
   """
   @spec decode(bitstring) :: {atom, term}
-  def decode(bitstring) do
-     try do
-      {:ok, JSON.decode!(bitstring)}
-    rescue
-      error -> {:error, error}
-    end
+  def decode(string) do
+    JSON.Decode.from_json(string)
   end
 
   @spec decode!(bitstring) :: term
-  def decode!(item) do
-    JSON.Decode.from_json(item)
+  def decode!(string) do
+    JSON.Decode.from_json!(string)
   end
 
 end

@@ -11,11 +11,15 @@ defmodule JSONDecodeTest do
       end
     end
 
-    defmacro cannot_decode(name, input, exception, message) do
+    defmacro cannot_decode(name, input, error, message) do
       quote do
         test "cannot decode " <> unquote(name) do
-          assert_raise unquote(exception), unquote(message), fn ->
-            JSON.decode!(unquote(input))
+          case JSON.decode(unquote(input)) do
+            { unquote(error), actual } ->
+              assert unquote(message) == actual
+            { error, actual } ->
+              flunk "Expected { #{unquote(error)}, #{unquote(message)} }, " <>
+                    "got { #{error}, #{actual} }"
           end
         end
       end
@@ -85,25 +89,25 @@ defmodule JSONDecodeTest do
             ])
 
     cannot_decode "bad literal", "nul",
-                  JSON.Decode.UnexpectedTokenError, %r{nul}
+                  :unexpected_token, "nul"
 
     cannot_decode "unterminated string", "\"Not a full string",
-                  JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+                  :unexpected_end_of_buffer, ""
 
-    cannot_decode "string with bad Unicode escape", "bzzt: \\u27qp wrong",
-                  JSON.Decode.UnexpectedTokenError, %r{qp}
+    cannot_decode "string with bad Unicode escape", "\"bzzt: \\u27qp wrong\"",
+                  :unexpected_token, "qp"
 
-    cannot_decode "number with trailing .", "889.foo", JSON.Decode.UnexpectedTokenError, %r{foo}
+    cannot_decode "number with trailing .", "889.foo", :unexpected_token, ".foo"
 
-    cannot_decode "open brace", "{", JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+    cannot_decode "open brace", "{", :unexpected_end_of_buffer, ""
 
-    cannot_decode "bad object", "{foo", JSON.Decode.UnexpectedTokenError, %r{foo}
+    cannot_decode "bad object", "{foo", :unexpected_token, "foo"
 
     cannot_decode "unterminated object", "{\"foo\":\"bar\"",
-                  JSON.Decode.UnexpectedEndOfBufferError, %r{buffer}
+                  :unexpected_end_of_buffer, ""
 
     cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
-                  JSON.Decode.UnexpectedTokenError, %r{bar}
+                  :unexpected_token, "\"bar\"}"
   end
 
 end

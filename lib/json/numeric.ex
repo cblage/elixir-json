@@ -42,8 +42,6 @@ defmodule JSON.Numeric do
   defp negate(:error), do: :error
   defp negate({ number, string }), do: { -1 * number, string }
 
-  defp to_i(char) when char in ?0..?9, do: char - ?0
-
   defp add_fractional(:error), do: :error
 
   defp add_fractional { sum, string } do
