@@ -170,10 +170,10 @@ defmodule JSON.Decode do
 
   defp consume_unicode_escape { acc, << a, b, c, d, rest :: binary >> } do
     s = << a, b, c, d >>
-    unless JSON.Hex.is_hex?(s) do
-      raise UnexpectedTokenError, token: s
+    case JSON.Numeric.to_integer_from_hex(s) do
+      :error -> raise UnexpectedTokenError, token: s
+      { n, _ } -> { [ << n :: utf8 >> | acc ], rest }
     end
-    { [ << JSON.Hex.to_integer(s) :: utf8 >> | acc ], rest }
   end
 
 end
