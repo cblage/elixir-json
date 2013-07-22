@@ -49,6 +49,10 @@ defmodule JSONDecodeTest do
     decodes "negative integer", "-1337", -1337
     decodes "negative float", "-13.37", -13.37
 
+    # decodes "integer with exponent", "98e2", 9800
+    # decodes "float with positive exponent", "-1.22783E+4", -12278.3
+    # decodes "float with negative exponent", "903.4e-6", 0.0009034
+
     decodes "empty object", "{}", HashDict.new
     decodes "simple object", "{\"result\": \"this is awesome\"}",\
                   HashDict.new([ { "result", "this is awesome" } ])
@@ -62,6 +66,8 @@ defmodule JSONDecodeTest do
             "{
               \"name\": \"Rafaëlla\",
               \"active\": true,
+              \"phone\": \"1.415.555.0000\",
+              \"balance\": 1.52E+5,
               \"children\": [
                 { \"name\": \"Søren\" },
                 { \"name\": \"Éloise\" }
@@ -70,6 +76,8 @@ defmodule JSONDecodeTest do
              HashDict.new([
               { "name", "Rafaëlla" },
               { "active", true },
+              { "phone", "1.415.555.0000" },
+              { "balance", 1.52e+5 },
               { "children", [
                 HashDict.new([ { "name", "Søren" } ]),
                 HashDict.new([ { "name", "Éloise" } ])

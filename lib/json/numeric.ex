@@ -18,17 +18,24 @@ defmodule JSON.Numeric do
       iex> JSON.Numeric.to_numeric "129245"
       { 129245, "" }
 
+      iex> JSON.Numeric.to_numeric "7.something"
+      { 7, ".something" }
+
       iex> JSON.Numeric.to_numeric "-88.22suffix"
       { -88.22, "suffix" }
+
+      iex> JSON.Numeric.to_numeric "-12e4and then some"
+      { -1.2e+5, "and then some" }
+
+      iex> JSON.Numeric.to_numeric "7842490016E-12-and more"
+      { 7.842490016e-3, "-and more" }
   """
   def to_numeric(string) do
     case string do
-      << ?-, string :: binary >> ->
-        to_numeric(string) |> negate
-      << char, string :: binary >> when char in ?0..?9 ->
-        to_numeric to_i(char), string
+      << ?-, suffix :: binary >> ->
+        to_numeric(suffix) |> negate
       _ ->
-        :error
+        String.to_integer(string) |> add_fractional |> apply_exponent
     end
   end
 
@@ -37,12 +44,12 @@ defmodule JSON.Numeric do
 
   defp to_i(char) when char in ?0..?9, do: char - ?0
 
-  defp to_numeric sum, string do
+  defp add_fractional(:error), do: :error
+
+  defp add_fractional { sum, string } do
     case string do
-      << char, string :: binary >> when char in ?0..?9 ->
-        to_numeric sum * 10 + to_i(char), string
-      << ?., string :: binary >> ->
-        { fractional, string } = consume_fractional({ 0, string }, 10.0)
+      << ?., c, string :: binary >> when c in ?0..?9 ->
+        { fractional, string } = consume_fractional({ 0, << c, string :: binary >> }, 10.0)
         { sum + fractional, string }
       _ ->
         { sum, string }
@@ -59,6 +66,20 @@ defmodule JSON.Numeric do
         consume_fractional { n + (next_char - ?0) / power, rest }, power * 10
       _ ->
         { n, << next_char, rest :: binary >> }
+    end
+  end
+
+  defp apply_exponent(:error), do: :error
+
+  defp apply_exponent { sum, string } do
+    case string do
+      << e, string :: binary >> when e in [?e, ?E] ->
+        case String.to_integer(string) do
+          { power, string } -> { sum * :math.pow(10, power), string }
+          _ -> :error
+        end
+      _ ->
+        { sum, string }
     end
   end
 
