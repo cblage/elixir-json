@@ -1,6 +1,68 @@
 defmodule JSON.Numeric do
 
-  @moduledoc """
+  @doc """
+  Like a mix of `String.to_integer` and `String.to_float`, but with some
+  JSON-specific rules.
+
+  Examples
+
+      iex> JSON.Numeric.to_numeric ""
+      :error
+
+      iex> JSON.Numeric.to_numeric "face0ff"
+      :error
+
+      iex> JSON.Numeric.to_numeric "-hello"
+      :error
+
+      iex> JSON.Numeric.to_numeric "129245"
+      { 129245, "" }
+
+      iex> JSON.Numeric.to_numeric "-88.22suffix"
+      { -88.22, "suffix" }
+  """
+  def to_numeric(string) do
+    case string do
+      << ?-, string :: binary >> ->
+        to_numeric(string) |> negate
+      << char, string :: binary >> when char in ?0..?9 ->
+        to_numeric to_i(char), string
+      _ ->
+        :error
+    end
+  end
+
+  defp negate(:error), do: :error
+  defp negate({ number, string }), do: { -1 * number, string }
+
+  defp to_i(char) when char in ?0..?9, do: char - ?0
+
+  defp to_numeric sum, string do
+    case string do
+      << char, string :: binary >> when char in ?0..?9 ->
+        to_numeric sum * 10 + to_i(char), string
+      << ?., string :: binary >> ->
+        { fractional, string } = consume_fractional({ 0, string }, 10.0)
+        { sum + fractional, string }
+      _ ->
+        { sum, string }
+    end
+  end
+
+  defp consume_fractional { number, "" }, _ do
+    { number, "" }
+  end
+
+  defp consume_fractional { n, << next_char, rest :: binary >> }, power do
+    case next_char do
+      m when m in ?0..?9 ->
+        consume_fractional { n + (next_char - ?0) / power, rest }, power * 10
+      _ ->
+        { n, << next_char, rest :: binary >> }
+    end
+  end
+
+  @doc """
   Like `String.to_integer`, but for hexadecimal numbers.
 
   Examples

@@ -31,10 +31,9 @@ defmodule JSON.Decode do
       << ?{, rest :: binary >> ->
         consume_object_contents { HashDict.new, lstrip(rest) }
       << ?-, m, rest :: binary >> when m in ?0..?9 ->
-        { number, rest } = consume_number { m - ?0, rest }
-        { -1 * number, rest }
+        JSON.Numeric.to_numeric << ?-, m, rest :: binary >>
       << m, rest :: binary >> when m in ?0..?9 ->
-        consume_number { m - ?0, rest }
+        JSON.Numeric.to_numeric << m, rest :: binary >>
       << ?", rest :: binary >> ->
         consume_string { [], rest }
       _ ->
@@ -110,39 +109,6 @@ defmodule JSON.Decode do
 
   defp consume_object_contents { _, json } do
     raise UnexpectedTokenError, token: json
-  end
-
-  # Number Parsing
-
-  ## consume_number: { Number, binary } -> { Number, binary }
-
-  defp consume_number { n, "" } do
-    { n, "" }
-  end
-
-  defp consume_number { n, << next_char, rest :: binary >> } do
-    case next_char do
-      x when x in ?0..?9 ->
-        consume_number { n * 10 + next_char - ?0, rest }
-      ?. ->
-        { fractional, tail } = consume_fractional({ 0, rest }, 10.0)
-        { n + fractional, tail }
-      _ ->
-        { n, << next_char, rest :: binary >> }
-    end
-  end
-
-  defp consume_fractional { n, "" }, _ do
-    { n, "" }
-  end
-
-  defp consume_fractional { n, << next_char, rest :: binary >> }, power do
-    case next_char do
-      m when m in ?0..?9 ->
-        consume_fractional { n + (next_char - ?0) / power, rest }, power * 10
-      _ ->
-        { n, << next_char, rest :: binary >> }
-    end
   end
 
   # String Parsing
