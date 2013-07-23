@@ -1,63 +1,113 @@
 Code.require_file "test_helper.exs", __DIR__
 
 defmodule JSONDecodeTest do
-  use ExUnit.Case
 
-  test "convert JSON string into correct Elixir string" do
-    assert \
-      JSON.decode(" \"this is a string\" ") \
-      == "this is a string"
+  defmodule DSL do
+    defmacro decodes(name, input, output) do
+      quote do
+        test "decodes " <> unquote(name) do
+          assert JSON.decode(unquote(input)) == {:ok, unquote(output)}
+        end
+      end
+    end
+
+    defmacro cannot_decode(name, input, error, message) do
+      quote do
+        test "cannot decode " <> unquote(name) do
+          case JSON.decode(unquote(input)) do
+            { unquote(error), actual } ->
+              assert unquote(message) == actual
+            { error, actual } ->
+              flunk "Expected { #{unquote(error)}, #{unquote(message)} }, " <>
+                    "got { #{error}, #{actual} }"
+          end
+        end
+      end
+    end
   end
 
-  test "convert a positive JSON integer into correct Elixir number" do
-    assert \
-      JSON.decode(" 1337 ") \
-      == 1337
-  end
+  defmodule Cases do
+    use ExUnit.Case
+    import JSONDecodeTest.DSL
 
-  test "convert a positive JSON float into correct Elixir number" do
-    assert \
-      JSON.decode(" 13.37 ") \
-      == 13.37
-  end
+    decodes "null",  "null",  nil
+    decodes "true",  "true",  true
+    decodes "false", "false", false
 
-  test "convert a negative JSON integer into correct Elixir number" do
-    assert \
-      JSON.decode(" -1337 ") \
-      == -1337
-  end
+    decodes "empty string", "\"\"", ""
+    decodes "simple string", "\"this is a string\"", "this is a string"
+    decodes "unicode string", "\"µ¥ ß†®îñ©\"",  "µ¥ ß†®îñ©"
+    decodes "string with quotes", "\"I said, \\\"Hi.\\\"\"", "I said, \"Hi.\""
+    decodes "string with solidi", "\"\\/ \\\\\"", "/ \\"
 
-  test "convert a negative JSON float into correct Elixir number" do
-    assert \
-      JSON.decode(" -13.37 ") \
-      == -1337
-  end
+    decodes "string with control characters",
+            "\"tab\\tnewline\\ncarriage return\\rform feed\\fend\"",
+            "tab\tnewline\ncarriage return\rform feed\fend"
 
-  test "convert JSON object into correct Elixir keyword" do
-    assert \
-      JSON.decode("{\"result\": \"this is awesome\"}") \
-      == [result: "this is awesome"]
-  end
+    decodes "string with unicode escape",
+            "\"star -> \\u272d <- star\"",
+            "star -> ✭ <- star"
 
-  test "convert JSON array into correct Elixir array" do
-    assert \
-      JSON.decode("[1, 2, 3, 4]") \
-      == [1, 2, 3, 4]
-  end
+    decodes "positive integer", "1337", 1337
+    decodes "positive float", "13.37", 13.37
+    decodes "negative integer", "-1337", -1337
+    decodes "negative float", "-13.37", -13.37
 
-  test "convert JSON empty array into correct Elixir empty array" do
-    assert \
-      JSON.decode("[]") \
-      == []
-  end
-  
-  #Maybe this should be empty tuple?
-  test "convert JSON empty object into correct Elixir empty array" do
-    assert \
-      JSON.decode("{}") \
-      == []
-  end
+    # decodes "integer with exponent", "98e2", 9800
+    # decodes "float with positive exponent", "-1.22783E+4", -12278.3
+    # decodes "float with negative exponent", "903.4e-6", 0.0009034
 
+    decodes "empty object", "{}", HashDict.new
+    decodes "simple object", "{\"result\": \"this is awesome\"}",\
+                  HashDict.new([ { "result", "this is awesome" } ])
 
+    decodes "empty array", "  [   ] ", []
+    decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
+    decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ",\
+                            [nil, [false, "five"], [3, true]]
+
+    decodes "complex object",
+            "{
+              \"name\": \"Rafaëlla\",
+              \"active\": true,
+              \"phone\": \"1.415.555.0000\",
+              \"balance\": 1.52E+5,
+              \"children\": [
+                { \"name\": \"Søren\" },
+                { \"name\": \"Éloise\" }
+              ]
+             }",
+             HashDict.new([
+              { "name", "Rafaëlla" },
+              { "active", true },
+              { "phone", "1.415.555.0000" },
+              { "balance", 1.52e+5 },
+              { "children", [
+                HashDict.new([ { "name", "Søren" } ]),
+                HashDict.new([ { "name", "Éloise" } ])
+              ] }
+            ])
+
+    cannot_decode "bad literal", "nul",
+                  :unexpected_token, "nul"
+
+    cannot_decode "unterminated string", "\"Not a full string",
+                  :unexpected_end_of_buffer, ""
+
+    cannot_decode "string with bad Unicode escape", "\"bzzt: \\u27qp wrong\"",
+                  :unexpected_token, "qp"
+
+    cannot_decode "number with trailing .", "889.foo", :unexpected_token, ".foo"
+
+    cannot_decode "open brace", "{", :unexpected_end_of_buffer, ""
+
+    cannot_decode "bad object", "{foo", :unexpected_token, "foo"
+
+    cannot_decode "unterminated object", "{\"foo\":\"bar\"",
+                  :unexpected_end_of_buffer, ""
+
+    cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
+                  :unexpected_token, "\"bar\"}"
+  end
 
 end
