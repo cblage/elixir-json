@@ -1,6 +1,6 @@
 Code.require_file "test_helper.exs", __DIR__
 
-defmodule JsonTest do
+defmodule JSONEncodeTest do
   use ExUnit.Case
 
   test "convert keyword with string into correct JSON" do
@@ -20,13 +20,5 @@ defmodule JsonTest do
       JSON.encode([this_is_null: nil, this_is_false: false, this_is_a_number: 1234, this_is_an_array: ["a", :b, "c"], this_is_a_subobject: [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]]]) \
       == "{\"this_is_null\":null,\"this_is_false\":false,\"this_is_a_number\":1234,\"this_is_an_array\":[\"a\",\"b\",\"c\"],\"this_is_a_subobject\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}}}"
   end
-
-
-  test "convert JSON into correct keyword" do
-    assert \
-      JSON.decode("{\"result\": \"this is awesome\"}") \
-      == [result: "this is awesome"]
-  end
-
 
 end
