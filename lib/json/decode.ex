@@ -11,7 +11,7 @@ defmodule JSON.Decode do
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
   def from_json(s) when is_binary(s) do
-    case consume_value(lstrip(s)) do
+    case lstrip(s) |> consume_value do
       { :unexpected_token, tok } -> { :unexpected_token, tok }
       { :unexpected_end_of_buffer, "" } -> { :unexpected_end_of_buffer, "" }
       { value, rest } ->
@@ -152,7 +152,7 @@ defmodule JSON.Decode do
       << ?\\, ?\\, rest :: binary >> -> consume_string { [ ?\\  | acc ], rest }
       << ?\\, ?/,  rest :: binary >> -> consume_string { [ ?/   | acc ], rest }
       << ?\\, ?u,  rest :: binary >> -> consume_string consume_unicode_escape({ acc, rest })
-      << ?",       rest :: binary >> -> { to_binary(Enum.reverse(acc)), rest }
+      << ?",       rest :: binary >> -> { Enum.reverse(acc) |> to_binary, rest }
       << c,        rest :: binary >> -> consume_string { [ c | acc ], rest }
     end
   end
