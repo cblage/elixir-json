@@ -54,8 +54,9 @@ defmodule JSON.Decode do
       _ ->
         if String.length(s) == 0 do
           { :unexpected_end_of_buffer, "" }
+        else 
+          { :unexpected_token, s }
         end
-        { :unexpected_token, s }
     end
   end
 
