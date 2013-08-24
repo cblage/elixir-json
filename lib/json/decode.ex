@@ -61,7 +61,7 @@ defmodule JSON.Decode do
   end
 
   defp consume_array_contents { acc, json } do
-    { value, after_value } = consume_value(lstrip(json))
+    { value, after_value } = lstrip(json) |> consume_value
     acc = [ value | acc ]
     after_value = lstrip(after_value)
 
