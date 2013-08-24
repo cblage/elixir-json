@@ -6,7 +6,7 @@ defmodule JSON do
   ## Examples
 
       iex> JSON.encode([result: "this will be a elixir result"])
-      "{\"result\":\"this will be a elixir result\"}"
+      {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
 
   """
   @spec encode(term) :: bitstring

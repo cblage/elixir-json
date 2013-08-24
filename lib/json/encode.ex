@@ -10,7 +10,7 @@ defprotocol JSON.Encode do
   ## Examples
 
       iex> JSON.Encode.to_json([result: "this will be a elixir result"]) 
-      "{\"result\":\"this will be a elixir result\"}"
+      {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
       
   """
   @spec to_json(term) :: bitstring
@@ -35,18 +35,23 @@ defimpl JSON.Encode, for: Tuple do
 end
 
 defimpl JSON.Encode, for: List do
-  def to_json([]) do 
-    "[]"
-  end
-
+  def to_json([]), do: {:ok, "[]"}
+  
   def to_json(list) do 
     if Keyword.keyword? list do 
-      "{" <> Enum.map_join(list, ",", fn {key, object} -> JSON.Encode.to_json(key) <> ":" <>  JSON.Encode.to_json(object) end) <> "}"
+      {:ok, "{" <> Enum.map_join(list, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
     else
-      "[" <> Enum.map_join(list, ",", JSON.Encode.to_json(&1)) <> "]"
+      {:ok, "[" <> Enum.map_join(list, ",", encode_item(&1)) <> "]"}
     end
   end
-  
+
+  defp encode_item (item) do 
+    encode_result = JSON.Encode.to_json(item)
+    case encode_result do 
+      {:ok, encoded_item} -> encoded_item
+      _ -> encode_result #propagate error, will trigger error in map_join
+    end
+  end
 
   def typeof([]), do: :array
    
@@ -60,7 +65,7 @@ defimpl JSON.Encode, for: List do
 end
 
 defimpl JSON.Encode, for: Number do
-  def to_json(number), do: "#{number}" # Elixir convers octal, etc into decimal when putting in strings
+  def to_json(number), do: {:ok, "#{number}"} # Elixir convers octal, etc into decimal when putting in strings
   def typeof(_), do: :number
 end
 
@@ -79,7 +84,7 @@ defimpl JSON.Encode, for: BitString do
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
-  def to_json(bitstring), do: <<?">> <> encode_binary_recursive(bitstring, "") <> <<?">>
+  def to_json(bitstring), do: {:ok, <<?">> <> encode_binary_recursive(bitstring, "") <> <<?">>}
 
   defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, accumulator) do
     encode_binary_recursive(tail, accumulator <> encode_binary_character(head))
