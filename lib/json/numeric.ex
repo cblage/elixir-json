@@ -30,56 +30,42 @@ defmodule JSON.Numeric do
       iex> JSON.Numeric.to_numeric "7842490016E-12-and more"
       { 7.842490016e-3, "-and more" }
   """
-  def to_numeric(string) do
-    case string do
-      << ?-, suffix :: binary >> ->
-        to_numeric(suffix) |> negate
-      _ ->
-        String.to_integer(string) |> add_fractional |> apply_exponent
-    end
-  end
-
+  def to_numeric(<< ?-, rest :: binary >>), do: to_numeric(rest) |> negate
+  def to_numeric(string) when is_binary(string), do: String.to_integer(string) |> add_fractional |> apply_exponent
+  
   defp negate(:error), do: :error
-  defp negate({ number, string }), do: { -1 * number, string }
+  defp negate({ number, string }) when is_binary(string), do: { -1 * number, string }
 
   defp add_fractional(:error), do: :error
 
-  defp add_fractional { sum, string } do
-    case string do
-      << ?., c, string :: binary >> when c in ?0..?9 ->
-        { fractional, string } = consume_fractional({ 0, << c, string :: binary >> }, 10.0)
-        { sum + fractional, string }
-      _ ->
-        { sum, string }
-    end
+  defp add_fractional({ sum, << ?., c, string :: binary >> }) when c in ?0..?9 do
+    { fractional, string } = consume_fractional({ 0, << c, string :: binary >> }, 10.0)
+    { sum + fractional, string }
   end
 
-  defp consume_fractional { number, "" }, _ do
-    { number, "" }
+  # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
+  defp add_fractional({ sum, string }) when is_binary(string), do: { sum, string }
+  
+  
+  defp consume_fractional({ sum, << next_char, rest :: binary >> }, power) when next_char in ?0..?9 do
+    consume_fractional({ sum + (next_char - ?0) / power, rest }, power * 10)
   end
 
-  defp consume_fractional { n, << next_char, rest :: binary >> }, power do
-    case next_char do
-      m when m in ?0..?9 ->
-        consume_fractional { n + (next_char - ?0) / power, rest }, power * 10
-      _ ->
-        { n, << next_char, rest :: binary >> }
-    end
-  end
+  # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
+  defp consume_fractional({ sum, string }, _) when is_binary(string), do: { sum, string }
+  
 
   defp apply_exponent(:error), do: :error
-
-  defp apply_exponent { sum, string } do
-    case string do
-      << e, string :: binary >> when e in [?e, ?E] ->
-        case String.to_integer(string) do
-          { power, string } -> { sum * :math.pow(10, power), string }
-          _ -> :error
-        end
-      _ ->
-        { sum, string }
+  
+  defp apply_exponent({ sum, << e, string :: binary >> }) when e in [?e, ?E] do
+    case String.to_integer(string) do
+      { power, string } -> { sum * :math.pow(10, power), string }
+      _ -> :error
     end
   end
+
+  # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
+  defp apply_exponent({ sum, string }) when is_binary(string), do: { sum, string }
 
   @doc """
   Like `String.to_integer`, but for hexadecimal numbers.
@@ -98,23 +84,20 @@ defmodule JSON.Numeric do
       iex> JSON.Numeric.to_integer_from_hex "C2freezing"
       { 3119, "reezing" }
   """
-  def to_integer_from_hex(s) do
-    case Regex.match?(%r{^[0-9a-fA-F]}, s) do
-      true -> to_integer_from_hex(s, 0)
-      false -> :error
+  def to_integer_from_hex(string) when is_binary(string) do
+    if Regex.match?(%r{^[0-9a-fA-F]}, string) do
+      to_integer_from_hex_recursive(string, 0)
+    else
+      :error
     end
   end
 
-  defp to_integer_from_hex(s, sum) do
-    case s do
-      << c, rest :: binary >> when c in ?0..?9 ->
-        to_integer_from_hex rest, 16 * sum + c - ?0
-      << c, rest :: binary >> when c in ?a..?f ->
-        to_integer_from_hex rest, 16 * sum + 10 + c - ?a
-      << c, rest :: binary >> when c in ?A..?F ->
-        to_integer_from_hex rest, 16 * sum + 10 + c - ?A
-      _ ->
-        { sum, s }
+  defp to_integer_from_hex_recursive(string, sum) when is_binary(string) do
+    case string do 
+      << c, rest :: binary >> when c in ?0..?9 -> to_integer_from_hex_recursive(rest, 16 * sum + c - ?0)
+      << c, rest :: binary >> when c in ?a..?f -> to_integer_from_hex_recursive(rest, 16 * sum + 10 + c - ?a)
+      << c, rest :: binary >> when c in ?A..?F -> to_integer_from_hex_recursive(rest, 16 * sum + 10 + c - ?A)
+      _ -> { sum, string }
     end
   end
 
