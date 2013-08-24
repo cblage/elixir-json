@@ -30,13 +30,8 @@ defprotocol JSON.Encode do
 end
 
 defimpl JSON.Encode, for: Tuple do
-  def to_json(term) do
-    tuple_to_list(term) |> JSON.Encode.to_json
-  end
-
-  def typeof(_) do
-    :array
-  end
+  def to_json(term), do: tuple_to_list(term) |> JSON.Encode.to_json
+  def typeof(_), do: :array
 end
 
 defimpl JSON.Encode, for: List do
@@ -53,10 +48,8 @@ defimpl JSON.Encode, for: List do
   end
   
 
-  def typeof([]) do 
-    :array
-  end
- 
+  def typeof([]), do: :array
+   
   def typeof(list) do
     if (Keyword.keyword? list) do
       :object
@@ -68,57 +61,33 @@ end
 
 defimpl JSON.Encode, for: Number do
   def to_json(number), do: "#{number}" # Elixir convers octal, etc into decimal when putting in strings
-
-  def typeof(_) do 
-    :number
-  end
+  def typeof(_), do: :number
 end
 
 defimpl JSON.Encode, for: Atom do
-   def to_json(false) do
-    "false"
-  end
+  def to_json(false), do: "false"  
+  def to_json(true), do: "true"  
+  def typeof(boolean) when is_boolean(boolean), do: :boolean   
 
-  def to_json(true) do
-    "true"
-  end
-  
-  def to_json(nil) do
-    "null"
-  end
+  def to_json(nil), do: "null"
+  def typeof(nil), do: :null
 
-  def to_json(atom) when is_atom(atom) do 
-    atom_to_binary(atom) |> JSON.Encode.to_json
-  end
-
-  def typeof(boolean) when is_boolean(boolean) do
-    :boolean
-  end
-  
-  def typeof(nil) do 
-    :null
-  end
-
-  def typeof(atom) when is_atom(atom) do
-    :string
-  end
+  def to_json(atom) when is_atom(atom), do: atom_to_binary(atom) |> JSON.Encode.to_json
+  def typeof(atom) when is_atom(atom), do: :string
 end
 
 defimpl JSON.Encode, for: BitString do
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
-  def to_json(bitstring) do 
-    <<?">> <> encode_binary_recursive(bitstring, "") <> <<?">>
-  end
+  def to_json(bitstring), do: <<?">> <> encode_binary_recursive(bitstring, "") <> <<?">>
 
   defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, accumulator) do
     encode_binary_recursive(tail, accumulator <> encode_binary_character(head))
   end
 
-  defp encode_binary_recursive(<<>>, accumulator) do
-    accumulator
-  end
+  defp encode_binary_recursive(<<>>, accumulator), do: accumulator
+  
 
   defp encode_binary_character(?"),   do: <<?\\, ?">> 
   defp encode_binary_character(?\b),  do: <<?\\, ?b>>
@@ -147,30 +116,18 @@ defimpl JSON.Encode, for: BitString do
     end
   end
 
-  def typeof(_) do
-    :string
-  end
+  def typeof(_), do: :string
 end
 
 defimpl JSON.Encode, for: Record do
-  def to_json(record) do 
-    record.to_keywords |> JSON.Encode.to_json
-  end
-
-  def typeof(_) do 
-    :object
-  end
+  def to_json(record), do: record.to_keywords |> JSON.Encode.to_json
+  def typeof(_), do: :object
 end
 
 #TODO: maybe this should return the result of "inspect" ?
 defimpl JSON.Encode, for: Any do
   @any_to_json "[Elixir.Any]"
 
-  def to_json(_) do 
-    JSON.Encode.to_json(@any_to_json)
-  end
-
-  def typeof(_) do
-    JSON.Encode.typeof(@any_to_json)
-  end
+  def to_json(_), do: JSON.Encode.to_json(@any_to_json)
+  def typeof(_), do: JSON.Encode.typeof(@any_to_json)
 end
