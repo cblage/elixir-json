@@ -20,9 +20,8 @@ defmodule JSON do
 
   ## Examples
 
-      iex> JSON.decode("{\"result\":\"this will be a elixir result\"}")
-      {:ok, [result: "this will be a elixir result"]}
-
+      iex> JSON.decode("{\\\"result\\\":\\\"this will be a elixir result\\\"}")
+      {:ok, HashDict.new [{"result", "this will be a elixir result"}]}
   """
   @spec decode(bitstring) :: {atom, term}
   def decode(string) do
