@@ -144,7 +144,7 @@ defmodule JSON.Decode do
     first_four_characters = << a, b, c, d >>
     case JSON.Numeric.to_integer_from_hex(first_four_characters) do
       { converted, "" } -> {[ << converted :: utf8 >> | acc ], rest }
-      { _, bad_tokens } -> { :unexpected_token, bad_tokens }
+      { _, unexpected_tokens } -> { :unexpected_token, unexpected_tokens }
       _ -> { :unexpected_token, first_four_characters }
     end
   end
