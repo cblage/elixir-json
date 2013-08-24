@@ -16,21 +16,21 @@ defmodule JSON.Numeric do
       :error
 
       iex> JSON.Numeric.to_numeric "129245"
-      { 129245, "" }
+      {129245, "" }
 
       iex> JSON.Numeric.to_numeric "7.something"
-      { 7, ".something" }
+      {7, ".something" }
 
       iex> JSON.Numeric.to_numeric "-88.22suffix"
-      { -88.22, "suffix" }
+      {-88.22, "suffix" }
 
       iex> JSON.Numeric.to_numeric "-12e4and then some"
-      { -1.2e+5, "and then some" }
+      {-1.2e+5, "and then some" }
 
       iex> JSON.Numeric.to_numeric "7842490016E-12-and more"
-      { 7.842490016e-3, "-and more" }
+      {7.842490016e-3, "-and more" }
   """
-  def to_numeric(<< ?-, rest :: binary >>), do: to_numeric(rest) |> negate
+  def to_numeric(<< ?-, after_minus :: binary >>), do: to_numeric(after_minus) |> negate
   def to_numeric(string) when is_binary(string), do: String.to_integer(string) |> add_fractional |> apply_exponent
   
   defp negate(:error), do: :error
@@ -46,7 +46,7 @@ defmodule JSON.Numeric do
   # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
   defp add_fractional({ sum, string }) when is_binary(string), do: { sum, string }
   
-  
+
   defp consume_fractional({ sum, << next_char, rest :: binary >> }, power) when next_char in ?0..?9 do
     consume_fractional({ sum + (next_char - ?0) / power, rest }, power * 10)
   end
