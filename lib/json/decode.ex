@@ -67,7 +67,6 @@ defmodule JSON.Decode do
         end
       _ -> consume_array_value_result #propagate error
     end
-    
   end
 
   # Object Parsing
@@ -157,5 +156,4 @@ defmodule JSON.Decode do
       _ -> { :unexpected_token, json }
     end
   end
-
 end
