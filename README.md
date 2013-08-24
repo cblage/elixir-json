@@ -5,8 +5,22 @@
 This library provides a natively implemented JSON encoder and decoder for Elixir.
 
 All contributions are welcome.
+## Installing
 
-# Examples
+Simply add ```{ :json, github: "cblage/elixir-json"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
+
+### Example for a project that already uses [Dynamo](https://github.com/elixir-lang/dynamo):
+```elixir
+defp deps do
+    [ { :cowboy, github: "extend/cowboy" },
+      { :dynamo, github: "elixir-lang/dynamo" },
+      { :json,   github: "cblage/elixir-json"} ]
+end
+```
+
+## Usage
+
+Encoding:
 
 ```elixir
   JSON.encode([result: "this will be a elixir result"])
@@ -18,5 +32,5 @@ All contributions are welcome.
   {:ok, [result: "this will be a elixir result"]}
 ```
 
-# License
+## License
 The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
