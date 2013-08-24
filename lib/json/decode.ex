@@ -152,7 +152,7 @@ defmodule JSON.Decode do
       << ?\\, ?\\, rest :: binary >> -> consume_string { [ ?\\  | acc ], rest }
       << ?\\, ?/,  rest :: binary >> -> consume_string { [ ?/   | acc ], rest }
       << ?\\, ?u,  rest :: binary >> -> consume_string consume_unicode_escape({ acc, rest })
-      << ?",       rest :: binary >> -> { Enum.reverse(acc) |> to_binary, rest }
+      << ?",       rest :: binary >> -> { Enum.reverse(acc) |> to_string, rest }
       << c,        rest :: binary >> -> consume_string { [ c | acc ], rest }
     end
   end
