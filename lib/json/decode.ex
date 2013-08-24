@@ -12,7 +12,7 @@ defmodule JSON.Decode do
 
   def from_json(s) when is_binary(s) do
     case lstrip(s) |> consume_value do
-      { :unexpected_token, tok } -> { :unexpected_token, tok }
+      { :unexpected_token, tok }        -> { :unexpected_token, tok }
       { :unexpected_end_of_buffer, "" } -> { :unexpected_end_of_buffer, "" }
       { value, rest } ->
         case rstrip(rest) do
@@ -24,12 +24,9 @@ defmodule JSON.Decode do
 
   def from_json!(s) when is_binary(s) do
     case from_json(s) do
-      { :unexpected_token, tok } ->
-        raise JSON.Decode.UnexpectedTokenError, token: tok
-      { :unexpected_end_of_buffer, _ } ->
-        raise JSON.Decode.UnexpectedEndOfBufferError
-      { :ok, value } ->
-        value
+      { :unexpected_token, tok }       -> raise JSON.Decode.UnexpectedTokenError, token: tok
+      { :unexpected_end_of_buffer, _ } -> raise JSON.Decode.UnexpectedEndOfBufferError
+      { :ok, value }                   -> value
     end
   end
 
@@ -41,16 +38,11 @@ defmodule JSON.Decode do
 
   defp consume_value(s) when is_binary(s) do
     case s do
-      << ?[, rest :: binary >> ->
-        consume_array_contents { [], lstrip(rest) }
-      << ?{, rest :: binary >> ->
-        consume_object_contents { HashDict.new, lstrip(rest) }
-      << ?-, m, rest :: binary >> when m in ?0..?9 ->
-        JSON.Numeric.to_numeric << ?-, m, rest :: binary >>
-      << m, rest :: binary >> when m in ?0..?9 ->
-        JSON.Numeric.to_numeric << m, rest :: binary >>
-      << ?", rest :: binary >> ->
-        consume_string { [], rest }
+      << ?[, rest :: binary >>                     -> consume_array_contents { [], lstrip(rest) }
+      << ?{, rest :: binary >>                     -> consume_object_contents { HashDict.new, lstrip(rest) }
+      << ?-, m, rest :: binary >> when m in ?0..?9 -> JSON.Numeric.to_numeric << ?-, m, rest :: binary >>
+      << m, rest :: binary >>     when m in ?0..?9 -> JSON.Numeric.to_numeric << m, rest :: binary >>
+      << ?", rest :: binary >>                     -> consume_string { [], rest }
       _ ->
         if String.length(s) == 0 do
           { :unexpected_end_of_buffer, "" }
@@ -74,11 +66,8 @@ defmodule JSON.Decode do
     after_value = lstrip(after_value)
 
     case after_value do
-      << ?,, after_comma :: binary >> ->
-        after_comma = lstrip(after_comma)
-        consume_array_contents { acc, after_comma }
-      << ?], after_close :: binary >> ->
-        consume_array_contents { acc, << ?], after_close :: binary >> }
+      << ?,, after_comma :: binary >> -> consume_array_contents { acc, lstrip(after_comma) }
+      << ?], after_close :: binary >> -> consume_array_contents { acc, << ?], after_close :: binary >> }
     end
   end
 
@@ -103,19 +92,15 @@ defmodule JSON.Decode do
     end
 
     { value, rest } = consume_value(rest)
-    acc = HashDict.put(acc, key, value)
+
+    acc  = HashDict.put(acc, key, value)
     rest = lstrip(rest)
 
     case rest do
-      << ?,, rest :: binary >> ->
-        rest = lstrip(rest)
-        consume_object_contents {acc, rest}
-      << ?}, rest :: binary >> ->
-        consume_object_contents { acc, << ?}, rest :: binary >> }
-      <<>> ->
-        { :unexpected_end_of_buffer, "" }
-      _ ->
-        { :unexpected_token, rest }
+      << ?,, rest :: binary >> -> consume_object_contents { acc, lstrip(rest) }
+      << ?}, rest :: binary >> -> consume_object_contents { acc, << ?}, rest :: binary >> }
+      <<>>                     -> { :unexpected_end_of_buffer, "" }
+      _                        -> { :unexpected_token, rest }
     end
   end
 

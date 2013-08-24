@@ -31,7 +31,7 @@ end
 
 defimpl JSON.Encode, for: Tuple do
   def to_json(term) do
-      tuple_to_list(term) |> JSON.Encode.to_json
+    tuple_to_list(term) |> JSON.Encode.to_json
   end
 
   def typeof(_) do
