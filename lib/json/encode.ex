@@ -65,14 +65,13 @@ defimpl JSON.Encode, for: Number do
 end
 
 defimpl JSON.Encode, for: Atom do
-  def to_json(false), do: "false"  
-  def to_json(true), do: "true"  
-  def typeof(boolean) when is_boolean(boolean), do: :boolean   
-
-  def to_json(nil), do: "null"
-  def typeof(nil), do: :null
-
+  def to_json(nil), do: {:ok, "null"}
+  def to_json(false), do: {:ok, "false"}
+  def to_json(true),  do: {:ok, "true"}
   def to_json(atom) when is_atom(atom), do: atom_to_binary(atom) |> JSON.Encode.to_json
+
+  def typeof(boolean) when is_boolean(boolean), do: :boolean   
+  def typeof(nil), do: :null
   def typeof(atom) when is_atom(atom), do: :string
 end
 
