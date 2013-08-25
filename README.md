@@ -20,8 +20,6 @@ end
 
 ## Usage
 
-Encoding:
-
 ```elixir
   JSON.encode([result: "this will be a elixir result"])
   {:ok, "{\"result\":\"this will be a elixir result\"}"}
