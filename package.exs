@@ -7,5 +7,5 @@ Expm.Package.new(
   maintainers: [
     [name: "Carlos Brito Lage",  email: "carlos@carloslage.net"],
     [name: "James Alexander Rosen", email: "james.a.rosen@gmail.com"]],
-  repositories: [[github: "cblage/elixir-json"]])
+  repositories: [[github: "cblage/elixir-json", tag: "v0.2.0"]])
     
