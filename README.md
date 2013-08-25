@@ -24,13 +24,30 @@ Encoding:
 
 ```elixir
   JSON.encode([result: "this will be a elixir result"])
-  "{\"result\":\"this will be a elixir result\"}"
+  {:ok, "{\"result\":\"this will be a elixir result\"}"}
 ```
 
 ```elixir
   JSON.decode("{\"result\":\"this will be a elixir result\"}")
   {:ok, [result: "this will be a elixir result"]}
 ```
+
+## Dynamo Filter
+
+Elixir JSON includes a very simple filter for the [Dynamo](https://github.com/elixir-lang/dynamo) web framework.
+
+If you want to use it, simply add Elixir JSON to your project's dependencies, and add the following line to your router:
+```elixir 
+filter JSON.Dynamo.Filter
+```
+
+Afterwards, to generate JSON responses, simply use ```conn.put_private``` and set the ```:result_object``` to whatever you want to be converted to JSON:
+```elixir
+  get "/whoami" do
+    conn.put_private :result_object, [ name: "Carlos", city: "New York", likes: "Programming" ]
+  end
+```
+
 
 ## License
 The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
