@@ -15,11 +15,8 @@ defmodule JSONDecodeTest do
       quote do
         test "cannot decode " <> unquote(name) do
           case JSON.decode(unquote(input)) do
-            { unquote(error), actual } ->
-              assert unquote(message) == actual
-            { error, actual } ->
-              flunk "Expected { #{unquote(error)}, #{unquote(message)} }, " <>
-                    "got { #{error}, #{actual} }"
+            { unquote(error), actual } -> assert unquote(message) == actual
+            { error, actual } -> flunk "Expected { #{unquote(error)}, #{unquote(message)} }, got { #{error}, #{actual} }"
           end
         end
       end
@@ -53,9 +50,9 @@ defmodule JSONDecodeTest do
     decodes "negative integer", "-1337", -1337
     decodes "negative float", "-13.37", -13.37
 
-    # decodes "integer with exponent", "98e2", 9800
-    # decodes "float with positive exponent", "-1.22783E+4", -12278.3
-    # decodes "float with negative exponent", "903.4e-6", 0.0009034
+    decodes "integer with exponent", "98e2", 9800
+    decodes "float with positive exponent", "-1.22783E+4", -12278.3
+    decodes "float with negative exponent", "903.4e-6", 0.0009034
 
     decodes "empty object", "{}", HashDict.new
     decodes "simple object", "{\"result\": \"this is awesome\"}",\
@@ -104,6 +101,9 @@ defmodule JSONDecodeTest do
     cannot_decode "bad object", "{foo", :unexpected_token, "foo"
 
     cannot_decode "unterminated object", "{\"foo\":\"bar\"",
+                  :unexpected_end_of_buffer, ""
+    
+    cannot_decode "multiple value unterminated object", "{\"foo\":\"bar\", \"omg\":",
                   :unexpected_end_of_buffer, ""
 
     cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
