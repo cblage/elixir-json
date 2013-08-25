@@ -1,3 +1,15 @@
+defexception JSON.Encode.Error, error_info: nil do
+  def message(exception) do
+    error_message = "An error occurred while encoding the JSON object"
+
+    if nil != exception.error_info  do
+      error_message <> " >>#{exception.error_info}<<"
+    else 
+      error_message
+    end
+  end
+end
+
 defprotocol JSON.Encode do  
   @moduledoc """
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.

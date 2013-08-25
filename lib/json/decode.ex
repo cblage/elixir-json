@@ -2,29 +2,23 @@ defmodule JSON.Decode do
 
   import String, only: [lstrip: 1, rstrip: 1]
 
+  defexception Error, message: "Invalid JSON - unknown error"
+
   defexception UnexpectedTokenError, token: nil do
     def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
   end
 
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
-  def from_json(s) when is_binary(s) do
-    case lstrip(s) |> consume_value do
-      { :unexpected_token, tok }        -> { :unexpected_token, tok }
-      { :unexpected_end_of_buffer, "" } -> { :unexpected_end_of_buffer, "" }
+  def from_json(bitstring) when is_binary(bitstring) do
+    case lstrip(bitstring) |> consume_value do
       { :ok, value, rest } ->
         case rstrip(rest) do
           "" -> { :ok, value }
           _  -> { :unexpected_token, rest }
         end
-    end
-  end
-
-  def from_json!(s) when is_binary(s) do
-    case from_json(s) do
-      { :ok, value }                   -> value
-      { :unexpected_token, tok }       -> raise JSON.Decode.UnexpectedTokenError, token: tok
-      { :unexpected_end_of_buffer, _ } -> raise JSON.Decode.UnexpectedEndOfBufferError
+      { :unexpected_token, tok }        -> { :unexpected_token, tok }
+      { :unexpected_end_of_buffer, "" } -> { :unexpected_end_of_buffer, "" }
     end
   end
 

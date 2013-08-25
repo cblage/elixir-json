@@ -9,8 +9,18 @@ defmodule JSON do
       {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
 
   """
-  @spec encode(term) :: bitstring
+  @spec encode(term) :: {atom, bitstring}
   def encode(term), do: JSON.Encode.to_json(term)
+
+  @spec encode!(term) :: bitstring
+  def encode!(term) do
+    case encode(term) do
+      { :ok, value }         -> value
+      { :error, error_info } -> raise JSON.Encode.Error, error_info: error_info
+      _                      -> raise JSON.Encode.Error
+    end
+  end
+
 
   @doc """
   Converts a valid JSON string into an Elixir term
@@ -24,6 +34,13 @@ defmodule JSON do
   def decode(string), do: JSON.Decode.from_json(string)
   
   @spec decode!(bitstring) :: term
-  def decode!(string), do: JSON.Decode.from_json!(string)
-  
+  def decode!(bitstring) do
+    case decode(bitstring) do
+      { :ok, value }                   -> value
+      { :unexpected_token, tok }       -> raise JSON.Decode.UnexpectedTokenError, token: tok
+      { :unexpected_end_of_buffer, _ } -> raise JSON.Decode.UnexpectedEndOfBufferError
+      _                                -> raise JSON.Decode.Error
+    end
+  end
+
 end
