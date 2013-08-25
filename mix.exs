@@ -3,8 +3,8 @@ defmodule JSON.Mixfile do
 
   def project do
     [ app: :json,
-      version: "0.1.0",
-      elixir: "~> 0.9.4 or ~> 0.10.0",
+      version: "0.2.0",
+      elixir: "~> 0.10.0",
       deps: deps,
       source_url: "https://github.com/cblage/elixir-json" ]
   end
