@@ -62,7 +62,6 @@ defimpl JSON.Encode, for: HashDict do
   def typeof(_), do: :object
 end
 
-
 defimpl JSON.Encode, for: List do
   def to_json([]), do: {:ok, "[]"}
   
@@ -74,7 +73,7 @@ defimpl JSON.Encode, for: List do
     end
   end
 
-  defp encode_item (item) do 
+  defp encode_item(item) do 
     encode_result = JSON.Encode.to_json(item)
     case encode_result do 
       {:ok, encoded_item} -> encoded_item
