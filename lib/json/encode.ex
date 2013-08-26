@@ -46,6 +46,23 @@ defimpl JSON.Encode, for: Tuple do
   def typeof(_), do: :array
 end
 
+defimpl JSON.Encode, for: HashDict do
+  def to_json(dict) do 
+    {:ok ,"{" <> Enum.map_join(dict, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
+  end
+
+  defp encode_item(item) do 
+    encode_result = JSON.Encode.to_json(item)
+    case encode_result do 
+      {:ok, encoded_item} -> encoded_item
+      _ -> encode_result #propagate error, will trigger error in map_join
+    end
+  end
+   
+  def typeof(_), do: :object
+end
+
+
 defimpl JSON.Encode, for: List do
   def to_json([]), do: {:ok, "[]"}
   
