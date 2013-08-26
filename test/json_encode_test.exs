@@ -23,4 +23,19 @@ defmodule JSONEncodeTest do
       == {:ok, "{\"this_is_null\":null,\"this_is_false\":false,\"this_is_a_number\":1234,\"this_is_an_array\":[\"a\",\"b\",\"c\"],\"this_is_a_subobject\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}}}"}
   end
 
+
+  test "convert HashDict into correct JSON" do
+    acc = HashDict.new
+    acc = HashDict.put(acc, "null",  nil)
+    acc = HashDict.put(acc, "false", false)
+    acc = HashDict.put(acc, "string", "this will be a string")
+    acc = HashDict.put(acc, "number", 1234)
+    acc = HashDict.put(acc, "array",  ["a", :b, "c"])
+    acc = HashDict.put(acc, "object", [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]])
+
+
+    assert JSON.encode(acc) \
+      == {:ok, "{\"array\":[\"a\",\"b\",\"c\"],\"false\":false,\"null\":null,\"number\":1234,\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"string\":\"this will be a string\"}"}
+  end
+
 end
