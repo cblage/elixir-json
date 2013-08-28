@@ -112,33 +112,35 @@ defimpl JSON.Encode, for: BitString do
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
-  def to_json(bitstring), do: {:ok, <<?">> <> encode_binary_recursive(bitstring, "") <> <<?">>}
+  def to_json(bitstring), do: {:ok, <<?">> <> encode_binary_recursive(bitstring, []) <> <<?">>}
 
-  defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, accumulator) do
-    encode_binary_recursive(tail, accumulator <> encode_binary_character(head))
+  defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, acc) do
+    encode_binary_recursive(tail, encode_binary_character(head, acc))
   end
 
-  defp encode_binary_recursive(<<>>, accumulator), do: accumulator
+  defp encode_binary_recursive(<<>>, acc), do: Enum.reverse(acc) |> iolist_to_binary
   
 
-  defp encode_binary_character(?"),   do: <<?\\, ?">> 
-  defp encode_binary_character(?\b),  do: <<?\\, ?b>>
-  defp encode_binary_character(?\f),  do: <<?\\, ?f>> 
-  defp encode_binary_character(?\n),  do: <<?\\, ?n>>
-  defp encode_binary_character(?\r),  do: <<?\\, ?r>>
-  defp encode_binary_character(?\t),  do: <<?\\, ?t>>
-  defp encode_binary_character(?/),   do: <<?\\, ?/>>
-  defp encode_binary_character('\\'), do: <<?\\, ?\\>>
-  defp encode_binary_character(char) when is_number(char) and char < @acii_space, do: <<?\\, ?u>> <> encode_hexadecimal_unicode_control_character(char)
-
-  #anything else besides these control characters, just let it through
-  defp encode_binary_character(char) when is_number(char), do: <<char>>
-
-
-  defp encode_hexadecimal_unicode_control_character(char) when is_number(char) do 
-    integer_to_binary(char, 16) |> zero_pad(4)
+  defp encode_binary_character(?",   acc),  do: [?", ?\\  | acc]
+  defp encode_binary_character(?\b,  acc),  do: [?b, ?\\  | acc]
+  defp encode_binary_character(?\f,  acc),  do: [?f, ?\\  | acc]
+  defp encode_binary_character(?\n,  acc),  do: [?n, ?\\  | acc]
+  defp encode_binary_character(?\r,  acc),  do: [?r, ?\\  | acc]
+  defp encode_binary_character(?\t,  acc),  do: [?t, ?\\  | acc]
+  defp encode_binary_character(?/,   acc),  do: [?/, ?\\  | acc]
+  defp encode_binary_character('\\', acc),  do: [?\\, ?\\ | acc]
+  defp encode_binary_character(char, acc) when is_number(char) and char < @acii_space do
+    encode_hexadecimal_unicode_control_character(char, [?u,  ?\\ | acc])
   end
 
+  #anything else besides these control characters, just let it through
+  defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
+
+
+  defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do 
+    [integer_to_binary(char, 16) |> zero_pad(4) |> bitstring_to_list |> Enum.reverse | acc]
+  end
+  
   defp zero_pad(string, desired_length) when is_bitstring(string) and is_number(desired_length) and desired_length > 0 do
     needed_padding_characters = String.length(string) - desired_length
     if needed_padding_characters > 0 do
