@@ -135,20 +135,15 @@ defimpl JSON.Encode, for: BitString do
 
   #anything else besides these control characters, just let it through
   defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
-
-
-  defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do 
-    [integer_to_binary(char, 16) |> zero_pad(4) |> bitstring_to_list |> Enum.reverse | acc]
-  end
   
-  defp zero_pad(string, desired_length) when is_bitstring(string) and is_number(desired_length) and desired_length > 0 do
-    needed_padding_characters = String.length(string) - desired_length
-    if needed_padding_characters > 0 do
-      String.duplicate("0", needed_padding_characters) <>  string
-    else
-      string
-    end
+  defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do 
+    [integer_to_list(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
   end
+
+  defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]
+  defp zeropad_hexadecimal_unicode_control_character([a, b]),    do: [?0, ?0,  a, b]
+  defp zeropad_hexadecimal_unicode_control_character([a]),       do: [?0, ?0, ?0, a]
+  defp zeropad_hexadecimal_unicode_control_character(iolist) when is_list(iolist), do: iolist
 
   def typeof(_), do: :string
 end
