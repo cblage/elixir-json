@@ -38,11 +38,10 @@ defmodule JSON do
   @spec decode!(char_list) :: term
   def decode!(bitstring) do
     case decode(bitstring) do
-      { :ok, value }                   -> value
-      { :unexpected_token, tok }       -> raise JSON.Decode.UnexpectedTokenError, token: tok
-      { :unexpected_end_of_buffer, _ } -> raise JSON.Decode.UnexpectedEndOfBufferError
-      _                                -> raise JSON.Decode.Error
+      { :ok, value } -> value
+      { :error, {:unexpected_token, tok } } -> raise JSON.Decode.UnexpectedTokenError, token: tok
+      { :error, :unexpected_end_of_buffe } -> raise JSON.Decode.UnexpectedEndOfBufferError
+      _ -> raise JSON.Decode.Error
     end
   end
-
 end
