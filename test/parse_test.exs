@@ -5,16 +5,16 @@ defmodule ParseTest do
   
   doctest JSON.Parse
 
-  #doctest JSON.Parse.String
+  doctest JSON.Parse.String
 
   doctest JSON.Parse.UnicodeEscape
 
-  #doctest JSON.Parse.Number
+  doctest JSON.Parse.Number
 
-  #doctest JSON.Parse.Array
+  doctest JSON.Parse.Array
 
-  #doctest JSON.Parse.Object
+  doctest JSON.Parse.Object
 
-  #doctest JSON.Parse.Value
+  doctest JSON.Parse.Value
 
 end
