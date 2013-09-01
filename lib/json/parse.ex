@@ -1,4 +1,5 @@
 defmodule JSON.Parse do
+
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
   
@@ -9,22 +10,39 @@ defmodule JSON.Parse do
 
       iex> JSON.Parse.consume_whitespace ''
       '' 
+      
+      iex> JSON.Parse.consume_whitespace ""
+      "" 
 
       iex> JSON.Parse.consume_whitespace 'xkcd'
       'xkcd'
 
+      iex> JSON.Parse.consume_whitespace "xkcd"
+      "xkcd"
+
       iex> JSON.Parse.consume_whitespace '  \\t\\r lalala '
       'lalala '
+      
+      iex> JSON.Parse.consume_whitespace "  \\t\\r lalala "
+      "lalala "
 
       iex> JSON.Parse.consume_whitespace ' \\n\\t\\n fooo \\u00dflalalal '
       'fooo \\u00dflalalal '
+
+      iex> JSON.Parse.consume_whitespace " \\n\\t\\n fooo \\u00dflalalal "
+      "fooo \\u00dflalalal "
   """
+  def consume_whitespace(<< @acii_space :: utf8, rest :: binary >>), do: consume_whitespace(rest)
+  def consume_whitespace(<< ?\t :: utf8, rest :: binary >>), do: consume_whitespace(rest)
+  def consume_whitespace(<< ?\r :: utf8, rest :: binary >>), do: consume_whitespace(rest)
+  def consume_whitespace(<< ?\n :: utf8, rest :: binary >>), do: consume_whitespace(rest)
+  
   def consume_whitespace([ @acii_space | rest ]), do: consume_whitespace(rest)
   def consume_whitespace([ ?\t | rest ]), do: consume_whitespace(rest)
   def consume_whitespace([ ?\r | rest ]), do: consume_whitespace(rest)
   def consume_whitespace([ ?\n | rest ]), do: consume_whitespace(rest)
-  def consume_whitespace(iolist) when is_list(iolist), do: iolist
 
+  def consume_whitespace(iolist) when is_list(iolist) or is_binary(iolist), do: iolist
 
   defmodule Value do
     @doc """
