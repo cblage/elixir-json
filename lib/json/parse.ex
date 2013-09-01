@@ -274,15 +274,39 @@ defmodule JSON.Parse do
         iex> JSON.Parse.UnicodeEscape.consume ''
         { :error, :unexpected_end_of_buffer }
 
+        iex> JSON.Parse.UnicodeEscape.consume ""
+        { :error, :unexpected_end_of_buffer }
+
         iex> JSON.Parse.UnicodeEscape.consume 'xkcd'
         { :error, {:unexpected_token, 'xkcd'} }
+
+        iex> JSON.Parse.UnicodeEscape.consume "xkcd"
+        { :error, {:unexpected_token, "xkcd"} }
 
         iex> JSON.Parse.UnicodeEscape.consume '\\\\u00df'
         { :ok, "ß", '' }
 
-        iex> JSON.Parse.UnicodeEscape.consume '\\\\u00dflalalal'
-        { :ok, "ß", 'lalalal' }
+        iex> JSON.Parse.UnicodeEscape.consume "\\\\u00df"
+        { :ok, "ß", "" }
+
+        iex> JSON.Parse.UnicodeEscape.consume "\\\\u00dflalalal"
+        { :ok, "ß", "lalalal" }
+
+        iex> JSON.Parse.UnicodeEscape.consume "\\\\u00dflalalal"
+        { :ok, "ß", "lalalal" }
     """
+    def consume(<< ?\\, ?u , rest :: binary >>) do
+      case consume_unicode_escape(rest, 0, 0) do
+        { :ok, tentative_codepoint, after_tentative_codepoint} ->
+          if Elixir.String.valid_codepoint? tentative_codepoint do
+            { :ok, tentative_codepoint, after_tentative_codepoint}
+          else
+            {:error, { :unexpected_token, << ?\\, ?u, rest >> } }
+          end
+        { :error, error_info } -> { :error, error_info }
+      end
+    end
+
     def consume([?\\, ?u | rest]) do
       case consume_unicode_escape(rest, 0, 0) do
         { :ok, tentative_codepoint, after_tentative_codepoint} ->
@@ -295,17 +319,18 @@ defmodule JSON.Parse do
       end
     end
 
-    def consume([ ]), do:  {:error, :unexpected_end_of_buffer}
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
-
+    def consume([ ]),   do:  {:error, :unexpected_end_of_buffer}
+    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
+    def consume(json) when is_list(json) or is_binary(json), do: {:error, { :unexpected_token, json }}
 
     #The only OK stop condition (consumed 4 expected chars successfully)
-    defp consume_unicode_escape(iolist, acc, chars_consumed) when is_list(iolist) and 4 === chars_consumed do
-      { :ok, << acc :: utf8 >>, iolist }
+    defp consume_unicode_escape(json, acc, chars_consumed) when (is_list(json) or is_binary(json)) and 4 === chars_consumed do
+      { :ok, << acc :: utf8 >>, json }
     end
 
     # there are not enough chars to consume the expected unicode escape
     defp consume_unicode_escape([], _, _), do: {:error, :unexpected_end_of_buffer}
+    defp consume_unicode_escape(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
 
     defp consume_unicode_escape([char | rest], acc, chars_consumed) when char in ?0..?9 do
       consume_unicode_escape(rest, 16 * acc + char - ?0, chars_consumed + 1)
@@ -319,8 +344,20 @@ defmodule JSON.Parse do
       consume_unicode_escape(rest, 16 * acc + 10 + char - ?A, chars_consumed + 1)
     end
 
+    defp consume_unicode_escape(<< char :: utf8, rest :: binary >>, acc, chars_consumed) when char in ?0..?9 do
+      consume_unicode_escape(rest, 16 * acc + char - ?0, chars_consumed + 1)
+    end
+
+    defp consume_unicode_escape(<< char :: utf8, rest :: binary >>, acc, chars_consumed) when char in ?a..?f do
+      consume_unicode_escape(rest, 16 * acc + 10 + char - ?a, chars_consumed + 1)
+    end
+
+    defp consume_unicode_escape(<< char :: utf8, rest :: binary >>, acc, chars_consumed) when char in ?A..?F do
+      consume_unicode_escape(rest, 16 * acc + 10 + char - ?A, chars_consumed + 1)
+    end
+
     #unexpected token stop condition, other stop conditions not met
-    defp consume_unicode_escape(iolist, _, _), do: {:error, {:unexpected_token, iolist}}
+    defp consume_unicode_escape(binary_or_iolist, _, _), do: {:error, {:unexpected_token, binary_or_iolist}}
   end
 
   defmodule Number do
