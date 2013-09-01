@@ -1,169 +1,380 @@
 defmodule JSON.Parse do
-
-  defexception Error, message: "Invalid JSON - unknown error"
-
-  defexception UnexpectedTokenError, token: nil do
-    def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
-  end
-
-  defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
-
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
-
-  defp consume_whitespace([ @acii_space | rest ]), do: consume_whitespace(rest)
-  defp consume_whitespace([ ?\t | rest ]), do: consume_whitespace(rest)
-  defp consume_whitespace([ ?\r | rest ]), do: consume_whitespace(rest)
-  defp consume_whitespace([ ?\n | rest ]), do: consume_whitespace(rest)
-
-  defp consume_whitespace(iolist) when is_list(iolist), do: iolist
-    
-  def from_json(bitstring) when is_binary(bitstring) do
-    case bitstring_to_list(bitstring) |> from_json do
-      { :ok, value } -> { :ok, value }
-      { :unexpected_token, tok }       -> { :unexpected_token, iolist_to_binary(tok) }
-      { :unexpected_end_of_buffer, s } -> { :unexpected_end_of_buffer, s }
-    end
-  end
-
-  def from_json(iolist) when is_list(iolist) do 
-    case consume_whitespace(iolist) |> consume_value do
-      { :ok, value, rest } ->
-        case consume_whitespace(rest) do
-          [] -> { :ok, value }
-          _  -> { :unexpected_token, rest }
-        end
-      { :unexpected_token, tok }       -> { :unexpected_token, tok }
-      { :unexpected_end_of_buffer, s } -> { :unexpected_end_of_buffer, s }
-    end
-  end
-
-  # consume_value: binary -> { nil | true | false | List | HashDict | binary, binary }
-
-  defp consume_value([ ?n, ?u, ?l, ?l  | rest ]), do: { :ok, nil,   rest }
-  defp consume_value([ ?t, ?r, ?u, ?e  | rest ]), do: { :ok, true,  rest }
-  defp consume_value([ ?f, ?a, ?l, ?s, ?e | rest ]), do: { :ok, false, rest }
-
-  defp consume_value([ ?[ | rest ]), do: consume_whitespace(rest) |> consume_array_contents
-  defp consume_value([ ?{ | rest ]), do: consume_whitespace(rest) |> consume_object_contents
-  defp consume_value([ ?" | rest ]), do: consume_string_contents(rest)
-
-  defp consume_value([ ?- , number | rest]) when number in ?0..?9, do: consume_number([ ?- , number | rest])
-  defp consume_value([ number | rest]) when number in ?0..?9, do: consume_number([ number | rest])
-
-  defp consume_value([ ]), do:  { :unexpected_end_of_buffer, "" }
-  defp consume_value(json), do: { :unexpected_token, json }
-
-  # Array Parsing
-
-  ## consume_array_contents: { List, binary } -> { List, binary }
-  defp consume_array_contents(json) when is_list(json), do: consume_array_contents([], json)
   
-  defp consume_array_contents(acc, [ ?] | rest ]), do: {:ok, Enum.reverse(acc), rest }
-  defp consume_array_contents(_, [] ), do: { :unexpected_end_of_buffer, "" }
+  @doc """
+  Consumes valid JSON whitespace if it exists, returns the rest of the buffer
 
-  defp consume_array_contents(acc, json) do
-    consume_array_value_result = consume_whitespace(json) |> consume_value
-    case consume_array_value_result do 
-      {:ok, value, after_value } ->
-        acc = [ value | acc ]
-        after_value = consume_whitespace(after_value)
+  ## Examples
+
+      iex> JSON.Parse.consume_whitespace ''
+      '' 
+
+      iex> JSON.Parse.consume_whitespace 'xkcd'
+      'xkcd'
+
+      iex> JSON.Parse.consume_whitespace '  \\t\\r lalala '
+      'lalala '
+
+      iex> JSON.Parse.consume_whitespace ' \\n\\t\\n fooo \\u00dflalalal '
+      'fooo \\u00dflalalal '
+  """
+  def consume_whitespace([ @acii_space | rest ]), do: consume_whitespace(rest)
+  def consume_whitespace([ ?\t | rest ]), do: consume_whitespace(rest)
+  def consume_whitespace([ ?\r | rest ]), do: consume_whitespace(rest)
+  def consume_whitespace([ ?\n | rest ]), do: consume_whitespace(rest)
+  def consume_whitespace(iolist) when is_list(iolist), do: iolist
+
+
+  defmodule Value do
+    @doc """
+    Consumes a valid JSON value, returns its elixir representation
+
+    ## Examples
+
+        iex> JSON.Parse.Value.consume ''
+        {:error, {:unexpected_end_of_buffer}
+
+        iex> JSON.Parse.Value.consume 'face0ff'
+        {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.Value.consume '-hello'
+        {:error, {:unexpected_token, 'hello'} }
+
+        iex> JSON.Parse.Value.consume '129245'
+        {:ok, 129245, '' }
+
+        iex> JSON.Parse.Value.consume '7.something'
+        {:ok, 7, '.something' }
+
+        iex> JSON.Parse.Value.consume '-88.22suffix'
+        {:ok, -88.22, 'suffix' }
+
+        iex> JSON.Parse.Value.consume '-12e4and then some'
+        {:ok, -1.2e+5, 'and then some' }
+
+        iex> JSON.Parse.Value.consume '7842490016E-12-and more'
+        {:ok, 7.842490016e-3, '-and more' }
+
+        iex> JSON.Parse.Value.consume 'null'
+        {:ok, nill, '' }
+
+        iex> JSON.Parse.Value.consume 'false'
+        {:ok, false, '' }
+
+        iex> JSON.Parse.Value.consume 'true'
+        {:ok, true, '' }
+    """
+    def consume([ ?[ | rest ]), do: JSON.Parse.Array.consume([ ?[ | rest ])
+    def consume([ ?{ | rest ]), do: JSON.Parse.Object.consume([ ?{ | rest ])
+    def consume([ ?" | rest ]), do: JSON.Parse.String.consume([ ?" | rest ])
+    
+    def consume([ ?- , number | rest]) when number in ?0..?9, do: JSON.Parse.Number.consume([ ?- , number | rest])
+    def consume([ number | rest]) when number in ?0..?9, do: JSON.Parse.Number.consume([ number | rest])
+
+    def consume([ ?n, ?u, ?l, ?l  | rest ]),    do: { :ok, nil,   rest }
+    def consume([ ?t, ?r, ?u, ?e  | rest ]),    do: { :ok, true,  rest }
+    def consume([ ?f, ?a, ?l, ?s, ?e | rest ]), do: { :ok, false, rest }
+
+    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}  
+  end
+
+  defmodule Object do
+    @doc """
+    Consumes a valid JSON object value, returns its elixir HashDict representation
+
+    ## Examples
+
+        iex> JSON.Parse.Object.consume ''
+        {:error, {:unexpected_end_of_buffer}
+
+        iex> JSON.Parse.Object.consume 'face0ff'
+        {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.Object.consume '[] '
+        {:error, {:unexpected_token, '[] '}}
         
-        case after_value  do
-          [ ?, | after_comma ] -> consume_array_contents(acc, consume_whitespace(after_comma))
-          _ -> consume_array_contents(acc, after_value)
-        end
-      _ -> consume_array_value_result #propagate error
+        iex> JSON.Parse.Object.consume ' [] '
+        {:error, {:unexpected_token, '[] '}}
+        
+        iex> JSON.Parse.Object.consume '[]'
+        {:error, {:unexpected_token, '[]'}}
+        
+        iex> JSON.Parse.Object.consume ' ["foo", 1, 2, 1.5] lala'
+        {:error, {:unexpected_token, '["foo", 1, 2, 1.5] lala'}}
+
+        iex> JSON.Parse.Object.consume '{"result": "this will be a elixir result"} lalal'
+        {:ok, HashDict.new [{"result", "this will be a elixir result"}], ' lalal'}
+    """
+    def consume([ ?{ | rest ]), do: JSON.Parse.consume_whitespace(rest) |> consume_object_contents
+    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+
+    # Object Parsing
+    defp consume_object_key(json) when is_list(json) do
+      case JSON.Parse.String.consume(json) do 
+        {:error, error_info} -> {:error, error_info}
+        {:ok, key, after_key } ->
+          case JSON.Parse.consume_whitespace(after_key) do
+            [ ?: | after_colon ] -> {:ok, key, JSON.Parse.consume_whitespace(after_colon)}
+            []    -> { :error, :unexpected_end_of_buffer}
+            _     -> { :error, {:unexpected_token, JSON.Parse.consume_whitespace(after_key) }}
+          end
+      end
     end
-  end
 
-  # Object Parsing
-
-  ## consume_object_contents: { Dict, binary } -> { Dict, binary }
-
-  defp consume_object_key(json) when is_list(json) do
-    key_result = consume_string_contents(json)
-    case key_result do 
-      {:ok, key, after_key } ->
-        case consume_whitespace(after_key) do
-          [ ?: | after_colon ] -> {:ok, key, consume_whitespace(after_colon)}
-          []    -> { :unexpected_end_of_buffer, "" }
-          _     -> { :unexpected_token, consume_whitespace(after_key) }
-        end
-      _ -> key_result #propagate error
+    defp consume_object_value(acc, key, after_key) do
+      case JSON.Parse.Value.consume(after_key) do
+        {:error, error_info} -> {:error, error_info}
+        {:ok, value, after_value} ->
+          acc  = HashDict.put(acc, key, value)
+          after_value = JSON.Parse.consume_whitespace(after_value)
+          case after_value do
+            [ ?, | after_comma ] ->  consume_object_contents(acc, JSON.Parse.consume_whitespace(after_comma))
+            _ -> consume_object_contents(acc, after_value)
+          end
+      end
     end
-  end
-
-  defp consume_object_value(acc, key, after_key) do
-    consume_value_result = consume_value(after_key)
-    case consume_value_result do
-      {:ok, value, after_value} ->
-        acc  = HashDict.put(acc, key, value)
-        after_value = consume_whitespace(after_value)
-        case after_value do
-          [ ?, | after_comma ] -> 
-            consume_object_contents(acc, consume_whitespace(after_comma))
-          _ -> consume_object_contents(acc, after_value)
-        end
-      _ -> consume_value_result #propagate error
-    end
-  end
-  
-  defp consume_object_contents(json) when is_list(json), do: consume_object_contents(HashDict.new, json)
-  
-  defp consume_object_contents(acc, [ ?" | rest]) do
-    consume_object_key_result = consume_object_key(rest)
-    case consume_object_key_result do
-      {:ok, key, after_key} -> consume_object_value(acc, key, after_key)
-      _  -> consume_object_key_result #propagate error
-    end
-  end
-
-  defp consume_object_contents(acc, [ ?} | rest ]), do: { :ok, acc, rest }
-
-  defp consume_object_contents(_, []),   do: { :unexpected_end_of_buffer, "" }
-  defp consume_object_contents(_, json), do: { :unexpected_token, json }
- 
-
-  # String Parsing
-  defp consume_string_contents(json)  when is_list(json), do: consume_string_contents({[], json})
-
-  #stop conditions
-  defp consume_string_contents({ :unexpected_token, s }),         do: { :unexpected_token, s }
-  defp consume_string_contents({ :unexpected_end_of_buffer, s }), do: { :unexpected_end_of_buffer, s }
-  defp consume_string_contents({ _,  [] }),                       do: { :unexpected_end_of_buffer, "" }
-  defp consume_string_contents({ acc, [ ?" | rest ] }), do: {:ok, Enum.reverse(acc) |> iolist_to_binary, rest }
-  
-  #parsing
-  defp consume_string_contents({ acc, [ ?\\, ?f  | rest ]}), do: consume_string_contents({ [ ?\f | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?n  | rest ]}), do: consume_string_contents({ [ ?\n | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?r  | rest ]}), do: consume_string_contents({ [ ?\r | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?t  | rest ]}), do: consume_string_contents({ [ ?\t | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?"  | rest ]}), do: consume_string_contents({ [ ?"  | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?\\ | rest ]}), do: consume_string_contents({ [ ?\\ | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?/  | rest ]}), do: consume_string_contents({ [ ?/  | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?u  | rest ]}), do: consume_unicode_escape({ acc, rest }) |> consume_string_contents 
-  
-  defp consume_string_contents({ acc, [ c | rest ]}), do: consume_string_contents { [ c | acc ], rest }
-
-  defp consume_unicode_escape({ acc, [ a, b, c, d | rest ] }) do
-    first_four_characters = [ a, b, c, d ]
-    case JSON.Numeric.to_integer_from_hex(first_four_characters) do
-      { converted, [] } -> {[ << converted :: utf8 >> | acc ], rest }
-      { _, unexpected_tokens } -> { :unexpected_token, unexpected_tokens }
-      _ -> { :unexpected_token, first_four_characters }
-    end
-  end
-
-  # if theres not enough 4 chars to match above pattern
-  defp consume_unicode_escape(_), do: {:unexpected_end_of_buffer, ""}
     
+    defp consume_object_contents(json) when is_list(json), do: consume_object_contents(HashDict.new, json)
+    
+    defp consume_object_contents(acc, [ ?" | rest]) do
+      case consume_object_key([ ?" | rest]) do
+        {:error, error_info}  -> {:error, error_info}
+        {:ok, key, after_key} -> consume_object_value(acc, key, after_key)
+      end
+    end
+
+    defp consume_object_contents(acc, [ ?} | rest ]), do: { :ok, acc, rest }
+
+    defp consume_object_contents(_, []),  do: {:error, :unexpected_end_of_buffer }
+    defp consume_object_contents(_, json) when is_list(json), do: {:error, { :unexpected_token, json } }
+  end
+
+  defmodule Array do
+    @doc """
+    Consumes a valid JSON array value, returns its elixir list representation
+
+    ## Examples
+
+        iex> JSON.Parse.Array.consume ''
+        {:error, {:unexpected_end_of_buffer}
+
+        iex> JSON.Parse.Array.consume 'face0ff'
+        {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.Array.consume '[] '
+        {:ok, [], ' ' }
+        
+        iex> JSON.Parse.Array.consume ' [] '
+        {:ok, [], ' ' }
+        
+        iex> JSON.Parse.Array.consume '[]'
+        {:ok, [], '' }
+        
+        iex> JSON.Parse.Array.consume ' ["foo", 1, 2, 1.5] lala'
+        {:ok, ["foo", 1, 2, 1.5], ' lala' }
+    """
+    def consume([ ?[ | rest ]), do: JSON.Parse.consume_whitespace(rest) |> consume_array_contents
+    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+   
+    # Array Parsing
+    defp consume_array_contents(json) when is_list(json), do: consume_array_contents([], json)
+    
+    defp consume_array_contents(acc, [ ?] | rest ]), do: {:ok, Enum.reverse(acc), rest }
+    defp consume_array_contents(_, [] ), do: { :unexpected_end_of_buffer, "" }
+
+    defp consume_array_contents(acc, json) do
+      case JSON.Parse.consume_whitespace(json) |> JSON.Parse.Value.consume do 
+        {:error, error_info} -> {:error, error_info}
+        {:ok, value, after_value } ->
+          after_value = JSON.Parse.consume_whitespace(after_value)
+          case after_value  do
+            [ ?, | after_comma ] -> consume_array_contents([ value | acc ], JSON.Parse.consume_whitespace(after_comma))
+            _ ->  consume_array_contents([ value | acc ], after_value)
+          end
+      end
+    end
+  end
+
+
+  defmodule String do
+    def consume([ ?" | rest ]), do: consume_string_contents(rest, [])
+    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    
+ 
+    #stop conditions
+    defp consume_string_contents([], _), do: {:error, :unexpected_end_of_buffer}
+    defp consume_string_contents([ ?" | rest ], acc), do: { :ok, Enum.reverse(acc) |> iolist_to_binary, rest }
+    
+    #parsing
+    defp consume_string_contents([ ?\\, ?f  | rest ], acc), do: consume_string_contents(rest, [ ?\f | acc ])
+    defp consume_string_contents([ ?\\, ?n  | rest ], acc), do: consume_string_contents(rest, [ ?\n | acc ])
+    defp consume_string_contents([ ?\\, ?r  | rest ], acc), do: consume_string_contents(rest, [ ?\r | acc ])
+    defp consume_string_contents([ ?\\, ?t  | rest ], acc), do: consume_string_contents(rest, [ ?\t | acc ])
+    defp consume_string_contents([ ?\\, ?"  | rest ], acc), do: consume_string_contents(rest, [ ?"  | acc ])
+    defp consume_string_contents([ ?\\, ?\\ | rest ], acc), do: consume_string_contents(rest, [ ?\\ | acc ])
+    defp consume_string_contents([ ?\\, ?/  | rest ], acc), do: consume_string_contents(rest, [ ?/  | acc ])
+    
+    defp consume_string_contents([ ?\\, ?u  | rest ], acc) do 
+      case JSON.Parse.UnicodeEscape.consume([ ?\\, ?u  | rest ]) do 
+        { :error, error_info } -> { :error, error_info }
+        { :ok, value, rest } -> consume_string_contents(rest, [ value | acc ])
+      end 
+    end
+    
+    defp consume_string_contents([ char | rest ], acc), do: consume_string_contents(rest, [ char | acc ])
+  end  
+
+  defmodule UnicodeEscape do
+    @doc """
+    Consumes a JSON Unicode Escaped character, returns its UTF8 representation
+
+    ## Examples
+
+        iex> JSON.Parse.UnicodeEscape.consume ''
+        { :error, :unexpected_end_of_buffer } 
+
+        iex> JSON.Parse.UnicodeEscape.consume 'xkcd'
+        { :error, {:unexpected_token, 'xkcd'} }
+
+        iex> JSON.Parse.UnicodeEscape.consume '\\\\u00df'
+        { :ok, "ß", '' }
+
+        iex> JSON.Parse.UnicodeEscape.consume '\\\\u00dflalalal'
+        { :ok, "ß", 'lalalal' }
+    """
+    def consume([?\\, ?u | rest]) do 
+      case consume_unicode_escape(rest, 0, 0) do 
+        { :ok, tentative_codepoint, after_tentative_codepoint} ->
+          if Elixir.String.valid_codepoint? tentative_codepoint do 
+            { :ok, tentative_codepoint, after_tentative_codepoint}
+          else
+            {:error, { :unexpected_token, [?\\, ?u | rest] } }
+          end
+        { :error, error_info } -> { :error, error_info }
+      end
+    end
+
+    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    
+    
+    #The only OK stop condition (consumed 4 expected chars successfully)
+    defp consume_unicode_escape(iolist, acc, chars_consumed) when is_list(iolist) and 4 === chars_consumed do
+      { :ok, << acc :: utf8 >>, iolist }
+    end
+
+    # there are not enough chars to consume the expected unicode escape
+    defp consume_unicode_escape([], _, _), do: {:error, :unexpected_end_of_buffer}
   
-  #Number parsing
-  defp consume_number(json) when is_list(json) do
-    case JSON.Parse.Numeric.to_numeric(json) do
-      { converted, rest } -> { :ok, converted, rest }
-      _ -> { :unexpected_token, json }
+    defp consume_unicode_escape([char | rest], acc, chars_consumed) when char in ?0..?9 do
+      consume_unicode_escape(rest, 16 * acc + char - ?0, chars_consumed + 1) 
+    end
+
+    defp consume_unicode_escape([char | rest], acc, chars_consumed) when char in ?a..?f do
+      consume_unicode_escape(rest, 16 * acc + 10 + char - ?a, chars_consumed + 1) 
+    end
+    
+    defp consume_unicode_escape([char | rest], acc, chars_consumed) when char in ?A..?F do
+      consume_unicode_escape(rest, 16 * acc + 10 + char - ?A, chars_consumed + 1) 
+    end
+
+    #unexpected token stop condition, other stop conditions not met
+    defp consume_unicode_escape(iolist, _, _), do: {:error, {:unexpected_token, iolist}}
+  end
+
+  defmodule Number do
+    @doc """
+    Consumes a valid JSON numerical value, returns its elixir numerical representation
+
+    ## Examples
+
+        iex> JSON.Parse.Numeric.consume ''
+        {:error, {:unexpected_end_of_buffer}
+
+        iex> JSON.Parse.Number.consume 'face0ff'
+        {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.Number.consume '-hello'
+        {:error, {:unexpected_token, 'hello'} }
+
+        iex> JSON.Parse.Number.consume '129245'
+        {:ok, 129245, '' }
+
+        iex> JSON.Parse.Number.consume '7.something'
+        {:ok, 7, '.something' }
+        
+        iex> JSON.Parse.Number.consume '7.4566something'
+        {:ok, 7.4566, 'something' }
+
+        iex> JSON.Parse.Number.consume '-88.22suffix'
+        {:ok, -88.22, 'suffix' }
+
+        iex> JSON.Parse.Number.consume '-12e4and then some'
+        {:ok, -1.2e+5, 'and then some' }
+
+        iex> JSON.Parse.Number.consume '7842490016E-12-and more'
+        {:ok, 7.842490016e-3, '-and more' }
+    """
+    def consume([ ?- , number | rest]) when number in ?0..?9 do 
+      consume([number | rest]) |> negate
+    end
+    
+    def consume([ number | rest]) when number in ?0..?9 do
+      iolist_to_integer([ number | rest]) 
+        |> add_fractional 
+        |> apply_exponent
+    end
+
+    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+
+    defp negate({:error, error_info}), do: {:error, error_info}
+    defp negate({:ok, number, iolist }) when is_list(iolist), do: {:ok, -1 * number, iolist }
+
+    defp add_fractional({:error, error_info}), do: {:error, error_info}
+
+    defp add_fractional({:ok, acc, [ ?., c | iolist ] }) when c in ?0..?9 do
+      { fractional, rest } = consume_fractional([ c | iolist ], 0, 10.0)
+      {:ok, acc + fractional, rest }
+    end
+
+    # ensures the following behavior - JSON.Parse.Number.consume '-88.22suffix' - {:ok, -88.22, 'suffix' }
+    defp add_fractional({:ok, acc, iolist }) when is_list(iolist), do: {:ok, acc, iolist }
+    
+    defp consume_fractional([ next_char | rest ], acc, power) when next_char in ?0..?9 do
+      consume_fractional(rest, acc + (next_char - ?0) / power, power * 10)
+    end
+
+    # ensures the following behavior - JSON.Parse.Number.consume '-88.22suffix' - {:ok, -88.22, 'suffix' }
+    defp consume_fractional(iolist, acc , _) when is_list(iolist), do: { acc, iolist }
+    
+    defp apply_exponent({:error, error_info}), do: { :error, error_info }
+    
+    defp apply_exponent({:ok, acc, [ e | rest ] }) when e in [?e, ?E] do
+      case iolist_to_integer(rest) do
+        { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
+        { :error, error_info } -> { :error, error_info }
+      end
+    end
+
+    # ensures the following behavior - JSON.Parse.Number.consume "7842490016E-12-and more" - {:ok, 7.842490016e-3, '-and more' }
+    defp apply_exponent({:ok, acc, iolist }) when is_list(iolist), do: {:ok, acc, iolist }
+
+    # mini-wrapper around :string.to_integer
+    defp iolist_to_integer(iolist) when is_list(iolist) do
+      case :string.to_integer(iolist) do
+        { :error, _ } -> 
+          case iolist do 
+            [] -> {:error,  :unexpected_end_of_buffer}
+            _ -> {:error, {:unexpected_token, iolist} }
+          end
+        { result, rest } -> {:ok, result, rest}
+      end
     end
   end
 end

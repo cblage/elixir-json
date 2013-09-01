@@ -6,17 +6,22 @@ defmodule JSONDecodeTest do
     defmacro decodes(name, input, output) do
       quote do
         test "decodes " <> unquote(name) do
-          assert JSON.decode(unquote(input)) == {:ok, unquote(output)}
+          decode_result = JSON.decode(unquote(input))
+          case decode_result do
+            { :ok, actual } -> assert unquote(output) == actual
+            decode_result -> flunk "Expected { :ok, #{unquote(output)} }, got { #{decode_result} }"
+          end
         end
       end
     end
 
-    defmacro cannot_decode(name, input, error, message) do
+    defmacro cannot_decode(name, input, error_info) do
       quote do
         test "cannot decode " <> unquote(name) do
-          case JSON.decode(unquote(input)) do
-            { unquote(error), actual } -> assert unquote(message) == actual
-            { error, actual } -> flunk "Expected { #{unquote(error)}, #{unquote(message)} }, got { #{error}, #{actual} }"
+          decode_result = JSON.decode(unquote(input))
+          case decode_result do
+            { :error, actual } -> assert unquote(error_info) == actual
+            decode_result -> flunk "Expected { :error, #{unquote(error_info)} }, got { #{decode_result} }"
           end
         end
       end
@@ -41,9 +46,7 @@ defmodule JSONDecodeTest do
             "\"tab\\tnewline\\ncarriage return\\rform feed\\fend\"",
             "tab\tnewline\ncarriage return\rform feed\fend"
 
-    decodes "string with unicode escape",
-            "\"star -> \\u272d <- star\"",
-            "star -> ✭ <- star"
+    decodes "string with unicode escape", "\"star -> \\u272d <- star\"", "star -> ✭ <- star"
 
     decodes "positive integer", "1337", 1337
     decodes "positive float", "13.37", 13.37
@@ -55,13 +58,11 @@ defmodule JSONDecodeTest do
     decodes "float with negative exponent", "903.4e-6", 0.0009034
 
     decodes "empty object", "{}", HashDict.new
-    decodes "simple object", "{\"result\": \"this is awesome\"}",\
-                  HashDict.new([ { "result", "this is awesome" } ])
+    decodes "simple object", "{\"result\": \"this is awesome\"}", HashDict.new([ { "result", "this is awesome" } ])
 
     decodes "empty array", "  [   ] ", []
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
-    decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ",\
-                            [nil, [false, "five"], [3, true]]
+    decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ", [nil, [false, "five"], [3, true]]
 
     decodes "complex object",
             "{
@@ -85,29 +86,23 @@ defmodule JSONDecodeTest do
               ] }
             ])
 
-    cannot_decode "bad literal", "nul",
-                  :unexpected_token, "nul"
+    cannot_decode "bad literal", "nul", {:unexpected_token, "nul"}
 
-    cannot_decode "unterminated string", "\"Not a full string",
-                  :unexpected_end_of_buffer, ""
+    cannot_decode "unterminated string", "\"Not a full string", :unexpected_end_of_buffer
 
-    cannot_decode "string with bad Unicode escape", "\"bzzt: \\u27qp wrong\"",
-                  :unexpected_token, "qp"
+    cannot_decode "string with bad Unicode escape", "\"bzzt: \\u27qp wrong\"", {:unexpected_token, "qp wrong\""}
 
-    cannot_decode "number with trailing .", "889.foo", :unexpected_token, ".foo"
+    cannot_decode "number with trailing .", "889.foo", {:unexpected_token, ".foo"}
 
-    cannot_decode "open brace", "{", :unexpected_end_of_buffer, ""
+    cannot_decode "open brace", "{", :unexpected_end_of_buffer
 
-    cannot_decode "bad object", "{foo", :unexpected_token, "foo"
+    cannot_decode "bad object", "{foo", {:unexpected_token, "foo"}
 
-    cannot_decode "unterminated object", "{\"foo\":\"bar\"",
-                  :unexpected_end_of_buffer, ""
+    cannot_decode "unterminated object", "{\"foo\":\"bar\"", :unexpected_end_of_buffer
     
-    cannot_decode "multiple value unterminated object", "{\"foo\":\"bar\", \"omg\":",
-                  :unexpected_end_of_buffer, ""
+    cannot_decode "multiple value unterminated object", "{\"foo\":\"bar\", \"omg\":", :unexpected_end_of_buffer
 
-    cannot_decode "object with missing colon", "{\"foo\" \"bar\"}",
-                  :unexpected_token, "\"bar\"}"
+    cannot_decode "object with missing colon", "{\"foo\" \"bar\"}", {:unexpected_token, "\"bar\"}"}
   end
 
 end
