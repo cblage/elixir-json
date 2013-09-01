@@ -40,7 +40,7 @@ defmodule JSON do
     case decode(bitstring) do
       { :ok, value } -> value
       { :error, {:unexpected_token, tok } } -> raise JSON.Decode.UnexpectedTokenError, token: tok
-      { :error, :unexpected_end_of_buffe } -> raise JSON.Decode.UnexpectedEndOfBufferError
+      { :error, :unexpected_end_of_buffer } -> raise JSON.Decode.UnexpectedEndOfBufferError
       _ -> raise JSON.Decode.Error
     end
   end
