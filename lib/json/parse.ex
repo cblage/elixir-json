@@ -33,13 +33,13 @@ defmodule JSON.Parse do
     ## Examples
 
         iex> JSON.Parse.Value.consume ''
-        {:error, {:unexpected_end_of_buffer}
+        {:error, :unexpected_end_of_buffer}
 
         iex> JSON.Parse.Value.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
 
         iex> JSON.Parse.Value.consume '-hello'
-        {:error, {:unexpected_token, 'hello'} }
+        {:error, {:unexpected_token, '-hello'} }
 
         iex> JSON.Parse.Value.consume '129245'
         {:ok, 129245, '' }
@@ -57,13 +57,14 @@ defmodule JSON.Parse do
         {:ok, 7.842490016e-3, '-and more' }
 
         iex> JSON.Parse.Value.consume 'null'
-        {:ok, nill, '' }
+        {:ok, nil, '' }
 
         iex> JSON.Parse.Value.consume 'false'
         {:ok, false, '' }
 
         iex> JSON.Parse.Value.consume 'true'
         {:ok, true, '' }
+
     """
     def consume([ ?[ | rest ]), do: JSON.Parse.Array.consume([ ?[ | rest ])
     def consume([ ?{ | rest ]), do: JSON.Parse.Object.consume([ ?{ | rest ])
@@ -87,7 +88,7 @@ defmodule JSON.Parse do
     ## Examples
 
         iex> JSON.Parse.Object.consume ''
-        {:error, {:unexpected_end_of_buffer}
+        {:error, :unexpected_end_of_buffer}
 
         iex> JSON.Parse.Object.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
@@ -95,17 +96,14 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Object.consume '[] '
         {:error, {:unexpected_token, '[] '}}
         
-        iex> JSON.Parse.Object.consume ' [] '
-        {:error, {:unexpected_token, '[] '}}
-        
         iex> JSON.Parse.Object.consume '[]'
         {:error, {:unexpected_token, '[]'}}
         
-        iex> JSON.Parse.Object.consume ' ["foo", 1, 2, 1.5] lala'
+        iex> JSON.Parse.Object.consume '["foo", 1, 2, 1.5] lala'
         {:error, {:unexpected_token, '["foo", 1, 2, 1.5] lala'}}
 
         iex> JSON.Parse.Object.consume '{"result": "this will be a elixir result"} lalal'
-        {:ok, HashDict.new [{"result", "this will be a elixir result"}], ' lalal'}
+        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
     """
     def consume([ ?{ | rest ]), do: JSON.Parse.consume_whitespace(rest) |> consume_object_contents
     def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
@@ -159,7 +157,7 @@ defmodule JSON.Parse do
     ## Examples
 
         iex> JSON.Parse.Array.consume ''
-        {:error, {:unexpected_end_of_buffer}
+        {:error, :unexpected_end_of_buffer}
 
         iex> JSON.Parse.Array.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
@@ -167,13 +165,10 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Array.consume '[] '
         {:ok, [], ' ' }
         
-        iex> JSON.Parse.Array.consume ' [] '
-        {:ok, [], ' ' }
-        
         iex> JSON.Parse.Array.consume '[]'
         {:ok, [], '' }
         
-        iex> JSON.Parse.Array.consume ' ["foo", 1, 2, 1.5] lala'
+        iex> JSON.Parse.Array.consume '["foo", 1, 2, 1.5] lala'
         {:ok, ["foo", 1, 2, 1.5], ' lala' }
     """
     def consume([ ?[ | rest ]), do: JSON.Parse.consume_whitespace(rest) |> consume_array_contents
@@ -293,14 +288,14 @@ defmodule JSON.Parse do
 
     ## Examples
 
-        iex> JSON.Parse.Numeric.consume ''
-        {:error, {:unexpected_end_of_buffer}
+        iex> JSON.Parse.Number.consume ''
+        {:error, :unexpected_end_of_buffer}
 
         iex> JSON.Parse.Number.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
 
         iex> JSON.Parse.Number.consume '-hello'
-        {:error, {:unexpected_token, 'hello'} }
+        {:error, {:unexpected_token, '-hello'} }
 
         iex> JSON.Parse.Number.consume '129245'
         {:ok, 129245, '' }
