@@ -196,6 +196,29 @@ defmodule JSON.Parse do
 
 
   defmodule String do
+    @doc """
+    Consumes a valid JSON string, returns its elixir representation
+
+    ## Examples
+
+        iex> JSON.Parse.String.consume ''
+        {:error, :unexpected_end_of_buffer}
+
+        iex> JSON.Parse.String.consume 'face0ff'
+        {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.String.consume '-hello'
+        {:error, {:unexpected_token, '-hello'} }
+
+        iex> JSON.Parse.String.consume '129245'
+        {:error, {:unexpected_token, '129245'} }
+
+        iex> JSON.Parse.Value.consume '\"7.something\"'
+        {:ok, "7.something", '' }
+
+        iex> JSON.Parse.Value.consume '\"-88.22suffix\" foo bar'
+        {:ok, "-88.22suffix", ' foo bar' }
+    """
     def consume([ ?" | rest ]), do: consume_string_contents(rest, [])
     def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
     def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
@@ -203,25 +226,25 @@ defmodule JSON.Parse do
  
     #stop conditions
     defp consume_string_contents([], _), do: {:error, :unexpected_end_of_buffer}
-    defp consume_string_contents([ ?" | rest ], acc), do: { :ok, Enum.reverse(acc) |> iolist_to_binary, rest }
+    defp consume_string_contents([ ?" | rest ], acc), do: { :ok, iolist_to_binary(acc), rest }
     
     #parsing
-    defp consume_string_contents([ ?\\, ?f  | rest ], acc), do: consume_string_contents(rest, [ ?\f | acc ])
-    defp consume_string_contents([ ?\\, ?n  | rest ], acc), do: consume_string_contents(rest, [ ?\n | acc ])
-    defp consume_string_contents([ ?\\, ?r  | rest ], acc), do: consume_string_contents(rest, [ ?\r | acc ])
-    defp consume_string_contents([ ?\\, ?t  | rest ], acc), do: consume_string_contents(rest, [ ?\t | acc ])
-    defp consume_string_contents([ ?\\, ?"  | rest ], acc), do: consume_string_contents(rest, [ ?"  | acc ])
-    defp consume_string_contents([ ?\\, ?\\ | rest ], acc), do: consume_string_contents(rest, [ ?\\ | acc ])
-    defp consume_string_contents([ ?\\, ?/  | rest ], acc), do: consume_string_contents(rest, [ ?/  | acc ])
+    defp consume_string_contents([ ?\\, ?f  | rest ], acc), do: consume_string_contents(rest, [ acc, ?\f ])
+    defp consume_string_contents([ ?\\, ?n  | rest ], acc), do: consume_string_contents(rest, [ acc, ?\n ])
+    defp consume_string_contents([ ?\\, ?r  | rest ], acc), do: consume_string_contents(rest, [ acc, ?\r ])
+    defp consume_string_contents([ ?\\, ?t  | rest ], acc), do: consume_string_contents(rest, [ acc, ?\t ])
+    defp consume_string_contents([ ?\\, ?"  | rest ], acc), do: consume_string_contents(rest, [ acc, ?"  ])
+    defp consume_string_contents([ ?\\, ?\\ | rest ], acc), do: consume_string_contents(rest, [ acc, ?\\ ])
+    defp consume_string_contents([ ?\\, ?/  | rest ], acc), do: consume_string_contents(rest, [ acc, ?/  ])
     
     defp consume_string_contents([ ?\\, ?u  | rest ], acc) do 
       case JSON.Parse.UnicodeEscape.consume([ ?\\, ?u  | rest ]) do 
         { :error, error_info } -> { :error, error_info }
-        { :ok, value, rest } -> consume_string_contents(rest, [ value | acc ])
+        { :ok, value, rest } -> consume_string_contents(rest, [ acc, value ])
       end 
     end
     
-    defp consume_string_contents([ char | rest ], acc), do: consume_string_contents(rest, [ char | acc ])
+    defp consume_string_contents([ char | rest ], acc), do: consume_string_contents(rest, [ acc, char ])
   end  
 
   defmodule UnicodeEscape do
