@@ -159,7 +159,7 @@ defmodule JSON.Decode do
 
   #Number parsing
   defp consume_number(json) when is_list(json) do
-    case JSON.Numeric.to_numeric(json) do
+    case JSON.Parse.Numeric.to_numeric(json) do
       { converted, rest } -> { :ok, converted, rest }
       _ -> { :unexpected_token, json }
     end

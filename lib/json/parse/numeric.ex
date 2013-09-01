@@ -1,4 +1,4 @@
-defmodule JSON.Numeric do
+defmodule JSON.Parse.Numeric do
 
   @doc """
   Like a mix of `String.to_integer` and `String.to_float`, but with some
@@ -6,28 +6,28 @@ defmodule JSON.Numeric do
 
   Examples
 
-      iex> JSON.Numeric.to_numeric ""
+      iex> JSON.Parse.Numeric.to_numeric ""
       :error
 
-      iex> JSON.Numeric.to_numeric "face0ff"
+      iex> JSON.Parse.Numeric.to_numeric "face0ff"
       :error
 
-      iex> JSON.Numeric.to_numeric "-hello"
+      iex> JSON.Parse.Numeric.to_numeric "-hello"
       :error
 
-      iex> JSON.Numeric.to_numeric "129245"
+      iex> JSON.Parse.Numeric.to_numeric "129245"
       {129245, "" }
 
-      iex> JSON.Numeric.to_numeric "7.something"
+      iex> JSON.Parse.Numeric.to_numeric "7.something"
       {7, ".something" }
 
-      iex> JSON.Numeric.to_numeric "-88.22suffix"
+      iex> JSON.Parse.Numeric.to_numeric "-88.22suffix"
       {-88.22, "suffix" }
 
-      iex> JSON.Numeric.to_numeric "-12e4and then some"
+      iex> JSON.Parse.Numeric.to_numeric "-12e4and then some"
       {-1.2e+5, "and then some" }
 
-      iex> JSON.Numeric.to_numeric "7842490016E-12-and more"
+      iex> JSON.Parse.Numeric.to_numeric "7842490016E-12-and more"
       {7.842490016e-3, "-and more" }
   """
   def iolist_to_integer(iolist) when is_list(iolist) do
@@ -58,7 +58,7 @@ defmodule JSON.Numeric do
     { sum + fractional, string }
   end
 
-  # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
+  # ensures the following behavior - JSON.Parse.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
   defp add_fractional({ sum, iolist }) when is_list(iolist), do: { sum, iolist }
 
 
@@ -66,7 +66,7 @@ defmodule JSON.Numeric do
     consume_fractional({ sum + (next_char - ?0) / power, rest }, power * 10)
   end
 
-  # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
+  # ensures the following behavior - JSON.Parse.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
   defp consume_fractional({ sum, iolist }, _) when is_list(iolist), do: { sum, iolist }
 
 
@@ -79,7 +79,7 @@ defmodule JSON.Numeric do
     end
   end
 
-  # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
+  # ensures the following behavior - JSON.Parse.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
   defp apply_exponent({ sum, iolist }) when is_list(iolist), do: { sum, iolist }
 
   @doc """
@@ -87,16 +87,16 @@ defmodule JSON.Numeric do
 
   Examples
 
-      iex> JSON.Numeric.to_integer_from_hex ""
+      iex> JSON.Parse.Numeric.to_integer_from_hex ""
       :error
 
-      iex> JSON.Numeric.to_integer_from_hex "xkcd"
+      iex> JSON.Parse.Numeric.to_integer_from_hex "xkcd"
       :error
 
-      iex> JSON.Numeric.to_integer_from_hex "94"
+      iex> JSON.Parse.Numeric.to_integer_from_hex "94"
       { 148, "" }
 
-      iex> JSON.Numeric.to_integer_from_hex "C2freezing"
+      iex> JSON.Parse.Numeric.to_integer_from_hex "C2freezing"
       { 3119, "reezing" }
   """
   def to_integer_from_hex(bitstring) when is_binary(bitstring) do
