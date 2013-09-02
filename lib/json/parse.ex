@@ -127,14 +127,33 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Value.consume "\\\"star -> \\\\u272d <- star\\\""
         {:ok, "star -> ✭ <- star", "" }
 
+        iex> JSON.Parse.Value.consume '[]'
+        {:ok, [], '' }
+
+        iex> JSON.Parse.Value.consume "[]"
+        {:ok, [], "" }
+
+        iex> JSON.Parse.Value.consume '["foo", 1, 2, 1.5] lala'
+        {:ok, ["foo", 1, 2, 1.5], ' lala' }
+
+        iex> JSON.Parse.Value.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+        {:ok, ["foo", 1, 2, 1.5], " lala" }
+
+        iex> JSON.Parse.Value.consume '{"result": "this will be a elixir result"} lalal'
+        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
+
+        iex> JSON.Parse.Value.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
+
     """
-    def consume([ ?[ | rest ]), do: JSON.Parse.Array.consume([ ?[ | rest ])
+    def consume([ ?[ | rest ]), do: JSON.Parse.Array.consume( [ ?[ | rest ])
     def consume([ ?{ | rest ]), do: JSON.Parse.Object.consume([ ?{ | rest ])
     def consume([ ?" | rest ]), do: JSON.Parse.String.consume([ ?" | rest ])
 
     def consume([ ?- , number | rest]) when number in ?0..?9, do: JSON.Parse.Number.consume([ ?- , number | rest])
     def consume([ number | rest]) when number in ?0..?9, do: JSON.Parse.Number.consume([ number | rest])
-
+    def consume(<< ?[, rest :: binary >>), do: JSON.Parse.Array.consume( << ?[, rest :: binary >>)
+    def consume(<< ?{, rest :: binary >>), do: JSON.Parse.Object.consume(<< ?{, rest :: binary >>)
     def consume(<< ?", rest :: binary >>), do: JSON.Parse.String.consume(<< ?", rest :: binary >>)
 
     def consume(<< ?- , number :: utf8, rest :: binary  >>) when number in ?0..?9 do
@@ -167,32 +186,51 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Object.consume ''
         {:error, :unexpected_end_of_buffer}
 
+        iex> JSON.Parse.Object.consume ""
+        {:error, :unexpected_end_of_buffer}
+
         iex> JSON.Parse.Object.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.Object.consume "face0ff"
+        {:error, {:unexpected_token, "face0ff"} }
 
         iex> JSON.Parse.Object.consume '[] '
         {:error, {:unexpected_token, '[] '}}
 
-        iex> JSON.Parse.Object.consume '[]'
-        {:error, {:unexpected_token, '[]'}}
+        iex> JSON.Parse.Object.consume "[] "
+        {:error, {:unexpected_token, "[] "}}
 
-        iex> JSON.Parse.Object.consume '["foo", 1, 2, 1.5] lala'
-        {:error, {:unexpected_token, '["foo", 1, 2, 1.5] lala'}}
+        iex> JSON.Parse.Object.consume "[]"
+        {:error, {:unexpected_token, "[]"}}
+
+        iex> JSON.Parse.Object.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+        {:error, {:unexpected_token, "[\\\"foo\\\", 1, 2, 1.5] lala"}}
 
         iex> JSON.Parse.Object.consume '{"result": "this will be a elixir result"} lalal'
         {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
+
+        iex> JSON.Parse.Object.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
     """
     def consume([ ?{ | rest ]), do: JSON.Parse.consume_whitespace(rest) |> consume_object_contents
+
+    def consume(<< ?{, rest :: binary >>), do: JSON.Parse.consume_whitespace(rest) |> consume_object_contents
+
     def consume([ ]), do:  {:error, :unexpected_end_of_buffer}
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
+
+    def consume(json) when is_list(json) or is_binary(json), do: {:error, { :unexpected_token, json }}
 
     # Object Parsing
-    defp consume_object_key(json) when is_list(json) do
+    defp consume_object_key(json) when is_list(json) or is_binary(json) do
       case JSON.Parse.String.consume(json) do
         {:error, error_info} -> {:error, error_info}
         {:ok, key, after_key } ->
           case JSON.Parse.consume_whitespace(after_key) do
+            << ?:,  after_colon :: binary >> -> {:ok, key, JSON.Parse.consume_whitespace(after_colon)}
             [ ?: | after_colon ] -> {:ok, key, JSON.Parse.consume_whitespace(after_colon)}
+            << >> -> { :error, :unexpected_end_of_buffer}
             []    -> { :error, :unexpected_end_of_buffer}
             _     -> { :error, {:unexpected_token, JSON.Parse.consume_whitespace(after_key) }}
           end
@@ -206,13 +244,14 @@ defmodule JSON.Parse do
           acc  = HashDict.put(acc, key, value)
           after_value = JSON.Parse.consume_whitespace(after_value)
           case after_value do
+            << ?,, after_comma :: binary >> ->  consume_object_contents(acc, JSON.Parse.consume_whitespace(after_comma))
             [ ?, | after_comma ] ->  consume_object_contents(acc, JSON.Parse.consume_whitespace(after_comma))
             _ -> consume_object_contents(acc, after_value)
           end
       end
     end
 
-    defp consume_object_contents(json) when is_list(json), do: consume_object_contents(HashDict.new, json)
+    defp consume_object_contents(json) when is_list(json) or is_binary(json), do: consume_object_contents(HashDict.new, json)
 
     defp consume_object_contents(acc, [ ?" | rest]) do
       case consume_object_key([ ?" | rest]) do
@@ -221,10 +260,20 @@ defmodule JSON.Parse do
       end
     end
 
-    defp consume_object_contents(acc, [ ?} | rest ]), do: { :ok, acc, rest }
+    defp consume_object_contents(acc, << ?", rest :: binary >>) do
+      case consume_object_key(<< ?" , rest :: binary >>) do
+        {:error, error_info}  -> {:error, error_info}
+        {:ok, key, after_key} -> consume_object_value(acc, key, after_key)
+      end
+    end
 
-    defp consume_object_contents(_, []),  do: {:error, :unexpected_end_of_buffer }
-    defp consume_object_contents(_, json) when is_list(json), do: {:error, { :unexpected_token, json } }
+    defp consume_object_contents(acc, [ ?} | rest ]), do: { :ok, acc, rest }
+    defp consume_object_contents(acc, << ?}, rest :: binary >>), do: { :ok, acc, rest }
+
+    defp consume_object_contents(_, << >>),  do: {:error, :unexpected_end_of_buffer }
+    defp consume_object_contents(_, []),     do: {:error, :unexpected_end_of_buffer }
+
+    defp consume_object_contents(_, json) when is_list(json) or is_binary(json), do: {:error, { :unexpected_token, json } }
   end
 
   defmodule Array do
@@ -236,27 +285,55 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Array.consume ''
         {:error, :unexpected_end_of_buffer}
 
+        iex> JSON.Parse.Array.consume ""
+        {:error, :unexpected_end_of_buffer}
+
+        iex> JSON.Parse.Array.consume '[1, 2 '
+        {:error, :unexpected_end_of_buffer}
+
+        iex> JSON.Parse.Array.consume "[1, 2 "
+        {:error, :unexpected_end_of_buffer}
+
         iex> JSON.Parse.Array.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
 
-        iex> JSON.Parse.Array.consume '[] '
-        {:ok, [], ' ' }
+        iex> JSON.Parse.Array.consume "face0ff"
+        {:error, {:unexpected_token, "face0ff"} }
+
+        iex> JSON.Parse.Array.consume '[] lala'
+        {:ok, [], ' lala' }
+
+        iex> JSON.Parse.Array.consume "[] lala"
+        {:ok, [], " lala" }
 
         iex> JSON.Parse.Array.consume '[]'
         {:ok, [], '' }
 
+        iex> JSON.Parse.Array.consume "[]"
+        {:ok, [], "" }
+
         iex> JSON.Parse.Array.consume '["foo", 1, 2, 1.5] lala'
         {:ok, ["foo", 1, 2, 1.5], ' lala' }
+
+        iex> JSON.Parse.Array.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+        {:ok, ["foo", 1, 2, 1.5], " lala" }
     """
     def consume([ ?[ | rest ]), do: JSON.Parse.consume_whitespace(rest) |> consume_array_contents
-    def consume([ ]), do:  {:error, :unexpected_end_of_buffer}
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+
+    def consume(<< ?[, rest :: binary >>), do: JSON.Parse.consume_whitespace(rest) |> consume_array_contents
+
+    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
+    def consume([ ]),   do:  {:error, :unexpected_end_of_buffer}
+    def consume(json) when is_list(json) or is_binary(json), do: {:error, { :unexpected_token, json }}
 
     # Array Parsing
-    defp consume_array_contents(json) when is_list(json), do: consume_array_contents([], json)
+    defp consume_array_contents(json) when is_list(json) or is_binary(json), do: consume_array_contents([], json)
 
+    defp consume_array_contents(acc, << ?], rest :: binary >>), do: {:ok, Enum.reverse(acc), rest }
     defp consume_array_contents(acc, [ ?] | rest ]), do: {:ok, Enum.reverse(acc), rest }
-    defp consume_array_contents(_, [] ), do: { :unexpected_end_of_buffer, "" }
+
+    defp consume_array_contents(_, << >> ), do: { :error,  :unexpected_end_of_buffer }
+    defp consume_array_contents(_, [] ), do: { :error, :unexpected_end_of_buffer }
 
     defp consume_array_contents(acc, json) do
       case JSON.Parse.consume_whitespace(json) |> JSON.Parse.Value.consume do
@@ -265,6 +342,7 @@ defmodule JSON.Parse do
           after_value = JSON.Parse.consume_whitespace(after_value)
           case after_value  do
             [ ?, | after_comma ] -> consume_array_contents([ value | acc ], JSON.Parse.consume_whitespace(after_comma))
+            << ?, , after_comma :: binary >> -> consume_array_contents([ value | acc ], JSON.Parse.consume_whitespace(after_comma))
             _ ->  consume_array_contents([ value | acc ], after_value)
           end
       end
