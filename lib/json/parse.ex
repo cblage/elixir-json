@@ -55,32 +55,77 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Value.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
 
+        iex> JSON.Parse.Value.consume "face0ff"
+        {:error, {:unexpected_token, "face0ff"} }
+
         iex> JSON.Parse.Value.consume '-hello'
         {:error, {:unexpected_token, '-hello'} }
+
+        iex> JSON.Parse.Value.consume "-hello"
+        {:error, {:unexpected_token, "-hello"} }
 
         iex> JSON.Parse.Value.consume '129245'
         {:ok, 129245, '' }
 
+        iex> JSON.Parse.Value.consume "129245"
+        {:ok, 129245, "" }
+
         iex> JSON.Parse.Value.consume '7.something'
         {:ok, 7, '.something' }
+
+        iex> JSON.Parse.Value.consume "7.something"
+        {:ok, 7, ".something" }
 
         iex> JSON.Parse.Value.consume '-88.22suffix'
         {:ok, -88.22, 'suffix' }
 
+        iex> JSON.Parse.Value.consume "-88.22suffix"
+        {:ok, -88.22, "suffix" }
+
         iex> JSON.Parse.Value.consume '-12e4and then some'
         {:ok, -1.2e+5, 'and then some' }
+
+        iex> JSON.Parse.Value.consume "-12e4and then some"
+        {:ok, -1.2e+5, "and then some" }
 
         iex> JSON.Parse.Value.consume '7842490016E-12-and more'
         {:ok, 7.842490016e-3, '-and more' }
 
+        iex> JSON.Parse.Value.consume "7842490016E-12-and more"
+        {:ok, 7.842490016e-3, "-and more" }
+
         iex> JSON.Parse.Value.consume 'null'
         {:ok, nil, '' }
+
+        iex> JSON.Parse.Value.consume "null"
+        {:ok, nil, ""}
 
         iex> JSON.Parse.Value.consume 'false'
         {:ok, false, '' }
 
+        iex> JSON.Parse.Value.consume "false"
+        {:ok, false, "" }
+
         iex> JSON.Parse.Value.consume 'true'
         {:ok, true, '' }
+
+        iex> JSON.Parse.Value.consume "true"
+        {:ok, true, "" }
+
+        iex> JSON.Parse.Value.consume '\\\"7.something\\\"'
+        {:ok, "7.something", '' }
+
+        iex> JSON.Parse.Value.consume "\\\"7.something\\\""
+        {:ok, "7.something", "" }
+
+        iex> JSON.Parse.Value.consume "\\\"-88.22suffix\\\" foo bar"
+        {:ok, "-88.22suffix", " foo bar" }
+
+        iex> JSON.Parse.Value.consume '\\\"-88.22suffix\\\" foo bar'
+        {:ok, "-88.22suffix", ' foo bar' }
+
+        iex> JSON.Parse.Value.consume "\\\"star -> \\\\u272d <- star\\\""
+        {:ok, "star -> ✭ <- star", "" }
 
     """
     def consume([ ?[ | rest ]), do: JSON.Parse.Array.consume([ ?[ | rest ])
@@ -90,12 +135,27 @@ defmodule JSON.Parse do
     def consume([ ?- , number | rest]) when number in ?0..?9, do: JSON.Parse.Number.consume([ ?- , number | rest])
     def consume([ number | rest]) when number in ?0..?9, do: JSON.Parse.Number.consume([ number | rest])
 
+    def consume(<< ?", rest :: binary >>), do: JSON.Parse.String.consume(<< ?", rest :: binary >>)
+
+    def consume(<< ?- , number :: utf8, rest :: binary  >>) when number in ?0..?9 do
+      JSON.Parse.Number.consume(<< ?- , number :: utf8, rest :: binary  >>)
+    end
+
+    def consume(<< number :: utf8, rest :: binary >>) when number in ?0..?9 do
+      JSON.Parse.Number.consume(<< number :: utf8, rest :: binary  >>)
+    end
+
     def consume([ ?n, ?u, ?l, ?l  | rest ]),    do: { :ok, nil,   rest }
     def consume([ ?t, ?r, ?u, ?e  | rest ]),    do: { :ok, true,  rest }
     def consume([ ?f, ?a, ?l, ?s, ?e | rest ]), do: { :ok, false, rest }
 
+    def consume("null"  <> rest), do: { :ok, nil,   rest }
+    def consume("true"  <> rest), do: { :ok, true,  rest }
+    def consume("false" <> rest), do: { :ok, false, rest }
+
     def consume([ ]), do:  {:error, :unexpected_end_of_buffer}
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
+    def consume(json) when is_list(json) or is_binary(json), do: {:error, { :unexpected_token, json }}
   end
 
   defmodule Object do
@@ -416,32 +476,63 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Number.consume ''
         {:error, :unexpected_end_of_buffer}
 
+        iex> JSON.Parse.Number.consume ""
+        {:error, :unexpected_end_of_buffer}
+
         iex> JSON.Parse.Number.consume 'face0ff'
         {:error, {:unexpected_token, 'face0ff'} }
+
+        iex> JSON.Parse.Number.consume "face0ff"
+        {:error, {:unexpected_token, "face0ff"} }
 
         iex> JSON.Parse.Number.consume '-hello'
         {:error, {:unexpected_token, '-hello'} }
 
+        iex> JSON.Parse.Number.consume "-hello"
+        {:error, {:unexpected_token, "-hello"} }
+
         iex> JSON.Parse.Number.consume '129245'
         {:ok, 129245, '' }
+
+        iex> JSON.Parse.Number.consume "129245"
+        {:ok, 129245, "" }
 
         iex> JSON.Parse.Number.consume '7.something'
         {:ok, 7, '.something' }
 
+        iex> JSON.Parse.Number.consume "7.something"
+        {:ok, 7, ".something" }
+
         iex> JSON.Parse.Number.consume '7.4566something'
         {:ok, 7.4566, 'something' }
+
+        iex> JSON.Parse.Number.consume "7.4566something"
+        {:ok, 7.4566, "something" }
 
         iex> JSON.Parse.Number.consume '-88.22suffix'
         {:ok, -88.22, 'suffix' }
 
+        iex> JSON.Parse.Number.consume "-88.22suffix"
+        {:ok, -88.22, "suffix" }
+
         iex> JSON.Parse.Number.consume '-12e4and then some'
         {:ok, -1.2e+5, 'and then some' }
 
+        iex> JSON.Parse.Number.consume "-12e4and then some"
+        {:ok, -1.2e+5, "and then some" }
+
         iex> JSON.Parse.Number.consume '7842490016E-12-and more'
         {:ok, 7.842490016e-3, '-and more' }
+
+        iex> JSON.Parse.Number.consume "7842490016E-12-and more"
+        {:ok, 7.842490016e-3, "-and more" }
     """
     def consume([ ?- , number | rest]) when number in ?0..?9 do
       consume([number | rest]) |> negate
+    end
+
+    def consume(<< ?- , number :: utf8 ,  rest :: binary >>) when number in ?0..?9 do
+      consume(<< number :: utf8, rest :: binary>>) |> negate
     end
 
     def consume([ number | rest]) when number in ?0..?9 do
@@ -450,49 +541,84 @@ defmodule JSON.Parse do
         |> apply_exponent
     end
 
+    def consume(<< ?- , number :: utf8, rest :: binary >>) when number in ?0..?9 do
+      consume(<< number :: utf8,  rest :: binary >>) |> negate
+    end
+
+    def consume(<< number :: utf8 ,  rest :: binary >>) when number in ?0..?9 do
+      bitstring_to_integer(<< number :: utf8, rest :: binary >>)
+        |> add_fractional
+        |> apply_exponent
+    end
+
     def consume([ ]), do:  {:error, :unexpected_end_of_buffer}
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
+    def consume(json) when is_list(json) or is_binary(json), do: {:error, { :unexpected_token, json }}
 
     defp negate({:error, error_info}), do: {:error, error_info}
-    defp negate({:ok, number, iolist }) when is_list(iolist), do: {:ok, -1 * number, iolist }
+    defp negate({:ok, number, json }) when is_list(json) or is_binary(json), do: {:ok, -1 * number, json }
 
     defp add_fractional({:error, error_info}), do: {:error, error_info}
 
-    defp add_fractional({:ok, acc, [ ?., c | iolist ] }) when c in ?0..?9 do
-      { fractional, rest } = consume_fractional([ c | iolist ], 0, 10.0)
+    defp add_fractional({:ok, acc, [ ?., c | rest ] }) when c in ?0..?9 do
+      { fractional, rest } = consume_fractional([ c | rest ], 0, 10.0)
+      {:ok, acc + fractional, rest }
+    end
+
+    defp add_fractional({:ok, acc, << ?., c :: utf8, rest :: binary >> }) when c in ?0..?9 do
+      { fractional, rest } = consume_fractional(<< c :: utf8,  rest :: binary >>, 0, 10.0)
       {:ok, acc + fractional, rest }
     end
 
     # ensures the following behavior - JSON.Parse.Number.consume '-88.22suffix' - {:ok, -88.22, 'suffix' }
-    defp add_fractional({:ok, acc, iolist }) when is_list(iolist), do: {:ok, acc, iolist }
+    defp add_fractional({:ok, acc, json }) when is_list(json) or is_binary(json), do: {:ok, acc, json }
 
-    defp consume_fractional([ next_char | rest ], acc, power) when next_char in ?0..?9 do
-      consume_fractional(rest, acc + (next_char - ?0) / power, power * 10)
+    defp consume_fractional([ number | rest ], acc, power) when number in ?0..?9 do
+      consume_fractional(rest, acc + (number - ?0) / power, power * 10)
+    end
+
+    defp consume_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
+      consume_fractional(rest, acc + (number - ?0) / power, power * 10)
     end
 
     # ensures the following behavior - JSON.Parse.Number.consume '-88.22suffix' - {:ok, -88.22, 'suffix' }
-    defp consume_fractional(iolist, acc , _) when is_list(iolist), do: { acc, iolist }
+    defp consume_fractional(json, acc , _) when is_list(json) or is_binary(json), do: { acc, json }
 
     defp apply_exponent({:error, error_info}), do: { :error, error_info }
 
-    defp apply_exponent({:ok, acc, [ e | rest ] }) when e in [?e, ?E] do
+    defp apply_exponent({:ok, acc, [ exponent | rest ] }) when exponent in [?e, ?E] do
       case iolist_to_integer(rest) do
         { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
         { :error, error_info } -> { :error, error_info }
       end
     end
 
+    defp apply_exponent({:ok, acc, << exponent :: utf8, rest :: binary >> }) when exponent in [?e, ?E] do
+      case bitstring_to_integer(rest) do
+        { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
+        { :error, error_info } -> { :error, error_info }
+      end
+    end
+
     # ensures the following behavior - JSON.Parse.Number.consume "7842490016E-12-and more" - {:ok, 7.842490016e-3, '-and more' }
-    defp apply_exponent({:ok, acc, iolist }) when is_list(iolist), do: {:ok, acc, iolist }
+    defp apply_exponent({:ok, acc, json }) when is_list(json) or is_binary(json), do: {:ok, acc, json }
+
+    # mini-wrapper around Elixir.String.to_integer
+    defp bitstring_to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
+
+    defp bitstring_to_integer(bitstring) when is_binary(bitstring) do
+      case Elixir.String.to_integer(bitstring) do
+        :error -> {:error, {:unexpected_token, bitstring} }
+        { result, rest } -> {:ok, result, rest}
+      end
+    end
 
     # mini-wrapper around :string.to_integer
+    defp iolist_to_integer([]), do: {:error, :unexpected_end_of_buffer}
+
     defp iolist_to_integer(iolist) when is_list(iolist) do
       case :string.to_integer(iolist) do
-        { :error, _ } ->
-          case iolist do
-            [] -> {:error,  :unexpected_end_of_buffer}
-            _ -> {:error, {:unexpected_token, iolist} }
-          end
+        { :error, _ } -> {:error, {:unexpected_token, iolist} }
         { result, rest } -> {:ok, result, rest}
       end
     end
