@@ -8,4 +8,3 @@ Expm.Package.new(
     [name: "Carlos Brito Lage",  email: "carlos@carloslage.net"],
     [name: "James Alexander Rosen", email: "james.a.rosen@gmail.com"]],
   repositories: [[github: "cblage/elixir-json", branch: "parser-decoder-decoupling"]])
-    

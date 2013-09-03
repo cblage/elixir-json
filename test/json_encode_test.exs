@@ -38,4 +38,8 @@ defmodule JSONEncodeTest do
       == {:ok, "{\"array\":[\"a\",\"b\",\"c\"],\"false\":false,\"null\":null,\"number\":1234,\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"string\":\"this will be a string\"}"}
   end
 
+  test "convert keyword with '\\' into correct JSON" do
+    assert \
+      JSON.encode([result: "\\n"]) == {:ok, "{\"result\":\"\\\\n\"}"}
+  end
 end
