@@ -752,6 +752,14 @@ defmodule JSON.Parse do
 
     defp bitstring_to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
 
+    defp bitstring_to_integer(<< ?-, char :: utf8, rest :: binary >>) when char in ?0..?9 do 
+      bitstring_to_integer(<< char :: utf8, rest :: binary >>) |> negate
+    end
+
+    defp bitstring_to_integer(<< ?+, char :: utf8, rest :: binary >>) when char in ?0..?9 do 
+      bitstring_to_integer(<< char :: utf8, rest :: binary >>)
+    end
+
     defp bitstring_to_integer(<< char :: utf8, rest :: binary >>) when char in ?0..?9  do
       case bitstring_to_integer(<< char :: utf8, rest :: binary >>, 0) do
         :error -> {:error, {:unexpected_token, << char :: utf8, rest :: binary >>} }
