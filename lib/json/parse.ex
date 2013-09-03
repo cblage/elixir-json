@@ -739,15 +739,26 @@ defmodule JSON.Parse do
     # ensures the following behavior - JSON.Parse.Number.consume "7842490016E-12-and more" - {:ok, 7.842490016e-3, '-and more' }
     defp bitstring_apply_exponent({:ok, acc, json }), do: {:ok, acc, json }
 
-    # mini-wrapper around Elixir.String.to_integer
+    # Elixir.String.to_integer converts the whole buffer into iolist, this is unacceptable, using own implementation
+    
+    defp bitstring_to_integer(<< char :: utf8, rest :: binary >>, acc) when char in ?0..?9 do
+      bitstring_to_integer(rest, 10 * acc + char - ?0) 
+    end
+
+    defp bitstring_to_integer(bitstring, acc) when is_binary(bitstring) do
+      {acc, bitstring}
+    end
+
     defp bitstring_to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
 
-    defp bitstring_to_integer(bitstring) do
-      case Elixir.String.to_integer(bitstring) do
-        :error -> {:error, {:unexpected_token, bitstring} }
+    defp bitstring_to_integer(<< char :: utf8, rest :: binary >>) when char in ?0..?9  do
+      case bitstring_to_integer(<< char :: utf8, rest :: binary >>, 0) do
+        :error -> {:error, {:unexpected_token, << char :: utf8, rest :: binary >>} }
         { result, rest } -> {:ok, result, rest}
       end
     end
+
+    defp bitstring_to_integer(bitstring) when is_binary(bitstring), do: {:error, {:unexpected_token, bitstring}}
 
 
     @doc """
