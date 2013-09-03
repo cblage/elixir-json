@@ -8,22 +8,22 @@ defmodule JSON.Decode do
   defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
 
-  def from_json(bitstring) when is_binary(bitstring) do
-    case bitstring_to_list(bitstring) |> from_json do
-      { :ok, value } -> { :ok, value }
-      { :error, error_info } -> 
-        case error_info do
-          { :unexpected_token, tok } -> { :error, { :unexpected_token, iolist_to_binary(tok) }}
-          _ -> { :error, error_info }
+  def from_bitstring(bitstring) when is_bitstring(bitstring) do
+    case JSON.Parse.bitstring_consume_whitespace(bitstring) |> JSON.Parse.Value.bitstring_consume do
+      { :error, error_info } -> { :error, error_info }
+      { :ok, value, rest } ->
+        case JSON.Parse.bitstring_consume_whitespace(rest) do
+          << >> -> { :ok, value }
+          _  -> { :error, { :unexpected_token, rest } }
         end
     end
   end
 
-  def from_json(iolist) when is_list(iolist) do 
-    case JSON.Parse.consume_whitespace(iolist) |> JSON.Parse.Value.consume do
+  def from_charlist(charlist) when is_list(charlist) do 
+    case JSON.Parse.charlist_consume_whitespace(charlist) |> JSON.Parse.Value.charlist_consume do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest } ->
-        case JSON.Parse.consume_whitespace(rest) do
+        case JSON.Parse.charlist_consume_whitespace(rest) do
           [] -> { :ok, value }
           _  -> { :error, { :unexpected_token, rest } }
         end

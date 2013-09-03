@@ -9,7 +9,7 @@ defmodule JSONDecodeTest do
           decode_result = JSON.decode(unquote(input))
           case decode_result do
             { :ok, actual } -> assert unquote(output) == actual
-            decode_result -> flunk "Expected { :ok, #{unquote(output)} }, got { #{decode_result} }"
+            decode_result -> flunk "Expected { :ok, "<> inspect(unquote(output)) <> "} }, got { "<> inspect(decode_result) <>"} }"
           end
         end
       end
@@ -21,7 +21,7 @@ defmodule JSONDecodeTest do
           decode_result = JSON.decode(unquote(input))
           case decode_result do
             { :error, actual } -> assert unquote(error_info) == actual
-            decode_result -> flunk "Expected { :error, #{unquote(error_info)} }, got { #{decode_result} }"
+            decode_result -> flunk "Expected { :error,"<> inspect(unquote(error_info)) <> "} }, got { "<> inspect(decode_result) <>"} }"
           end
         end
       end
@@ -64,7 +64,29 @@ defmodule JSONDecodeTest do
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
     decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ", [nil, [false, "five"], [3, true]]
 
-    decodes "complex object",
+    decodes "complex object in charlist",
+            '{
+              "name": "Jenny",
+              "active": true,
+              "phone": "1.415.555.0000",
+              "balance": 1.52E+5,
+              "children": [
+                { "name": "Penny" },
+                { "name": "Elga" }
+              ]
+             }',
+             HashDict.new([
+              { "name", "Jenny" },
+              { "active", true },
+              { "phone", "1.415.555.0000" },
+              { "balance", 1.52e+5 },
+              { "children", [
+                HashDict.new([ { "name", "Penny" } ]),
+                HashDict.new([ { "name", "Elga" } ])
+              ] }
+            ])
+
+    decodes "complex object in bitstring",
             "{
               \"name\": \"Rafaëlla\",
               \"active\": true,
