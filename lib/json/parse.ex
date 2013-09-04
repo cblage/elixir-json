@@ -107,17 +107,16 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Value.bitstring_consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
         {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
     """
+    def bitstring_consume(<< ?[, _ :: binary >> = bin), do: JSON.Parse.Array.bitstring_consume(bin)
+    def bitstring_consume(<< ?{, _ :: binary >> = bin), do: JSON.Parse.Object.bitstring_consume(bin)
+    def bitstring_consume(<< ?", _ :: binary >> = bin), do: JSON.Parse.String.bitstring_consume(bin)
 
-    def bitstring_consume(<< ?[, rest :: binary >>), do: JSON.Parse.Array.bitstring_consume( << ?[, rest :: binary >>)
-    def bitstring_consume(<< ?{, rest :: binary >>), do: JSON.Parse.Object.bitstring_consume(<< ?{, rest :: binary >>)
-    def bitstring_consume(<< ?", rest :: binary >>), do: JSON.Parse.String.bitstring_consume(<< ?", rest :: binary >>)
-
-    def bitstring_consume(<< ?- , number :: utf8, rest :: binary  >>) when number in ?0..?9 do
-      JSON.Parse.Number.bitstring_consume(<< ?- , number :: utf8, rest :: binary  >>)
+    def bitstring_consume(<< ?- , number :: utf8, _ :: binary  >> = bin) when number in ?0..?9 do
+      JSON.Parse.Number.bitstring_consume(bin)
     end
 
-    def bitstring_consume(<< number :: utf8, rest :: binary >>) when number in ?0..?9 do
-      JSON.Parse.Number.bitstring_consume(<< number :: utf8, rest :: binary  >>)
+    def bitstring_consume(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
+      JSON.Parse.Number.bitstring_consume(bin)
     end
 
     def bitstring_consume(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
@@ -180,16 +179,16 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Value.charlist_consume '{"result": "this will be a elixir result"} lalal'
         {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
     """
-    def charlist_consume([ ?[ | rest ]), do: JSON.Parse.Array.charlist_consume( [ ?[ | rest ])
-    def charlist_consume([ ?{ | rest ]), do: JSON.Parse.Object.charlist_consume([ ?{ | rest ])
-    def charlist_consume([ ?" | rest ]), do: JSON.Parse.String.charlist_consume([ ?" | rest ])
+    def charlist_consume([ ?[ | _ ] = charlist), do: JSON.Parse.Array.charlist_consume(charlist)
+    def charlist_consume([ ?{ | _ ] = charlist), do: JSON.Parse.Object.charlist_consume(charlist)
+    def charlist_consume([ ?" | _ ] = charlist), do: JSON.Parse.String.charlist_consume(charlist)
 
-    def charlist_consume([ ?- , number | rest]) when number in ?0..?9 do
-        JSON.Parse.Number.charlist_consume([ ?- , number | rest])
+    def charlist_consume([ ?- , number | _ ] = charlist) when number in ?0..?9 do
+        JSON.Parse.Number.charlist_consume(charlist)
     end
 
-    def charlist_consume([ number | rest]) when number in ?0..?9 do
-        JSON.Parse.Number.charlist_consume([ number | rest])
+    def charlist_consume([ number | _ ] = charlist) when number in ?0..?9 do
+        JSON.Parse.Number.charlist_consume(charlist)
     end
 
 
@@ -279,16 +278,18 @@ defmodule JSON.Parse do
           acc  = HashDict.put(acc, key, value)
           after_value = JSON.Parse.bitstring_consume_whitespace(after_value)
           case after_value do
-            << ?,, after_comma :: binary >> ->  bitstring_consume_object_contents(acc, JSON.Parse.bitstring_consume_whitespace(after_comma))
-            _ -> bitstring_consume_object_contents(acc, after_value)
+            << ?,, after_comma :: binary >> ->
+              bitstring_consume_object_contents(acc, JSON.Parse.bitstring_consume_whitespace(after_comma))
+            _
+              -> bitstring_consume_object_contents(acc, after_value)
           end
       end
     end
 
     defp bitstring_consume_object_contents(json), do: bitstring_consume_object_contents(HashDict.new, json)
 
-    defp bitstring_consume_object_contents(acc, << ?", rest :: binary >>) do
-      case bitstring_consume_object_key(<< ?" , rest :: binary >>) do
+    defp bitstring_consume_object_contents(acc, << ?", _ :: binary >> = bin) do
+      case bitstring_consume_object_key(bin) do
         {:error, error_info}  -> {:error, error_info}
         {:ok, key, after_key} -> bitstring_consume_object_value(acc, key, after_key)
       end
@@ -326,9 +327,8 @@ defmodule JSON.Parse do
     end
 
     defp charlist_consume_object_contents(json), do: charlist_consume_object_contents(HashDict.new, json)
-
-    defp charlist_consume_object_contents(acc, [ ?" | rest]) do
-      case charlist_consume_object_key([ ?" | rest]) do
+    defp charlist_consume_object_contents(acc, [ ?" | _ ] = list) do
+      case charlist_consume_object_key(list) do
         {:error, error_info}  -> {:error, error_info}
         {:ok, key, after_key} -> charlist_consume_object_value(acc, key, after_key)
       end
@@ -500,8 +500,8 @@ defmodule JSON.Parse do
     defp bitstring_consume_string_contents(<< ?\\, ?\\, rest :: binary >>, acc), do: bitstring_consume_string_contents(rest, [ acc, ?\\ ])
     defp bitstring_consume_string_contents(<< ?\\, ?/,  rest :: binary >>, acc), do: bitstring_consume_string_contents(rest, [ acc, ?/  ])
 
-    defp bitstring_consume_string_contents(<< ?\\, ?u , rest :: binary >>, acc) do
-      case JSON.Parse.UnicodeEscape.bitstring_consume(<< ?\\, ?u , rest :: binary >>) do
+    defp bitstring_consume_string_contents(<< ?\\, ?u , rest :: binary >> = bin , acc) do
+      case JSON.Parse.UnicodeEscape.bitstring_consume(bin) do
         { :error, error_info } -> { :error, error_info }
         { :ok, value, rest } -> bitstring_consume_string_contents(rest, [ acc, value ])
       end
@@ -551,8 +551,8 @@ defmodule JSON.Parse do
     defp charlist_consume_string_contents([ ?\\, ?\\ | rest ], acc), do: charlist_consume_string_contents(rest, [ acc, ?\\ ])
     defp charlist_consume_string_contents([ ?\\, ?/  | rest ], acc), do: charlist_consume_string_contents(rest, [ acc, ?/  ])
 
-    defp charlist_consume_string_contents([ ?\\, ?u  | rest ], acc) do
-      case JSON.Parse.UnicodeEscape.charlist_consume([ ?\\, ?u  | rest ]) do
+    defp charlist_consume_string_contents([ ?\\, ?u  | rest ] = list, acc) do
+      case JSON.Parse.UnicodeEscape.charlist_consume(list) do
         { :error, error_info } -> { :error, error_info }
         { :ok, value, rest } -> charlist_consume_string_contents(rest, [ acc, value ])
       end
@@ -580,13 +580,13 @@ defmodule JSON.Parse do
         iex> JSON.Parse.UnicodeEscape.bitstring_consume "\\\\u00dflalalal"
         { :ok, "ß", "lalalal" }
     """
-    def bitstring_consume(<< ?\\, ?u , rest :: binary >>) do
+    def bitstring_consume(<< ?\\, ?u , rest :: binary >> = bin) do
       case bitstring_consume_unicode_escape(rest, 0, 0) do
         { :ok, tentative_codepoint, after_tentative_codepoint} ->
           if Elixir.String.valid_codepoint? tentative_codepoint do
             { :ok, tentative_codepoint, after_tentative_codepoint}
           else
-            {:error, { :unexpected_token, << ?\\, ?u, rest >> } }
+            {:error, { :unexpected_token, bin} }
           end
         { :error, error_info } -> { :error, error_info }
       end
@@ -636,13 +636,13 @@ defmodule JSON.Parse do
         { :ok, "ß", 'lalalal' }
 
     """
-    def charlist_consume([?\\, ?u | rest]) do
+    def charlist_consume([?\\, ?u | rest] = list) do
       case charlist_consume_unicode_escape(rest, 0, 0) do
         { :ok, tentative_codepoint, after_tentative_codepoint} ->
           if Elixir.String.valid_codepoint? tentative_codepoint do
             { :ok, tentative_codepoint, after_tentative_codepoint}
           else
-            {:error, { :unexpected_token, [?\\, ?u | rest] } }
+            {:error, { :unexpected_token, list } }
           end
         { :error, error_info } -> { :error, error_info }
       end
@@ -685,7 +685,7 @@ defmodule JSON.Parse do
         {:error, {:unexpected_token, "face0ff"} }
 
         iex> JSON.Parse.Number.bitstring_consume "-hello"
-        {:error, {:unexpected_token, "-hello"} }
+        {:error, {:unexpected_token, "hello"} }
 
         iex> JSON.Parse.Number.bitstring_consume "129245"
         {:ok, 129245, "" }
@@ -705,20 +705,23 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Number.bitstring_consume "7842490016E-12-and more"
         {:ok, 7.842490016e-3, "-and more" }
     """
-    def bitstring_consume(<< ?- , number :: utf8 ,  rest :: binary >>) when number in ?0..?9 do
-      bitstring_consume(<< number :: utf8, rest :: binary>>) |> negate
-    end
+    def bitstring_consume(<< ?- , rest :: binary >>), do: bitstring_consume(rest) |> negate
 
-    def bitstring_consume(<< number :: utf8 ,  rest :: binary >>) when number in ?0..?9 do
-      bitstring_to_integer(<< number :: utf8, rest :: binary >>) |> bitstring_add_fractional |> bitstring_apply_exponent
+    def bitstring_consume(<< number :: utf8 ,  _ :: binary >> = bin) when number in ?0..?9 do
+      bitstring_to_integer(bin) |> bitstring_add_fractional |> bitstring_apply_exponent
     end
 
     def bitstring_consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
     def bitstring_consume(json), do: {:error, { :unexpected_token, json }}
 
-    defp bitstring_add_fractional({:ok, acc, << ?., c :: utf8, rest :: binary >> }) when c in ?0..?9 do
-      { fractional, rest } = bitstring_consume_fractional(<< c :: utf8,  rest :: binary >>, 0, 10.0)
-      {:ok, acc + fractional, rest }
+    defp bitstring_add_fractional({:ok, acc, << ?., after_dot :: binary >> = bin })  do
+      case after_dot do
+        << c :: utf8, _ :: binary >> when c in ?0..?9 ->
+          { fractional, rest } = bitstring_consume_fractional(after_dot, 0, 10.0)
+          {:ok, acc + fractional, rest }
+        _ ->
+          {:ok, acc, bin }
+      end
     end
 
     defp bitstring_add_fractional({:ok, acc, json }), do: {:ok, acc, json }
@@ -729,7 +732,7 @@ defmodule JSON.Parse do
 
     defp bitstring_consume_fractional(json, acc , _) when is_binary(json), do: { acc, json }
 
-    defp bitstring_apply_exponent({:ok, acc, << exponent :: utf8, rest :: binary >> }) when exponent in [?e, ?E] do
+    defp bitstring_apply_exponent({:ok, acc, << exponent :: utf8, rest :: binary >> }) when exponent in 'eE' do
       case bitstring_to_integer(rest) do
         { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
         { :error, error_info } -> { :error, error_info }
@@ -740,9 +743,9 @@ defmodule JSON.Parse do
     defp bitstring_apply_exponent({:ok, acc, json }), do: {:ok, acc, json }
 
     # Elixir.String.to_integer converts the whole buffer into iolist, this is unacceptable, using own implementation
-    
+
     defp bitstring_to_integer(<< char :: utf8, rest :: binary >>, acc) when char in ?0..?9 do
-      bitstring_to_integer(rest, 10 * acc + char - ?0) 
+      bitstring_to_integer(rest, 10 * acc + char - ?0)
     end
 
     defp bitstring_to_integer(bitstring, acc) when is_binary(bitstring) do
@@ -751,17 +754,28 @@ defmodule JSON.Parse do
 
     defp bitstring_to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
 
-    defp bitstring_to_integer(<< ?-, char :: utf8, rest :: binary >>) when char in ?0..?9 do 
-      bitstring_to_integer(<< char :: utf8, rest :: binary >>) |> negate
+    defp bitstring_to_integer(<< ?-, after_minus :: binary >>) do
+      case after_minus do
+        << char :: utf8,  _ :: binary >> when char in ?0..?9 ->
+          bitstring_to_integer(after_minus) |> negate
+        _ ->
+          {:error, {:unexpected_token, after_minus}}
+      end
     end
 
-    defp bitstring_to_integer(<< ?+, char :: utf8, rest :: binary >>) when char in ?0..?9 do 
-      bitstring_to_integer(<< char :: utf8, rest :: binary >>)
+
+    defp bitstring_to_integer(<< ?+, after_plus :: binary >>) do
+      case after_plus do
+        << char :: utf8,  _ :: binary >> when char in ?0..?9  ->
+          bitstring_to_integer(after_plus)
+        _ ->
+          {:error, {:unexpected_token, after_plus}}
+      end
     end
 
-    defp bitstring_to_integer(<< char :: utf8, rest :: binary >>) when char in ?0..?9  do
-      case bitstring_to_integer(<< char :: utf8, rest :: binary >>, 0) do
-        :error -> {:error, {:unexpected_token, << char :: utf8, rest :: binary >>} }
+    defp bitstring_to_integer(<< char :: utf8, rest :: binary >> = bin) when char in ?0..?9  do
+      case bitstring_to_integer(bin, 0) do
+        :error -> {:error, {:unexpected_token, bin} }
         { result, rest } -> {:ok, result, rest}
       end
     end
@@ -781,7 +795,7 @@ defmodule JSON.Parse do
         {:error, {:unexpected_token, 'face0ff'} }
 
         iex> JSON.Parse.Number.charlist_consume '-hello'
-        {:error, {:unexpected_token, '-hello'} }
+        {:error, {:unexpected_token, 'hello'} }
 
         iex> JSON.Parse.Number.charlist_consume '129245'
         {:ok, 129245, '' }
@@ -801,9 +815,7 @@ defmodule JSON.Parse do
         iex> JSON.Parse.Number.charlist_consume '7842490016E-12-and more'
         {:ok, 7.842490016e-3, '-and more' }
     """
-    def charlist_consume([ ?- , number | rest]) when number in ?0..?9 do
-      charlist_consume([number | rest]) |> negate
-    end
+    def charlist_consume([ ?- | rest]), do: charlist_consume(rest) |> negate
 
     def charlist_consume([ number | rest]) when number in ?0..?9 do
       iolist_to_integer([ number | rest]) |> charlist_add_fractional |> charlist_apply_exponent
@@ -831,8 +843,7 @@ defmodule JSON.Parse do
 
     #exponent
     defp charlist_apply_exponent({:error, error_info}), do: { :error, error_info }
-
-    defp charlist_apply_exponent({:ok, acc, [ exponent | rest ] }) when exponent in [?e, ?E] do
+    defp charlist_apply_exponent({:ok, acc, [ exponent | rest ] }) when exponent in 'eE' do
       case iolist_to_integer(rest) do
         { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
         { :error, error_info } -> { :error, error_info }
