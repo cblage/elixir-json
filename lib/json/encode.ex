@@ -69,7 +69,7 @@ defimpl JSON.Encode, for: List do
     if Keyword.keyword? list do 
       {:ok, "{" <> Enum.map_join(list, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
     else
-      {:ok, "[" <> Enum.map_join(list, ",", encode_item(&1)) <> "]"}
+      {:ok, "[" <> Enum.map_join(list, ",", &encode_item(&1)) <> "]"}
     end
   end
 
