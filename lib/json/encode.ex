@@ -118,7 +118,7 @@ defimpl JSON.Encode, for: BitString do
     encode_binary_recursive(tail, encode_binary_character(head, acc))
   end
 
-  defp encode_binary_recursive(<<>>, acc), do: Enum.reverse(acc) |> iolist_to_binary
+  defp encode_binary_recursive(<<>>, acc), do: Enum.reverse(acc) |> to_string
   
 
   defp encode_binary_character(?",   acc),  do: [?", ?\\  | acc]
