@@ -47,7 +47,7 @@ defmodule JSON.Numeric do
 
   def to_numeric([?- | after_minus ]), do: to_numeric(after_minus) |> negate
   def to_numeric(iolist) when is_list(iolist), do: iolist_to_integer(iolist) |> add_fractional |> apply_exponent
-  
+
   defp negate(:error), do: :error
   defp negate({ number, iolist }) when is_list(iolist), do: { -1 * number, iolist }
 
@@ -60,7 +60,7 @@ defmodule JSON.Numeric do
 
   # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
   defp add_fractional({ sum, iolist }) when is_list(iolist), do: { sum, iolist }
-  
+
 
   defp consume_fractional({ sum, [ next_char | rest ] }, power) when next_char in ?0..?9 do
     consume_fractional({ sum + (next_char - ?0) / power, rest }, power * 10)
@@ -68,10 +68,10 @@ defmodule JSON.Numeric do
 
   # ensures the following behavior - JSON.Numeric.to_integer_from_hex "C2freezing" { 3119, "reezing" }
   defp consume_fractional({ sum, iolist }, _) when is_list(iolist), do: { sum, iolist }
-  
+
 
   defp apply_exponent(:error), do: :error
-  
+
   defp apply_exponent({ sum, [ e | rest ] }) when e in [?e, ?E] do
     case iolist_to_integer(rest) do
       { power, rest } -> { sum * :math.pow(10, power), rest }
@@ -103,7 +103,7 @@ defmodule JSON.Numeric do
     case bitstring_to_list(bitstring) |> to_integer_from_hex do
       { result, rest } -> {result, iolist_to_binary(rest)}
       :error -> :error
-    end   
+    end
   end
 
   def to_integer_from_hex(iolist) when is_list(iolist) do
@@ -116,7 +116,7 @@ defmodule JSON.Numeric do
 
 
   defp to_integer_from_hex_recursive(iolist, sum) when is_list(iolist) do
-    case iolist do 
+    case iolist do
       [ c | rest ] when c in ?0..?9 -> to_integer_from_hex_recursive(rest, 16 * sum + c - ?0)
       [ c | rest ] when c in ?a..?f -> to_integer_from_hex_recursive(rest, 16 * sum + 10 + c - ?a)
       [ c | rest ] when c in ?A..?F -> to_integer_from_hex_recursive(rest, 16 * sum + 10 + c - ?A)

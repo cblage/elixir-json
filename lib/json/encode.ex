@@ -4,26 +4,26 @@ defexception JSON.Encode.Error, error_info: nil do
 
     if nil != exception.error_info  do
       error_message <> " >>#{exception.error_info}<<"
-    else 
+    else
       error_message
     end
   end
 end
 
-defprotocol JSON.Encode do  
+defprotocol JSON.Encode do
   @moduledoc """
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.
   """
 
-  
+
   @doc """
   Returns a JSON string representation of the Elixir term
 
   ## Examples
 
-      iex> JSON.Encode.to_json([result: "this will be a elixir result"]) 
+      iex> JSON.Encode.to_json([result: "this will be a elixir result"])
       {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
-      
+
   """
   @spec to_json(term) :: bitstring
   def to_json(term)
@@ -33,9 +33,9 @@ defprotocol JSON.Encode do
 
   ## Examples
 
-      iex> JSON.Encode.typeof([result: "this will be a elixir result"]) 
+      iex> JSON.Encode.typeof([result: "this will be a elixir result"])
       :object
-      
+
   """
   @spec typeof(term) :: atom
   def typeof(term)
@@ -47,42 +47,42 @@ defimpl JSON.Encode, for: Tuple do
 end
 
 defimpl JSON.Encode, for: HashDict do
-  def to_json(dict) do 
+  def to_json(dict) do
     {:ok ,"{" <> Enum.map_join(dict, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
   end
 
-  defp encode_item(item) do 
+  defp encode_item(item) do
     encode_result = JSON.Encode.to_json(item)
-    case encode_result do 
+    case encode_result do
       {:ok, encoded_item} -> encoded_item
       _ -> encode_result #propagate error, will trigger error in map_join
     end
   end
-   
+
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encode, for: List do
   def to_json([]), do: {:ok, "[]"}
-  
-  def to_json(list) do 
-    if Keyword.keyword? list do 
+
+  def to_json(list) do
+    if Keyword.keyword? list do
       {:ok, "{" <> Enum.map_join(list, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
     else
       {:ok, "[" <> Enum.map_join(list, ",", &encode_item(&1)) <> "]"}
     end
   end
 
-  defp encode_item(item) do 
+  defp encode_item(item) do
     encode_result = JSON.Encode.to_json(item)
-    case encode_result do 
+    case encode_result do
       {:ok, encoded_item} -> encoded_item
       _ -> encode_result #propagate error, will trigger error in map_join
     end
   end
 
   def typeof([]), do: :array
-   
+
   def typeof(list) do
     if (Keyword.keyword? list) do
       :object
@@ -103,7 +103,7 @@ defimpl JSON.Encode, for: Atom do
   def to_json(true),  do: {:ok, "true"}
   def to_json(atom) when is_atom(atom), do: atom_to_binary(atom) |> JSON.Encode.to_json
 
-  def typeof(boolean) when is_boolean(boolean), do: :boolean   
+  def typeof(boolean) when is_boolean(boolean), do: :boolean
   def typeof(nil), do: :null
   def typeof(atom) when is_atom(atom), do: :string
 end
@@ -119,7 +119,7 @@ defimpl JSON.Encode, for: BitString do
   end
 
   defp encode_binary_recursive(<<>>, acc), do: Enum.reverse(acc) |> to_string
-  
+
 
   defp encode_binary_character(?",   acc),  do: [?", ?\\  | acc]
   defp encode_binary_character(?\b,  acc),  do: [?b, ?\\  | acc]
@@ -135,8 +135,8 @@ defimpl JSON.Encode, for: BitString do
 
   #anything else besides these control characters, just let it through
   defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
-  
-  defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do 
+
+  defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
     [integer_to_list(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
   end
 
