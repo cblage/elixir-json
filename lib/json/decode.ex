@@ -17,7 +17,7 @@ defmodule JSON.Decode do
   defp consume_whitespace([ ?\n | rest ]), do: consume_whitespace(rest)
 
   defp consume_whitespace(iolist) when is_list(iolist), do: iolist
-    
+
   def from_json(bitstring) when is_binary(bitstring) do
     case bitstring_to_list(bitstring) |> from_json do
       { :ok, value } -> { :ok, value }
@@ -26,7 +26,7 @@ defmodule JSON.Decode do
     end
   end
 
-  def from_json(iolist) when is_list(iolist) do 
+  def from_json(iolist) when is_list(iolist) do
     case consume_whitespace(iolist) |> consume_value do
       { :ok, value, rest } ->
         case consume_whitespace(rest) do
@@ -58,17 +58,17 @@ defmodule JSON.Decode do
 
   ## consume_array_contents: { List, binary } -> { List, binary }
   defp consume_array_contents(json) when is_list(json), do: consume_array_contents([], json)
-  
+
   defp consume_array_contents(acc, [ ?] | rest ]), do: {:ok, Enum.reverse(acc), rest }
   defp consume_array_contents(_, [] ), do: { :unexpected_end_of_buffer, "" }
 
   defp consume_array_contents(acc, json) do
     consume_array_value_result = consume_whitespace(json) |> consume_value
-    case consume_array_value_result do 
+    case consume_array_value_result do
       {:ok, value, after_value } ->
         acc = [ value | acc ]
         after_value = consume_whitespace(after_value)
-        
+
         case after_value  do
           [ ?, | after_comma ] -> consume_array_contents(acc, consume_whitespace(after_comma))
           _ -> consume_array_contents(acc, after_value)
@@ -83,7 +83,7 @@ defmodule JSON.Decode do
 
   defp consume_object_key(json) when is_list(json) do
     key_result = consume_string_contents(json)
-    case key_result do 
+    case key_result do
       {:ok, key, after_key } ->
         case consume_whitespace(after_key) do
           [ ?: | after_colon ] -> {:ok, key, consume_whitespace(after_colon)}
@@ -101,16 +101,16 @@ defmodule JSON.Decode do
         acc  = HashDict.put(acc, key, value)
         after_value = consume_whitespace(after_value)
         case after_value do
-          [ ?, | after_comma ] -> 
+          [ ?, | after_comma ] ->
             consume_object_contents(acc, consume_whitespace(after_comma))
           _ -> consume_object_contents(acc, after_value)
         end
       _ -> consume_value_result #propagate error
     end
   end
-  
+
   defp consume_object_contents(json) when is_list(json), do: consume_object_contents(HashDict.new, json)
-  
+
   defp consume_object_contents(acc, [ ?" | rest]) do
     consume_object_key_result = consume_object_key(rest)
     case consume_object_key_result do
@@ -123,7 +123,7 @@ defmodule JSON.Decode do
 
   defp consume_object_contents(_, []),   do: { :unexpected_end_of_buffer, "" }
   defp consume_object_contents(_, json), do: { :unexpected_token, json }
- 
+
 
   # String Parsing
   defp consume_string_contents(json)  when is_list(json), do: consume_string_contents({[], json})
@@ -133,7 +133,7 @@ defmodule JSON.Decode do
   defp consume_string_contents({ :unexpected_end_of_buffer, s }), do: { :unexpected_end_of_buffer, s }
   defp consume_string_contents({ _,  [] }),                       do: { :unexpected_end_of_buffer, "" }
   defp consume_string_contents({ acc, [ ?" | rest ] }), do: {:ok, Enum.reverse(acc) |> iolist_to_binary, rest }
-  
+
   #parsing
   defp consume_string_contents({ acc, [ ?\\, ?f  | rest ]}), do: consume_string_contents({ [ ?\f | acc ], rest })
   defp consume_string_contents({ acc, [ ?\\, ?n  | rest ]}), do: consume_string_contents({ [ ?\n | acc ], rest })
@@ -142,8 +142,8 @@ defmodule JSON.Decode do
   defp consume_string_contents({ acc, [ ?\\, ?"  | rest ]}), do: consume_string_contents({ [ ?"  | acc ], rest })
   defp consume_string_contents({ acc, [ ?\\, ?\\ | rest ]}), do: consume_string_contents({ [ ?\\ | acc ], rest })
   defp consume_string_contents({ acc, [ ?\\, ?/  | rest ]}), do: consume_string_contents({ [ ?/  | acc ], rest })
-  defp consume_string_contents({ acc, [ ?\\, ?u  | rest ]}), do: consume_unicode_escape({ acc, rest }) |> consume_string_contents 
-  
+  defp consume_string_contents({ acc, [ ?\\, ?u  | rest ]}), do: consume_unicode_escape({ acc, rest }) |> consume_string_contents
+
   defp consume_string_contents({ acc, [ c | rest ]}), do: consume_string_contents { [ c | acc ], rest }
 
   defp consume_unicode_escape({ acc, [ a, b, c, d | rest ] }) do
@@ -157,8 +157,8 @@ defmodule JSON.Decode do
 
   # if theres not enough 4 chars to match above pattern
   defp consume_unicode_escape(_), do: {:unexpected_end_of_buffer, ""}
-    
-  
+
+
   #Number parsing
   defp consume_number(json) when is_list(json) do
     case JSON.Numeric.to_numeric(json) do
