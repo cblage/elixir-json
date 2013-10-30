@@ -92,12 +92,8 @@ defimpl JSON.Encode, for: List do
   end
 end
 
-defimpl JSON.Encode, for: Integer do
-  def to_json(number), do: {:ok, "#{number}"} # Elixir convers octal, etc into decimal when putting in strings
-  def typeof(_), do: :number
-end
-
-defimpl JSON.Encode, for: Float do
+# TODO: get rid of "Number" when we want to phase out 10.3 support. 
+defimpl JSON.Encode, for: [Number, Integer, Float] do
   def to_json(number), do: {:ok, "#{number}"} # Elixir convers octal, etc into decimal when putting in strings
   def typeof(_), do: :number
 end
