@@ -128,7 +128,7 @@ defmodule JSON.Parse.Charlist do
       JSON.Parse.Charlist.Whitespace.consume(rest) |> consume_object_contents
     end
 
-    def consume([ ]),  do:  {:error, :unexpected_end_of_buffer} 
+    def consume([ ]),  do: {:error, :unexpected_end_of_buffer} 
     def consume(json), do: {:error, { :unexpected_token, json }}
 
     defp consume_object_key(json) when is_list(json) or is_binary(json) do
@@ -251,7 +251,7 @@ defmodule JSON.Parse.Charlist do
   
     """
     def consume([ ?" | rest ]), do: consume_string_contents(rest, [])
-    def consume([ ]),  do:  {:error, :unexpected_end_of_buffer} 
+    def consume([ ]),  do: {:error, :unexpected_end_of_buffer} 
     def consume(json), do: {:error, { :unexpected_token, json }}
     
 
@@ -366,55 +366,65 @@ defmodule JSON.Parse.Charlist do
         iex> JSON.Parse.Charlist.Number.consume '7842490016E-12-and more'
         {:ok, 7.842490016e-3, '-and more' }
     """
-    def consume([ ?- | rest]), do: consume(rest) |> negate
+    def consume([ ?- | rest]) do
+      case consume(rest) do 
+        {:ok, number, json } -> {:ok, -1 * number, json }
+        {:error, error_info} -> {:error, error_info}
+      end
+    end
     
-    def consume([ number | rest]) when number in ?0..?9 do
-      iolist_to_integer([ number | rest]) |> add_fractional |> apply_exponent
+    def consume(charlist) when is_list(charlist) do
+      case charlist do 
+        [number | _ ] when number in ?0..?9 -> 
+            to_integer(charlist) |> add_fractional |> apply_exponent
+
+        [] ->  {:error, :unexpected_end_of_buffer} 
+        _  -> {:error, { :unexpected_token, charlist }}
+      end
     end
 
-    def consume([ ]), do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    # mini-wrapper around :string.to_integer
+    defp to_integer([]), do: {:error, :unexpected_end_of_buffer}
+
+    defp to_integer(charlist) when is_list(charlist) do
+      case :string.to_integer(charlist) do
+        { :error, _ } -> {:error, {:unexpected_token, charlist} }
+        { result, rest } -> {:ok, result, rest}
+      end
+    end
 
     #fractional
     defp add_fractional({:error, error_info}), do: {:error, error_info}
 
-    defp add_fractional({:ok, acc, [ ?., c | rest ] }) when c in ?0..?9 do
-      { fractional, rest } = consume_fractional([ c | rest ], 0, 10.0)
-      {:ok, acc + fractional, rest }
+    defp add_fractional({:ok, acc, [ ?. | after_dot ] }) do
+      case after_dot do 
+        [ c | _ ] when c in ?0..?9  -> 
+          { fractional, after_fractional } = consume_fractional after_dot, 0, 10.0
+          {:ok, acc + fractional, after_fractional }
+        _ -> 
+          {:ok, acc, [ ?. | after_dot ]}
+      end
     end
 
-    defp add_fractional({:ok, acc, json }) when is_list(json), do: {:ok, acc, json }
+    defp add_fractional({:ok, acc, json }), do: {:ok, acc, json }
 
     defp consume_fractional([ number | rest ], acc, power) when number in ?0..?9 do
       consume_fractional(rest, acc + (number - ?0) / power, power * 10)
     end
     
-    defp consume_fractional(json, acc , _) when is_list(json), do: { acc, json }
+    defp consume_fractional(json, acc , _), do: { acc, json }
 
 
     #exponent    
     defp apply_exponent({:error, error_info}), do: { :error, error_info }
     
     defp apply_exponent({:ok, acc, [ exponent | rest ] }) when exponent in 'eE' do
-      case iolist_to_integer(rest) do
+      case to_integer(rest) do
         { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
         { :error, error_info } -> { :error, error_info }
       end
     end
 
-    defp apply_exponent({:ok, acc, json }) when is_list(json), do: {:ok, acc, json }
-    
-    # mini-wrapper around :string.to_integer
-    defp iolist_to_integer([]), do: {:error, :unexpected_end_of_buffer}
-
-    defp iolist_to_integer(iolist) when is_list(iolist) do
-      case :string.to_integer(iolist) do
-        { :error, _ } -> {:error, {:unexpected_token, iolist} }
-        { result, rest } -> {:ok, result, rest}
-      end
-    end
-
-    defp negate({:error, error_info}), do: {:error, error_info}
-    defp negate({:ok, number, json }), do: {:ok, -1 * number, json }
+    defp apply_exponent({:ok, acc, json }), do: {:ok, acc, json }
   end
 end
