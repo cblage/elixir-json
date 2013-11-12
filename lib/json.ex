@@ -31,16 +31,14 @@ defmodule JSON do
       {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new) }
   """
   @spec decode(bitstring) :: {atom, term}
-  def decode(bitstring) when is_bitstring(bitstring), do: JSON.Decode.from_bitstring(bitstring)
-
   @spec decode(char_list) :: {atom, term}
-  def decode(charlist) when is_list(charlist), do: JSON.Decode.from_charlist(charlist)
+  def decode(bitstring_or_char_list), do: JSON.Decode.from_json(bitstring_or_char_list)
   
   
   @spec decode!(bitstring) :: term
   @spec decode!(char_list) :: term
-  def decode!(bitstring_or_charlist) do
-    case decode(bitstring_or_charlist) do
+  def decode!(bitstring_or_char_list) do
+    case decode(bitstring_or_char_list) do
       { :ok, value } -> value
       { :error, {:unexpected_token, tok } } -> raise JSON.Decode.UnexpectedTokenError, token: tok
       { :error, :unexpected_end_of_buffer } -> raise JSON.Decode.UnexpectedEndOfBufferError
