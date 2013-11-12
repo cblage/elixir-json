@@ -1,29 +1,46 @@
-defmodule JSON.Decode do
-  defexception Error, message: "Invalid JSON - unknown error"
+defexception JSON.Decode.Error, message: "Invalid JSON - unknown error"
 
-  defexception UnexpectedTokenError, token: nil do
-    def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
-  end
+defexception JSON.Decode.UnexpectedTokenError, token: nil do
+  def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
+end
 
-  defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
+defexception JSON.Decode.UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
 
-  def from_bitstring(bitstring) when is_bitstring(bitstring) do
-    case JSON.Parse.bitstring_consume_whitespace(bitstring) |> JSON.Parse.Value.bitstring_consume do
+defprotocol JSON.Decode do
+  @moduledoc """
+  Defines the protocol required for converting raw JSON into Elixir terms
+  """
+
+
+  @doc """
+  Returns an atom and an Elixir term
+  """
+  @spec from_json(bitstring) :: {atom, term}
+  @spec from_json(char_list) :: {atom, term}
+  def from_json(bitstring_or_char_list)
+
+end
+
+defimpl JSON.Decode, for: BitString do
+  def from_json(bitstring) do
+    case JSON.Parse.Bitstring.Whitespace.consume(bitstring) |> JSON.Parse.Bitstring.Value.consume do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest } ->
-        case JSON.Parse.bitstring_consume_whitespace(rest) do
+        case JSON.Parse.Bitstring.Whitespace.consume(rest) do
           << >> -> { :ok, value }
           _  -> { :error, { :unexpected_token, rest } }
         end
     end
   end
+end
 
-  def from_charlist(charlist) when is_list(charlist) do 
-    case JSON.Parse.charlist_consume_whitespace(charlist) |> JSON.Parse.Value.charlist_consume do
+defimpl JSON.Decode, for: List do
+  def from_json(charlist) do
+    case JSON.Parse.Charlist.Whitespace.consume(charlist) |> JSON.Parse.Charlist.Value.consume do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest } ->
-        case JSON.Parse.charlist_consume_whitespace(rest) do
+        case JSON.Parse.Charlist.Whitespace.consume(rest) do
           [] -> { :ok, value }
           _  -> { :error, { :unexpected_token, rest } }
         end
