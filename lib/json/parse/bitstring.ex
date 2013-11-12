@@ -28,7 +28,6 @@ defmodule JSON.Parse.Bitstring do
     def consume(bitstring) when is_binary(bitstring), do: bitstring
   end
 
-
   defmodule Value do
     
     @doc """
@@ -223,7 +222,7 @@ defmodule JSON.Parse.Bitstring do
         {:error, error_info} -> {:error, error_info}
         {:ok, value, after_value } ->
           after_value = JSON.Parse.Bitstring.Whitespace.consume(after_value)
-          case after_value  do
+          case after_value do
             << ?, , after_comma :: binary >> -> 
               consume_array_contents([ value | acc ], JSON.Parse.Bitstring.Whitespace.consume(after_comma))
             _ ->  
@@ -388,32 +387,50 @@ defmodule JSON.Parse.Bitstring do
         iex> JSON.Parse.Bitstring.Number.consume "7842490016E-12-and more"
         {:ok, 7.842490016e-3, "-and more" }
     """
-    def consume(<< ?- , rest :: binary >>), do: consume(rest) |> negate
+    def consume(<< ?- , rest :: binary >>) do 
+      case consume(rest) do 
+        {:ok, number, json } -> {:ok, -1 * number, json }
+        {:error, error_info} -> {:error, error_info}
+      end
+    end
     
-    def consume(<< number :: utf8 ,  _ :: binary >> = bin) when number in ?0..?9 do 
-      to_integer(bin) |> add_fractional |> apply_exponent
+
+    def consume(binary) do
+      case binary do 
+        << number :: utf8 ,  _ :: binary >> when number in ?0..?9 -> 
+          to_integer(binary) |> add_fractional |> apply_exponent
+
+        << >> ->  {:error, :unexpected_end_of_buffer} 
+        _  -> {:error, { :unexpected_token, binary }}
+      end
     end
 
-    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json), do: {:error, { :unexpected_token, json }}
 
-    defp add_fractional({:ok, acc, << ?., after_dot :: binary >> = bin })  do
-      case after_dot do 
-        << c :: utf8, _ :: binary >> when c in ?0..?9 -> 
-          { fractional, rest } = consume_fractional(after_dot, 0, 10.0)
-          {:ok, acc + fractional, rest }    
+    defp add_fractional({:error, error_info}), do: {:error, error_info}
+
+    defp add_fractional({:ok, acc, bin})  do
+      case bin do
+        << ?., after_dot :: binary >>  -> 
+          case after_dot do 
+            << c :: utf8, _ :: binary >> when c in ?0..?9 -> 
+              { fractional, rest } = consume_fractional(after_dot, 0, 10.0)
+              {:ok, acc + fractional, rest }    
+            _ -> 
+              {:ok, acc, bin }
+          end
         _ -> 
           {:ok, acc, bin }
       end
     end
-
-    defp add_fractional({:ok, acc, json }), do: {:ok, acc, json }
 
     defp consume_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
       consume_fractional(rest, acc + (number - ?0) / power, power * 10)
     end
 
     defp consume_fractional(json, acc , _) when is_binary(json), do: { acc, json }
+
+
+    defp apply_exponent({:error, error_info}), do: { :error, error_info }
 
     defp apply_exponent({:ok, acc, << exponent :: utf8, rest :: binary >> }) when exponent in 'eE' do
       case to_integer(rest) do
@@ -422,50 +439,16 @@ defmodule JSON.Parse.Bitstring do
       end
     end
 
-    # ensures the following behavior - JSON.Parse.Bitstring.Number.consume "7842490016E-12-and more" - {:ok, 7.842490016e-3, '-and more' }
     defp apply_exponent({:ok, acc, json }), do: {:ok, acc, json }
 
-    # Elixir.String.to_integer converts the whole buffer into iolist, this is unacceptable, using own implementation
-    
-    defp to_integer(<< char :: utf8, rest :: binary >>, acc) when char in ?0..?9 do
-      to_integer(rest, 10 * acc + char - ?0) 
-    end
-
-    defp to_integer(bitstring, acc) when is_binary(bitstring) do
-      {acc, bitstring}
-    end
 
     defp to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
 
-    defp to_integer(<< ?-, after_minus :: binary >>) do
-      case after_minus do 
-        << char :: utf8,  _ :: binary >> when char in ?0..?9 ->
-          to_integer(after_minus) |> negate
-        _ -> 
-          {:error, {:unexpected_token, after_minus}}
-      end
-    end
-
-
-    defp to_integer(<< ?+, after_plus :: binary >>) do
-      case after_plus do 
-        << char :: utf8,  _ :: binary >> when char in ?0..?9  ->
-          to_integer(after_plus)
-        _ -> 
-          {:error, {:unexpected_token, after_plus}}
-      end
-    end
-
-    defp to_integer(<< char :: utf8, rest :: binary >> = bin) when char in ?0..?9  do
-      case to_integer(bin, 0) do
-        :error -> {:error, {:unexpected_token, bin} }
+    defp to_integer(binary) do
+      case Integer.parse(binary) do
+        { :error, _ } -> {:error, {:unexpected_token, binary} }
         { result, rest } -> {:ok, result, rest}
       end
     end
-
-    defp to_integer(bitstring) when is_binary(bitstring), do: {:error, {:unexpected_token, bitstring}}
-
-    defp negate({:error, error_info}), do: {:error, error_info}
-    defp negate({:ok, number, json }), do: {:ok, -1 * number, json }
   end
 end
