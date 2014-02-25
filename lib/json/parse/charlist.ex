@@ -131,7 +131,7 @@ defmodule JSON.Parse.Charlist do
     def consume([ ]),  do: {:error, :unexpected_end_of_buffer} 
     def consume(json), do: {:error, { :unexpected_token, json }}
 
-    defp consume_object_key(json) when is_list(json) or is_binary(json) do
+    defp consume_object_key(json) when is_list(json) do
       case JSON.Parse.Charlist.String.consume(json) do 
         { :error, error_info } -> { :error, error_info }
         { :ok, key, after_key } ->
