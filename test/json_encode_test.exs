@@ -32,10 +32,10 @@ defmodule JSONEncodeTest do
     acc = HashDict.put(acc, "number", 1234)
     acc = HashDict.put(acc, "array",  ["a", :b, "c"])
     acc = HashDict.put(acc, "object", [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]])
-
-
+  
+  
     assert JSON.encode(acc) \
-      == {:ok, "{\"array\":[\"a\",\"b\",\"c\"],\"false\":false,\"null\":null,\"number\":1234,\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"string\":\"this will be a string\"}"}
+      == {:ok, "{\"number\":1234,\"false\":false,\"array\":[\"a\",\"b\",\"c\"],\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"null\":null,\"string\":\"this will be a string\"}"}
   end
 
   test "convert keyword with '\\' into correct JSON" do
