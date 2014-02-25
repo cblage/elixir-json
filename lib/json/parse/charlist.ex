@@ -139,7 +139,7 @@ defmodule JSON.Parse.Charlist do
             [ ?: | after_colon ] -> 
               { :ok, key, JSON.Parse.Charlist.Whitespace.consume(after_colon) }
             [] -> 
-              { :error, :unexpected_end_of_buffer}
+              { :error, :unexpected_end_of_buffer }
             _ -> 
               { :error, { :unexpected_token, JSON.Parse.Charlist.Whitespace.consume(after_key) } }
           end
@@ -399,7 +399,7 @@ defmodule JSON.Parse.Charlist do
 
 
     #exponent    
-    defp apply_exponent({ :error, error_info}), do: { :error, error_info }
+    defp apply_exponent({ :error, error_info }), do: { :error, error_info }
     
     defp apply_exponent({ :ok, acc, [ exponent | rest ] }) when exponent in 'eE' do
       case to_integer(rest) do
