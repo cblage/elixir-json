@@ -245,6 +245,12 @@ defmodule JSON.Parse.Charlist do
         
         iex> JSON.Parse.Charlist.String.consume '\\\"7.something\\\"'
         {:ok, "7.something", '' }
+        
+        iex> JSON.Parse.Charlist.String.consume '\\\"star -> \\\\u272d <- star\\\"'
+        {:ok, "star -> ✭ <- star", '' }
+        
+        iex> JSON.Parse.Charlist.String.consume '\\\"\\\\u00df ist wunderbar\\\"'
+        {:ok, "ß ist wunderbar", '' }
 
         iex> JSON.Parse.Charlist.String.consume '\\\"-88.22suffix\\\" foo bar'
         {:ok, "-88.22suffix", ' foo bar' }
@@ -268,50 +274,21 @@ defmodule JSON.Parse.Charlist do
     defp consume_string_contents([ ?\\, ?\\ | rest ], acc), do: consume_string_contents(rest, [ acc, ?\\ ])
     defp consume_string_contents([ ?\\, ?/  | rest ], acc), do: consume_string_contents(rest, [ acc, ?/  ])
     
-    defp consume_string_contents([ ?\\, ?u  | rest ] = list, acc) do 
-      case JSON.Parse.Charlist.UnicodeEscape.consume(list) do 
-        { :error, error_info } -> { :error, error_info }
-        { :ok, value, rest } -> consume_string_contents(rest, [ acc, value ])
-      end 
-    end
-
-    defp consume_string_contents([ char | rest ], acc), do: consume_string_contents(rest, [ acc, char ])   
-    
-  end  
-
-  defmodule UnicodeEscape do
-    @doc """
-    Consumes a JSON Unicode Escaped character, returns its UTF8 representation
-
-    ## Examples
-
-        iex> JSON.Parse.Charlist.UnicodeEscape.consume ''
-        { :error, :unexpected_end_of_buffer } 
-
-        iex> JSON.Parse.Charlist.UnicodeEscape.consume 'xkcd'
-        { :error, {:unexpected_token, 'xkcd'} }
-
-        iex> JSON.Parse.Charlist.UnicodeEscape.consume '\\\\u00df'
-        { :ok, "ß", '' }
-        
-        iex> JSON.Parse.Charlist.UnicodeEscape.consume '\\\\u00dflalalal'
-        { :ok, "ß", 'lalalal' }
-
-    """
-    def consume([?\\, ?u | rest]) do 
+    defp consume_string_contents([ ?\\, ?u  | rest ], acc) do 
       case consume_unicode_escape(rest, 0, 0) do 
-        { :ok, tentative_codepoint, after_tentative_codepoint} ->
-          case tentative_codepoint do 
-            << _ ::utf8 >> -> { :ok, tentative_codepoint, after_tentative_codepoint}
+        { :error, error_info } -> { :error, error_info }
+        { :ok, decoded_codepoint, after_decoded_codepoint} ->
+          case decoded_codepoint do 
+            << _ ::utf8 >> -> consume_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint])
             _ -> {:error, { :unexpected_token, [?\\, ?u | rest]} } #copying only in case of error
           end
-        { :error, error_info } -> { :error, error_info }
       end
     end
 
-    def consume([ ]),   do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json) when is_list(json), do: {:error, { :unexpected_token, json }}
+    # omnomnom, eat the next character
+    defp consume_string_contents([ char | rest ], acc), do: consume_string_contents(rest, [ acc, char ])   
     
+    # The only OK stop condition (consumed 4 expected chars successfully)
     defp consume_unicode_escape(json, acc, chars_consumed) when 4 === chars_consumed do
       { :ok, << acc :: utf8 >>, json }
     end

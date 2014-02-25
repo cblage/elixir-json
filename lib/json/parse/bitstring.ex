@@ -259,6 +259,9 @@ defmodule JSON.Parse.Bitstring do
 
         iex> JSON.Parse.Bitstring.String.consume "\\\"star -> \\\\u272d <- star\\\""
         {:ok, "star -> ✭ <- star", "" }
+
+        iex> JSON.Parse.Bitstring.String.consume "\\\"\\\\u00df ist wunderbar\\\""
+        {:ok, "ß ist wunderbar", "" }
     
         iex> JSON.Parse.Bitstring.String.consume "\\\"Rafaëlla\\\" foo bar"
         {:ok, "Rafaëlla", " foo bar" }
@@ -289,50 +292,21 @@ defmodule JSON.Parse.Bitstring do
     defp consume_string_contents(<< ?\\, ?\\, rest :: binary >>, acc), do: consume_string_contents(rest, [ acc, ?\\ ])
     defp consume_string_contents(<< ?\\, ?/,  rest :: binary >>, acc), do: consume_string_contents(rest, [ acc, ?/  ])
     
-    defp consume_string_contents(<< ?\\, ?u , rest :: binary >> = bin , acc) do 
-      case JSON.Parse.Bitstring.UnicodeEscape.consume(bin) do 
-        { :error, error_info } -> { :error, error_info }
-        { :ok, value, rest } -> consume_string_contents(rest, [ acc, value ])
-      end 
+    defp consume_string_contents(<< ?\\, ?u , rest :: binary >> , acc) do 
+      case consume_unicode_escape(rest, 0, 0) do 
+       { :error, error_info } -> { :error, error_info }
+       { :ok, decoded_codepoint, after_decoded_codepoint} ->
+          case decoded_codepoint do 
+            << _ ::utf8 >> -> consume_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint ])
+            _ -> {:error, { :unexpected_token, << ?\\, ?u , rest :: binary >> } }
+          end
+      end
     end
     
     defp consume_string_contents(<< char :: utf8, rest :: binary >>, acc), do: consume_string_contents(rest, [ acc, char ])   
-  end  
+     
 
-  defmodule UnicodeEscape do
-    @doc """
-    Consumes a JSON Unicode Escaped character, returns its UTF8 representation
-
-    ## Examples
-
-        iex> JSON.Parse.Bitstring.UnicodeEscape.consume ""
-        { :error, :unexpected_end_of_buffer } 
-
-        iex> JSON.Parse.Bitstring.UnicodeEscape.consume "foo"
-        { :error, { :unexpected_token, "foo" } } 
-
-        iex> JSON.Parse.Bitstring.UnicodeEscape.consume "\\\\u00df"
-        { :ok, "ß", "" }
-
-        iex> JSON.Parse.Bitstring.UnicodeEscape.consume "\\\\u00dflalalal"
-        { :ok, "ß", "lalalal" }
-    """
-    def consume(<< ?\\, ?u , rest :: binary >>) do 
-      case consume_unicode_escape(rest, 0, 0) do 
-        { :ok, tentative_codepoint, after_tentative_codepoint} ->
-          case tentative_codepoint do 
-            << _ ::utf8 >> -> { :ok, tentative_codepoint, after_tentative_codepoint}
-            _ -> {:error, { :unexpected_token, << ?\\, ?u , rest :: binary >>} }
-          end
-        { :error, error_info } -> { :error, error_info }
-      end
-    end
-
-    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json) when is_binary(json), do: {:error, { :unexpected_token, json }}
-    
-
-    #The only OK stop conditions (consumed 4 expected chars successfully)
+    # The only OK stop condition (consumed 4 expected chars successfully)
     defp consume_unicode_escape(json, acc, chars_consumed) when 4 === chars_consumed do
       { :ok, << acc :: utf8 >>, json }
     end
