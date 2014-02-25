@@ -12,6 +12,8 @@ defmodule JSON.Encode.Error do
 end
 
 defprotocol JSON.Encode do
+  @fallback_to_any true
+
   @moduledoc """
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.
   """
