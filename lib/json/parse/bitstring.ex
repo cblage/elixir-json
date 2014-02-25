@@ -134,8 +134,8 @@ defmodule JSON.Parse.Bitstring do
       JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_object_contents
     end
 
-    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json),  do: {:error, { :unexpected_token, json }}
+    def consume(<< >>), do: { :error, :unexpected_end_of_buffer } 
+    def consume(json),  do: { :error, { :unexpected_token, json } }
     
     # Object Parsing
     defp consume_object_key(json) do
@@ -143,18 +143,21 @@ defmodule JSON.Parse.Bitstring do
         {:error, error_info} -> {:error, error_info}
         {:ok, key, after_key } ->
           case JSON.Parse.Bitstring.Whitespace.consume(after_key) do
-            << ?:,  after_colon :: binary >> -> {:ok, key, JSON.Parse.Bitstring.Whitespace.consume(after_colon)}
-            << >> -> { :error, :unexpected_end_of_buffer}
-            _     -> { :error, {:unexpected_token, JSON.Parse.Bitstring.Whitespace.consume(after_key) }}
+            << ?:,  after_colon :: binary >> -> 
+              { :ok, key, JSON.Parse.Bitstring.Whitespace.consume(after_colon) }
+            << >> -> 
+              { :error, :unexpected_end_of_buffer}
+            _ -> 
+              { :error, { :unexpected_token, JSON.Parse.Bitstring.Whitespace.consume(after_key) } }
           end
       end
     end
 
     defp consume_object_value(acc, key, after_key) do
       case JSON.Parse.Bitstring.Value.consume(after_key) do
-        {:error, error_info} -> {:error, error_info}
-        {:ok, value, after_value} ->
-          acc  = HashDict.put(acc, key, value)
+        { :error, error_info } -> { :error, error_info }
+        { :ok, value, after_value } ->
+          acc = HashDict.put(acc, key, value)
           after_value = JSON.Parse.Bitstring.Whitespace.consume(after_value)
           case after_value do
             << ?,, after_comma :: binary >> ->  
@@ -169,15 +172,15 @@ defmodule JSON.Parse.Bitstring do
 
     defp consume_object_contents(acc, << ?", _ :: binary >> = bin) do
       case consume_object_key(bin) do
-        {:error, error_info}  -> {:error, error_info}
-        {:ok, key, after_key} -> consume_object_value(acc, key, after_key)
+        { :error, error_info }  -> { :error, error_info }
+        { :ok, key, after_key } -> consume_object_value(acc, key, after_key)
       end
     end
 
     defp consume_object_contents(acc, << ?}, rest :: binary >>), do: { :ok, acc, rest }
 
-    defp consume_object_contents(_, << >>),  do: {:error, :unexpected_end_of_buffer }
-    defp consume_object_contents(_, json), do: {:error, { :unexpected_token, json } }
+    defp consume_object_contents(_, << >>), do: { :error, :unexpected_end_of_buffer }
+    defp consume_object_contents(_, json), do: { :error, { :unexpected_token, json } }
   end
 
   defmodule Array do
@@ -208,18 +211,18 @@ defmodule JSON.Parse.Bitstring do
       JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_array_contents
     end
 
-    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json),  do: {:error, { :unexpected_token, json }}
+    def consume(<< >>), do:  { :error, :unexpected_end_of_buffer } 
+    def consume(json),  do: { :error, { :unexpected_token, json } }
 
 
-    defp consume_array_contents(json) when is_binary(json), do: consume_array_contents([], json)
+    defp consume_array_contents(json) when is_binary(json), do: consume_array_contents([ ], json)
     
-    defp consume_array_contents(acc, << ?], rest :: binary >>), do: {:ok, Enum.reverse(acc), rest }
+    defp consume_array_contents(acc, << ?], rest :: binary >>), do: { :ok, Enum.reverse(acc), rest }
     defp consume_array_contents(_, << >> ), do: { :error,  :unexpected_end_of_buffer }
     
     defp consume_array_contents(acc, json) do
       case JSON.Parse.Bitstring.Whitespace.consume(json) |> JSON.Parse.Bitstring.Value.consume do 
-        {:error, error_info} -> {:error, error_info}
+        { :error, error_info } -> { :error, error_info }
         {:ok, value, after_value } ->
           after_value = JSON.Parse.Bitstring.Whitespace.consume(after_value)
           case after_value do
@@ -269,13 +272,13 @@ defmodule JSON.Parse.Bitstring do
         iex> JSON.Parse.Bitstring.String.consume "\\\"Éloise woot\\\" Éloise"
         {:ok, "Éloise woot", " Éloise" }
     """
-    def consume(<< ?" :: utf8 , rest :: binary >>), do: consume_string_contents(rest, [])
-    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
-    def consume(json), do: {:error, { :unexpected_token, json }}
+    def consume(<< ?" :: utf8 , rest :: binary >>), do: consume_string_contents(rest, [ ])
+    def consume(<< >>), do: { :error, :unexpected_end_of_buffer }
+    def consume(json), do: { :error, { :unexpected_token, json } }
      
 
     #stop conditions
-    defp consume_string_contents(<< >>, _), do: {:error, :unexpected_end_of_buffer}
+    defp consume_string_contents(<< >>, _), do: { :error, :unexpected_end_of_buffer }
     defp consume_string_contents(<< ?" :: utf8, rest :: binary >>, acc) do
       case Elixir.String.from_char_list(acc) do 
         {:ok, encoded_string } -> { :ok, encoded_string, rest }
@@ -297,8 +300,10 @@ defmodule JSON.Parse.Bitstring do
        { :error, error_info } -> { :error, error_info }
        { :ok, decoded_codepoint, after_decoded_codepoint} ->
           case decoded_codepoint do 
-            << _ ::utf8 >> -> consume_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint ])
-            _ -> {:error, { :unexpected_token, << ?\\, ?u , rest :: binary >> } }
+            << _ ::utf8 >> -> 
+              consume_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint ])
+            _ -> 
+              { :error, { :unexpected_token, << ?\\, ?u , rest :: binary >> } }
           end
       end
     end
@@ -325,7 +330,7 @@ defmodule JSON.Parse.Bitstring do
       consume_unicode_escape(rest, 16 * acc + 10 + char - ?A, chars_consumed + 1) 
     end
 
-    defp consume_unicode_escape(json, _, _), do: {:error, {:unexpected_token, json}}
+    defp consume_unicode_escape(json, _, _), do: { :error, { :unexpected_token, json } }
   end
 
   defmodule Number do
@@ -363,8 +368,8 @@ defmodule JSON.Parse.Bitstring do
     """
     def consume(<< ?- , rest :: binary >>) do 
       case consume(rest) do 
-        {:ok, number, json } -> {:ok, -1 * number, json }
-        {:error, error_info} -> {:error, error_info}
+        { :ok, number, json } -> { :ok, -1 * number, json }
+        { :error, error_info } -> { :error, error_info }
       end
     end
     
@@ -373,27 +378,26 @@ defmodule JSON.Parse.Bitstring do
       case binary do 
         << number :: utf8 ,  _ :: binary >> when number in ?0..?9 -> 
           to_integer(binary) |> add_fractional |> apply_exponent
-
-        << >> ->  {:error, :unexpected_end_of_buffer} 
-        _  -> {:error, { :unexpected_token, binary }}
+        << >> ->  { :error, :unexpected_end_of_buffer } 
+        _  -> { :error, { :unexpected_token, binary } }
       end
     end
 
 
-    defp add_fractional({:error, error_info}), do: {:error, error_info}
+    defp add_fractional({ :error, error_info }), do: { :error, error_info }
 
-    defp add_fractional({:ok, acc, bin})  do
+    defp add_fractional({ :ok, acc, bin })  do
       case bin do
         << ?., after_dot :: binary >>  -> 
           case after_dot do 
             << c :: utf8, _ :: binary >> when c in ?0..?9 -> 
               { fractional, rest } = consume_fractional(after_dot, 0, 10.0)
-              {:ok, acc + fractional, rest }    
+              { :ok, acc + fractional, rest }    
             _ -> 
-              {:ok, acc, bin }
+              { :ok, acc, bin }
           end
         _ -> 
-          {:ok, acc, bin }
+          { :ok, acc, bin }
       end
     end
 
@@ -404,23 +408,23 @@ defmodule JSON.Parse.Bitstring do
     defp consume_fractional(json, acc , _) when is_binary(json), do: { acc, json }
 
 
-    defp apply_exponent({:error, error_info}), do: { :error, error_info }
+    defp apply_exponent({ :error, error_info }), do: { :error, error_info }
 
-    defp apply_exponent({:ok, acc, << exponent :: utf8, rest :: binary >> }) when exponent in 'eE' do
+    defp apply_exponent({ :ok, acc, << exponent :: utf8, rest :: binary >> }) when exponent in 'eE' do
       case to_integer(rest) do
         { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
         { :error, error_info } -> { :error, error_info }
       end
     end
 
-    defp apply_exponent({:ok, acc, json }), do: {:ok, acc, json }
+    defp apply_exponent({ :ok, acc, json }), do: { :ok, acc, json }
 
 
-    defp to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
+    defp to_integer(<< >>), do: { :error,  :unexpected_end_of_buffer }
 
     defp to_integer(binary) do
       case Integer.parse(binary) do
-        { :error, _ } -> {:error, {:unexpected_token, binary} }
+        { :error, _ } -> { :error, { :unexpected_token, binary } }
         { result, rest } -> {:ok, result, rest}
       end
     end

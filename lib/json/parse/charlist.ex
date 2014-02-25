@@ -87,11 +87,11 @@ defmodule JSON.Parse.Charlist do
     def consume([ ?" | _ ] = charlist), do: JSON.Parse.Charlist.String.consume(charlist)
     
     def consume([ ?- , number | _ ] = charlist) when number in ?0..?9 do
-        JSON.Parse.Charlist.Number.consume(charlist)
+      JSON.Parse.Charlist.Number.consume(charlist)
     end
 
     def consume([ number | _ ] = charlist) when number in ?0..?9 do
-        JSON.Parse.Charlist.Number.consume(charlist)
+      JSON.Parse.Charlist.Number.consume(charlist)
     end
     
 
@@ -99,8 +99,8 @@ defmodule JSON.Parse.Charlist do
     def consume([ ?t, ?r, ?u, ?e  | rest ]),    do: { :ok, true,  rest }
     def consume([ ?f, ?a, ?l, ?s, ?e | rest ]), do: { :ok, false, rest }
 
-    def consume([ ]),  do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json), do: {:error, { :unexpected_token, json }}      
+    def consume([ ]),  do:  { :error, :unexpected_end_of_buffer } 
+    def consume(json), do:  { :error, { :unexpected_token, json } }      
   end
 
   defmodule Object do
@@ -133,12 +133,15 @@ defmodule JSON.Parse.Charlist do
 
     defp consume_object_key(json) when is_list(json) or is_binary(json) do
       case JSON.Parse.Charlist.String.consume(json) do 
-        {:error, error_info} -> {:error, error_info}
-        {:ok, key, after_key } ->
+        { :error, error_info } -> { :error, error_info }
+        { :ok, key, after_key } ->
           case JSON.Parse.Charlist.Whitespace.consume(after_key) do
-            [ ?: | after_colon ] -> {:ok, key, JSON.Parse.Charlist.Whitespace.consume(after_colon)}
-            []    -> { :error, :unexpected_end_of_buffer}
-            _     -> { :error, {:unexpected_token, JSON.Parse.Charlist.Whitespace.consume(after_key) }}
+            [ ?: | after_colon ] -> 
+              { :ok, key, JSON.Parse.Charlist.Whitespace.consume(after_colon) }
+            [] -> 
+              { :error, :unexpected_end_of_buffer}
+            _ -> 
+              { :error, { :unexpected_token, JSON.Parse.Charlist.Whitespace.consume(after_key) } }
           end
       end
     end
@@ -167,8 +170,8 @@ defmodule JSON.Parse.Charlist do
     
     defp consume_object_contents(acc, [ ?} | rest ]), do: { :ok, acc, rest }
     
-    defp consume_object_contents(_, []), do: {:error, :unexpected_end_of_buffer }
-    defp consume_object_contents(_, json), do: {:error, { :unexpected_token, json } }
+    defp consume_object_contents(_, [ ]),   do: { :error, :unexpected_end_of_buffer }
+    defp consume_object_contents(_, json), do: { :error, { :unexpected_token, json } }
   end
 
   defmodule Array do
@@ -198,13 +201,14 @@ defmodule JSON.Parse.Charlist do
     def consume([ ?[ | rest ]) do 
       JSON.Parse.Charlist.Whitespace.consume(rest) |> consume_array_contents
     end
-    def consume([ ]),  do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json), do: {:error, { :unexpected_token, json }}
+
+    def consume([ ]),  do: { :error, :unexpected_end_of_buffer } 
+    def consume(json), do: { :error, { :unexpected_token, json } }
     
    
     # Array Parsing
 
-    defp consume_array_contents(json) when is_list(json), do: consume_array_contents([], json)
+    defp consume_array_contents(json) when is_list(json), do: consume_array_contents([ ], json)
     
     defp consume_array_contents(acc, [ ?] | rest ]), do: {:ok, Enum.reverse(acc), rest }
     defp consume_array_contents(_, [] ), do: { :error, :unexpected_end_of_buffer }
@@ -257,12 +261,12 @@ defmodule JSON.Parse.Charlist do
   
     """
     def consume([ ?" | rest ]), do: consume_string_contents(rest, [])
-    def consume([ ]),  do: {:error, :unexpected_end_of_buffer} 
-    def consume(json), do: {:error, { :unexpected_token, json }}
+    def consume([ ]),  do: { :error, :unexpected_end_of_buffer } 
+    def consume(json), do: { :error, { :unexpected_token, json } }
     
 
     #stop conditions
-    defp consume_string_contents([], _), do: {:error, :unexpected_end_of_buffer}
+    defp consume_string_contents([ ], _), do: { :error, :unexpected_end_of_buffer }
     defp consume_string_contents([ ?" | rest ], acc), do: { :ok, iolist_to_binary(acc), rest }
 
     #parsing
@@ -279,8 +283,10 @@ defmodule JSON.Parse.Charlist do
         { :error, error_info } -> { :error, error_info }
         { :ok, decoded_codepoint, after_decoded_codepoint} ->
           case decoded_codepoint do 
-            << _ ::utf8 >> -> consume_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint])
-            _ -> {:error, { :unexpected_token, [?\\, ?u | rest]} } #copying only in case of error
+            << _ ::utf8 >> -> 
+              consume_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint])
+            _ -> 
+              { :error, { :unexpected_token, [?\\, ?u | rest] } } # copying only in case of error
           end
       end
     end
@@ -293,7 +299,7 @@ defmodule JSON.Parse.Charlist do
       { :ok, << acc :: utf8 >>, json }
     end
 
-    defp consume_unicode_escape([], _, _), do: {:error, :unexpected_end_of_buffer}
+    defp consume_unicode_escape([ ], _, _), do: {:error, :unexpected_end_of_buffer}
     
     defp consume_unicode_escape([char | rest], acc, chars_consumed) when char in ?0..?9 do
       consume_unicode_escape(rest, 16 * acc + char - ?0, chars_consumed + 1) 
@@ -307,7 +313,7 @@ defmodule JSON.Parse.Charlist do
       consume_unicode_escape(rest, 16 * acc + 10 + char - ?A, chars_consumed + 1) 
     end
   
-    defp consume_unicode_escape(json, _, _), do: {:error, {:unexpected_token, json}}
+    defp consume_unicode_escape(json, _, _), do: { :error, { :unexpected_token, json } }
   end
 
   defmodule Number do
@@ -345,45 +351,45 @@ defmodule JSON.Parse.Charlist do
     """
     def consume([ ?- | rest]) do
       case consume(rest) do 
-        {:ok, number, json } -> {:ok, -1 * number, json }
-        {:error, error_info} -> {:error, error_info}
+        { :ok, number, json } ->  { :ok, -1 * number, json }
+        { :error, error_info } -> { :error, error_info }
       end
     end
     
     def consume(charlist) when is_list(charlist) do
       case charlist do 
-        [number | _ ] when number in ?0..?9 -> 
+        [ number | _ ] when number in ?0..?9 -> 
             to_integer(charlist) |> add_fractional |> apply_exponent
-
-        [] ->  {:error, :unexpected_end_of_buffer} 
-        _  -> {:error, { :unexpected_token, charlist }}
+        [ ] ->  
+          { :error, :unexpected_end_of_buffer } 
+        _  -> { :error, { :unexpected_token, charlist } }
       end
     end
 
     # mini-wrapper around :string.to_integer
-    defp to_integer([]), do: {:error, :unexpected_end_of_buffer}
+    defp to_integer([ ]), do: { :error, :unexpected_end_of_buffer }
 
     defp to_integer(charlist) when is_list(charlist) do
       case :string.to_integer(charlist) do
-        { :error, _ } -> {:error, {:unexpected_token, charlist} }
-        { result, rest } -> {:ok, result, rest}
+        { :error, _ } -> { :error, { :unexpected_token, charlist } }
+        { result, rest } -> { :ok, result, rest }
       end
     end
 
     #fractional
-    defp add_fractional({:error, error_info}), do: {:error, error_info}
+    defp add_fractional({ :error, error_info }), do: { :error, error_info }
 
     defp add_fractional({:ok, acc, [ ?. | after_dot ] }) do
       case after_dot do 
         [ c | _ ] when c in ?0..?9  -> 
           { fractional, after_fractional } = consume_fractional after_dot, 0, 10.0
-          {:ok, acc + fractional, after_fractional }
+          { :ok, acc + fractional, after_fractional }
         _ -> 
-          {:ok, acc, [ ?. | after_dot ]}
+          { :ok, acc, [ ?. | after_dot ] }
       end
     end
 
-    defp add_fractional({:ok, acc, json }), do: {:ok, acc, json }
+    defp add_fractional({ :ok, acc, json }), do: { :ok, acc, json }
 
     defp consume_fractional([ number | rest ], acc, power) when number in ?0..?9 do
       consume_fractional(rest, acc + (number - ?0) / power, power * 10)
@@ -393,15 +399,15 @@ defmodule JSON.Parse.Charlist do
 
 
     #exponent    
-    defp apply_exponent({:error, error_info}), do: { :error, error_info }
+    defp apply_exponent({ :error, error_info}), do: { :error, error_info }
     
-    defp apply_exponent({:ok, acc, [ exponent | rest ] }) when exponent in 'eE' do
+    defp apply_exponent({ :ok, acc, [ exponent | rest ] }) when exponent in 'eE' do
       case to_integer(rest) do
         { :ok, power, rest } -> { :ok, acc * :math.pow(10, power), rest }
         { :error, error_info } -> { :error, error_info }
       end
     end
 
-    defp apply_exponent({:ok, acc, json }), do: {:ok, acc, json }
+    defp apply_exponent({ :ok, acc, json }), do: { :ok, acc, json }
   end
 end
