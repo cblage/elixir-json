@@ -15,8 +15,6 @@ defprotocol JSON.Decode do
   @doc """
   Returns an atom and an Elixir term
   """
-  @spec from_json(bitstring) :: {atom, term}
-  @spec from_json(char_list) :: {atom, term}
   def from_json(bitstring_or_char_list)
 
 end
