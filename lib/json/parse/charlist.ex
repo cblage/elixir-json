@@ -148,13 +148,15 @@ defmodule JSON.Parse.Charlist do
 
     defp consume_object_value(acc, key, after_key) do
       case JSON.Parse.Charlist.Value.consume(after_key) do
-        {:error, error_info} -> {:error, error_info}
-        {:ok, value, after_value} ->
+        { :error, error_info} -> { :error, error_info }
+        { :ok, value, after_value } ->
           acc  = HashDict.put(acc, key, value)
           after_value = JSON.Parse.Charlist.Whitespace.consume(after_value)
           case after_value do
-            [ ?, | after_comma ] -> consume_object_contents(acc, JSON.Parse.Charlist.Whitespace.consume(after_comma))
-            _ -> consume_object_contents(acc, after_value)
+            [ ?, | after_comma ] -> 
+              consume_object_contents(acc, JSON.Parse.Charlist.Whitespace.consume(after_comma))
+            _ -> 
+              consume_object_contents(acc, after_value)
           end
       end
     end
@@ -163,14 +165,14 @@ defmodule JSON.Parse.Charlist do
     
     defp consume_object_contents(acc, [ ?" | _ ] = list) do
       case consume_object_key(list) do
-        {:error, error_info}  -> {:error, error_info}
-        {:ok, key, after_key} -> consume_object_value(acc, key, after_key)
+        { :error, error_info }  -> { :error, error_info }
+        { :ok, key, after_key } -> consume_object_value(acc, key, after_key)
       end
     end
     
     defp consume_object_contents(acc, [ ?} | rest ]), do: { :ok, acc, rest }
     
-    defp consume_object_contents(_, [ ]),   do: { :error, :unexpected_end_of_buffer }
+    defp consume_object_contents(_, [ ]),  do: { :error, :unexpected_end_of_buffer }
     defp consume_object_contents(_, json), do: { :error, { :unexpected_token, json } }
   end
 
@@ -215,8 +217,8 @@ defmodule JSON.Parse.Charlist do
 
     defp consume_array_contents(acc, json) do
       case JSON.Parse.Charlist.Whitespace.consume(json) |> JSON.Parse.Charlist.Value.consume do 
-        {:error, error_info} -> {:error, error_info}
-        {:ok, value, after_value } ->
+        { :error, error_info } -> { :error, error_info }
+        { :ok, value, after_value } ->
           after_value = JSON.Parse.Charlist.Whitespace.consume(after_value)
           case after_value  do
             [ ?, | after_comma ] -> 
@@ -299,7 +301,7 @@ defmodule JSON.Parse.Charlist do
       { :ok, << acc :: utf8 >>, json }
     end
 
-    defp consume_unicode_escape([ ], _, _), do: {:error, :unexpected_end_of_buffer}
+    defp consume_unicode_escape([ ], _, _), do: { :error, :unexpected_end_of_buffer }
     
     defp consume_unicode_escape([char | rest], acc, chars_consumed) when char in ?0..?9 do
       consume_unicode_escape(rest, 16 * acc + char - ?0, chars_consumed + 1) 
