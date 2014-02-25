@@ -5,8 +5,8 @@ defmodule JSON do
 
   ## Examples
 
-      iex> JSON.encode([result: "this will be a elixir result"])
-      {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
+      iex> JSON.encode([result: "this will be a JSON result"])
+      {:ok, "{\\\"result\\\":\\\"this will be a JSON result\\\"}"}
 
   """
   @spec encode(term) :: {atom, bitstring}
@@ -27,8 +27,8 @@ defmodule JSON do
 
   ## Examples
 
-      iex> JSON.decode("{\\\"result\\\":\\\"this will be a elixir result\\\"}")
-      {:ok, HashDict.new [{"result", "this will be a elixir result"}]}
+      iex> JSON.decode("{\\\"result\\\":\\\"this will be an Elixir result\\\"}")
+      {:ok, HashDict.new [{"result", "this will be an Elixir result"}]}
   """
   @spec decode(bitstring) :: {atom, term}
   @spec decode(char_list) :: {atom, term}
