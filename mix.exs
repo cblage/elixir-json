@@ -5,18 +5,18 @@ defmodule JSON.Mixfile do
     [ app: :json,
       version: "0.3.0-dev",
       elixir: "~> 0.12.0",
-      deps: deps,
-      source_url: "https://github.com/cblage/elixir-json" ]
+      deps: deps(Mix.env),
+      source_url: "https://github.com/cblage/elixir-json",
+      homepage_url: "http://expm.co/json" ]
   end
 
-  # Configuration for the OTP application
-  def application do
-    []
+  def application, do: []
+  
+  def deps(:prod), do: []
+
+  def deps(:docs) do
+    deps(:prod) ++ [ { :ex_doc, github: "elixir-lang/ex_doc" } ]
   end
 
-  # Returns the list of dependencies in the format:
-  # { :foobar, "0.1", git: "https://github.com/elixir-lang/foobar.git" }
-  defp deps do
-    []
-  end
+  def deps(_), do: deps(:prod)
 end
