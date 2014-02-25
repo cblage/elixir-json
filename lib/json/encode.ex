@@ -129,7 +129,7 @@ defimpl JSON.Encode, for: BitString do
   defp encode_binary_character(?\r,  acc),  do: [?r, ?\\  | acc]
   defp encode_binary_character(?\t,  acc),  do: [?t, ?\\  | acc]
   defp encode_binary_character(?/,   acc),  do: [?/, ?\\  | acc]
-  defp encode_binary_character(?\\, acc),  do: [?\\, ?\\ | acc]
+  defp encode_binary_character(?\\,  acc),  do: [?\\, ?\\ | acc]
   defp encode_binary_character(char, acc) when is_number(char) and char < @acii_space do
     encode_hexadecimal_unicode_control_character(char, [?u,  ?\\ | acc])
   end
