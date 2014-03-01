@@ -38,6 +38,20 @@ defmodule JSONEncodeTest do
       == {:ok, "{\"number\":1234,\"false\":false,\"array\":[\"a\",\"b\",\"c\"],\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"null\":null,\"string\":\"this will be a string\"}"}
   end
 
+  test "convert map into correct JSON" do
+    acc = Map.new
+    acc = Map.put(acc, "null",  nil)
+    acc = Map.put(acc, "false", false)
+    acc = Map.put(acc, "string", "this will be a string")
+    acc = Map.put(acc, "number", 1234)
+    acc = Map.put(acc, "array",  ["a", :b, "c"])
+    acc = Map.put(acc, "object", [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]])
+
+
+    assert JSON.encode(acc) \
+      == {:ok, "{\"array\":[\"a\",\"b\",\"c\"],\"false\":false,\"null\":null,\"number\":1234,\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"string\":\"this will be a string\"}"}
+  end
+
   test "convert keyword with '\\' into correct JSON" do
     assert \
       JSON.encode([result: "\\n"]) == {:ok, "{\"result\":\"\\\\n\"}"}
