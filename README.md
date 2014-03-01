@@ -27,7 +27,7 @@ end
 
 ```elixir
   JSON.decode("{\"result\":\"this will be a elixir result\"}")
-  {:ok, [result: "this will be a elixir result"]}
+  {:ok, %{"result" => "this will be a elixir result"}}
 ```
 
 ## Dynamo Filter

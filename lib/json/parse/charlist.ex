@@ -80,7 +80,7 @@ defmodule JSON.Parse.Charlist do
         {:ok, ["foo", 1, 2, 1.5], ' lala' }
 
         iex> JSON.Parse.Charlist.Value.consume '{"result": "this will be a elixir result"} lalal'
-        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
+        {:ok, %{"result" => "this will be a elixir result"}, ' lalal'}
     """
     def consume([ ?[ | _ ] = charlist), do: JSON.Parse.Charlist.Array.consume(charlist)
     def consume([ ?{ | _ ] = charlist), do: JSON.Parse.Charlist.Object.consume(charlist)
@@ -105,7 +105,7 @@ defmodule JSON.Parse.Charlist do
 
   defmodule Object do
     @doc """
-    Consumes a valid JSON object value, returns its elixir HashDict representation
+    Consumes a valid JSON object value, returns its elixir map representation
 
     ## Examples
 
@@ -122,7 +122,7 @@ defmodule JSON.Parse.Charlist do
         {:error, {:unexpected_token, '[]'}}
         
         iex> JSON.Parse.Charlist.Object.consume '{"result": "this will be a elixir result"} lalal'
-        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
+        {:ok, %{"result" => "this will be a elixir result"}, ' lalal'}
     """
     def consume([ ?{ | rest ]) do
       JSON.Parse.Charlist.Whitespace.consume(rest) |> consume_object_contents
@@ -150,7 +150,7 @@ defmodule JSON.Parse.Charlist do
       case JSON.Parse.Charlist.Value.consume(after_key) do
         {:error, error_info} -> {:error, error_info}
         {:ok, value, after_value} ->
-          acc  = HashDict.put(acc, key, value)
+          acc  = Map.put(acc, key, value)
           after_value = JSON.Parse.Charlist.Whitespace.consume(after_value)
           case after_value do
             [ ?, | after_comma ] -> consume_object_contents(acc, JSON.Parse.Charlist.Whitespace.consume(after_comma))
@@ -159,7 +159,7 @@ defmodule JSON.Parse.Charlist do
       end
     end
     
-    defp consume_object_contents(json), do: consume_object_contents(HashDict.new, json)
+    defp consume_object_contents(json), do: consume_object_contents(%{}, json)
     
     defp consume_object_contents(acc, [ ?" | _ ] = list) do
       case consume_object_key(list) do

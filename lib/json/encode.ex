@@ -48,19 +48,35 @@ defimpl JSON.Encode, for: Tuple do
   def typeof(_), do: :array
 end
 
-defimpl JSON.Encode, for: HashDict do
-  def to_json(dict) do
-    {:ok ,"{" <> Enum.map_join(dict, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
+# Helper to support both HashDict and maps as convertible to object. The need
+# for this is related to the incompatibility between the way Dict
+# implementations work and protocols (i.e. there's no general way for Elixir to
+# know if something is considered a dict).
+defmodule JSON.EncodeDictHelper do
+  @moduledoc false
+
+  def encode_dict(dict) do
+    {:ok ,"{" <> Enum.map_join(dict, ",", fn {key, object} ->
+            encode_dict_item(key) <> ":" <>  encode_dict_item(object) end)
+          <> "}"}
   end
 
-  defp encode_item(item) do
+  defp encode_dict_item(item) do
     encode_result = JSON.Encode.to_json(item)
     case encode_result do
       {:ok, encoded_item} -> encoded_item
       _ -> encode_result #propagate error, will trigger error in map_join
     end
   end
+end
 
+defimpl JSON.Encode, for: HashDict do
+  def to_json(dict), do: JSON.EncodeDictHelper.encode_dict(dict)
+  def typeof(_), do: :object
+end
+
+defimpl JSON.Encode, for: Map do
+  def to_json(dict), do: JSON.EncodeDictHelper.encode_dict(dict)
   def typeof(_), do: :object
 end
 
