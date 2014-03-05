@@ -107,7 +107,7 @@ defmodule JSON.Numeric do
   end
 
   def to_integer_from_hex(iolist) when is_list(iolist) do
-    if Regex.match?(%r{^[0-9a-fA-F]}, iolist) do
+    if Regex.match?(~r/^[0-9a-fA-F]/, iolist_to_binary(iolist)) do
       to_integer_from_hex_recursive(iolist, 0)
     else
       :error
