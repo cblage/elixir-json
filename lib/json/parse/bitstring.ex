@@ -35,107 +35,107 @@ defmodule JSON.Parse.Bitstring do
 
     ## Examples
 
-        iex> JSON.Parse.Bitstring.Value.consume ""
+        iex> JSON.Parse.Bitstring.Value.consume "", JSON.Collector.new
         {:error, :unexpected_end_of_buffer}
 
-        iex> JSON.Parse.Bitstring.Value.consume "face0ff"
+        iex> JSON.Parse.Bitstring.Value.consume "face0ff", JSON.Collector.new
         {:error, {:unexpected_token, "face0ff"} }
 
-        iex> JSON.Parse.Bitstring.Value.consume "-hello"
+        iex> JSON.Parse.Bitstring.Value.consume "-hello", JSON.Collector.new
         {:error, {:unexpected_token, "-hello"} }
 
-        iex> JSON.Parse.Bitstring.Value.consume "129245"
+        iex> JSON.Parse.Bitstring.Value.consume "129245", JSON.Collector.new
         {:ok, 129245, "" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "7.something"
+        iex> JSON.Parse.Bitstring.Value.consume "7.something", JSON.Collector.new
         {:ok, 7, ".something" }
  
-        iex> JSON.Parse.Bitstring.Value.consume "-88.22suffix"
+        iex> JSON.Parse.Bitstring.Value.consume "-88.22suffix", JSON.Collector.new
         {:ok, -88.22, "suffix" }
         
-        iex> JSON.Parse.Bitstring.Value.consume "-12e4and then some"
+        iex> JSON.Parse.Bitstring.Value.consume "-12e4and then some", JSON.Collector.new
         {:ok, -1.2e+5, "and then some" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "7842490016E-12-and more"
+        iex> JSON.Parse.Bitstring.Value.consume "7842490016E-12-and more", JSON.Collector.new
         {:ok, 7.842490016e-3, "-and more" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "null"
+        iex> JSON.Parse.Bitstring.Value.consume "null", JSON.Collector.new
         {:ok, nil, ""}
         
-        iex> JSON.Parse.Bitstring.Value.consume "false"
+        iex> JSON.Parse.Bitstring.Value.consume "false", JSON.Collector.new
         {:ok, false, "" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "true"
+        iex> JSON.Parse.Bitstring.Value.consume "true", JSON.Collector.new
         {:ok, true, "" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "\\\"7.something\\\""
+        iex> JSON.Parse.Bitstring.Value.consume "\\\"7.something\\\"", JSON.Collector.new
         {:ok, "7.something", "" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "\\\"-88.22suffix\\\" foo bar"
+        iex> JSON.Parse.Bitstring.Value.consume "\\\"-88.22suffix\\\" foo bar", JSON.Collector.new
         {:ok, "-88.22suffix", " foo bar" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "\\\"star -> \\\\u272d <- star\\\""
+        iex> JSON.Parse.Bitstring.Value.consume "\\\"star -> \\\\u272d <- star\\\"", JSON.Collector.new
         {:ok, "star -> ✭ <- star", "" }
         
-        iex> JSON.Parse.Bitstring.Value.consume "[]"
+        iex> JSON.Parse.Bitstring.Value.consume "[]", JSON.Collector.new
         {:ok, [], "" }
         
-        iex> JSON.Parse.Bitstring.Value.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+        iex> JSON.Parse.Bitstring.Value.consume "[\\\"foo\\\", 1, 2, 1.5] lala", JSON.Collector.new
         {:ok, ["foo", 1, 2, 1.5], " lala" }
 
-        iex> JSON.Parse.Bitstring.Value.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+        iex> JSON.Parse.Bitstring.Value.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal", JSON.Collector.new
         {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
     """
-    def consume(<< ?[, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Array.consume(bin)
-    def consume(<< ?{, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Object.consume(bin)
-    def consume(<< ?", _ :: binary >> = bin), do: JSON.Parse.Bitstring.String.consume(bin)
+    def consume(<< ?[, _ :: binary >> = bin, collector), do: JSON.Parse.Bitstring.Array.consume(bin, collector)
+    def consume(<< ?{, _ :: binary >> = bin, collector), do: JSON.Parse.Bitstring.Object.consume(bin, collector)
+    def consume(<< ?", _ :: binary >> = bin, _), do: JSON.Parse.Bitstring.String.consume(bin)
 
-    def consume(<< ?- , number :: utf8, _ :: binary  >> = bin) when number in ?0..?9 do
+    def consume(<< ?- , number :: utf8, _ :: binary  >> = bin, _) when number in ?0..?9 do
       JSON.Parse.Bitstring.Number.consume(bin)
     end
 
-    def consume(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
+    def consume(<< number :: utf8, _ :: binary >> = bin, _) when number in ?0..?9 do
       JSON.Parse.Bitstring.Number.consume(bin)
     end
 
-    def consume(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
-    def consume(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: { :ok, true,  rest }
-    def consume(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: { :ok, false, rest }
+    def consume(<< ?n, ?u, ?l, ?l, rest :: binary >>, _), do: { :ok, nil,   rest }
+    def consume(<< ?t, ?r, ?u, ?e, rest :: binary >>, _), do: { :ok, true,  rest }
+    def consume(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>, _), do: { :ok, false, rest }
 
-    def consume(<< >>), do:  {:error, :unexpected_end_of_buffer} 
-    def consume(json), do: {:error, { :unexpected_token, json }}  
+    def consume(<< >>, _), do:  {:error, :unexpected_end_of_buffer} 
+    def consume(json, _), do: {:error, { :unexpected_token, json }}  
   end
 
   defmodule Object do
     @doc """
-    Consumes a valid JSON object value, returns its elixir HashDict representation
+    Consumes a valid JSON object value, returns its elixir representation based on the provided Collector
 
     ## Examples
 
-        iex> JSON.Parse.Bitstring.Object.consume ""
+        iex> JSON.Parse.Bitstring.Object.consume "", JSON.Collector.new
         {:error, :unexpected_end_of_buffer}
 
-        iex> JSON.Parse.Bitstring.Object.consume "face0ff"
+        iex> JSON.Parse.Bitstring.Object.consume "face0ff", JSON.Collector.new
         {:error, {:unexpected_token, "face0ff"} }
         
-        iex> JSON.Parse.Bitstring.Object.consume "[] "
+        iex> JSON.Parse.Bitstring.Object.consume "[] ", JSON.Collector.new
         {:error, {:unexpected_token, "[] "}}
         
-        iex> JSON.Parse.Bitstring.Object.consume "[]"
+        iex> JSON.Parse.Bitstring.Object.consume "[]", JSON.Collector.new
         {:error, {:unexpected_token, "[]"}}
         
-        iex> JSON.Parse.Bitstring.Object.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+        iex> JSON.Parse.Bitstring.Object.consume "[\\\"foo\\\", 1, 2, 1.5] lala", JSON.Collector.new
         {:error, {:unexpected_token, "[\\\"foo\\\", 1, 2, 1.5] lala"}}
 
-        iex> JSON.Parse.Bitstring.Object.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+        iex> JSON.Parse.Bitstring.Object.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal", JSON.Collector.new
         {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
     """
-    def consume(<< ?{, rest :: binary >>) do
-      JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_object_contents
+    def consume(<< ?{, rest :: binary >>, collector) do
+      JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_object_contents(collector)
     end
 
-    def consume(<< >>), do: { :error, :unexpected_end_of_buffer } 
-    def consume(json),  do: { :error, { :unexpected_token, json } }
+    def consume(<< >>, _), do: { :error, :unexpected_end_of_buffer } 
+    def consume(json, _),  do: { :error, { :unexpected_token, json } }
     
     # Object Parsing
     defp consume_object_key(json) do
@@ -153,34 +153,34 @@ defmodule JSON.Parse.Bitstring do
       end
     end
 
-    defp consume_object_value(acc, key, after_key) do
-      case JSON.Parse.Bitstring.Value.consume(after_key) do
+    defp consume_object_value(acc, key, after_key, collector) do
+      case JSON.Parse.Bitstring.Value.consume(after_key, collector) do
         { :error, error_info } -> { :error, error_info }
         { :ok, value, after_value } ->
-          acc = HashDict.put(acc, key, value)
+          acc = collector.object.put(acc, key, value)
           after_value = JSON.Parse.Bitstring.Whitespace.consume(after_value)
           case after_value do
             << ?,, after_comma :: binary >> ->  
-              consume_object_contents(acc, JSON.Parse.Bitstring.Whitespace.consume(after_comma))
+              consume_object_contents(acc, JSON.Parse.Bitstring.Whitespace.consume(after_comma), collector)
             _ 
-              -> consume_object_contents(acc, after_value)
+              -> consume_object_contents(acc, after_value, collector)
           end
       end
     end
 
-    defp consume_object_contents(json), do: consume_object_contents(HashDict.new, json)
+    defp consume_object_contents(json, collector), do: consume_object_contents(collector.object.create(), json, collector)
 
-    defp consume_object_contents(acc, << ?", _ :: binary >> = bin) do
+    defp consume_object_contents(acc, << ?", _ :: binary >> = bin, collector) do
       case consume_object_key(bin) do
         { :error, error_info }  -> { :error, error_info }
-        { :ok, key, after_key } -> consume_object_value(acc, key, after_key)
+        { :ok, key, after_key } -> consume_object_value(acc, key, after_key, collector)
       end
     end
 
-    defp consume_object_contents(acc, << ?}, rest :: binary >>), do: { :ok, acc, rest }
+    defp consume_object_contents(acc, << ?}, rest :: binary >>, collector), do: { :ok, collector.object.close(acc), rest }
 
-    defp consume_object_contents(_, << >>), do: { :error, :unexpected_end_of_buffer }
-    defp consume_object_contents(_, json), do: { :error, { :unexpected_token, json } }
+    defp consume_object_contents(_, << >>, _), do: { :error, :unexpected_end_of_buffer }
+    defp consume_object_contents(_, json, _), do: { :error, { :unexpected_token, json } }
   end
 
   defmodule Array do
@@ -189,47 +189,47 @@ defmodule JSON.Parse.Bitstring do
 
     ## Examples
 
-        iex> JSON.Parse.Bitstring.Array.consume ""
+        iex> JSON.Parse.Bitstring.Array.consume "", JSON.Collector.new
         {:error, :unexpected_end_of_buffer}
                
-        iex> JSON.Parse.Bitstring.Array.consume "[1, 2 "
+        iex> JSON.Parse.Bitstring.Array.consume "[1, 2 ", JSON.Collector.new
         {:error, :unexpected_end_of_buffer}
 
-        iex> JSON.Parse.Bitstring.Array.consume "face0ff"
+        iex> JSON.Parse.Bitstring.Array.consume "face0ff", JSON.Collector.new
         {:error, {:unexpected_token, "face0ff"} }
 
-        iex> JSON.Parse.Bitstring.Array.consume "[] lala"
+        iex> JSON.Parse.Bitstring.Array.consume "[] lala", JSON.Collector.new
         {:ok, [], " lala" }
         
-        iex> JSON.Parse.Bitstring.Array.consume "[]"
+        iex> JSON.Parse.Bitstring.Array.consume "[]", JSON.Collector.new
         {:ok, [], "" }
         
-        iex> JSON.Parse.Bitstring.Array.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+        iex> JSON.Parse.Bitstring.Array.consume "[\\\"foo\\\", 1, 2, 1.5] lala", JSON.Collector.new
         {:ok, ["foo", 1, 2, 1.5], " lala" }
     """
-    def consume(<< ?[, rest :: binary >>) do 
-      JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_array_contents
+    def consume(<< ?[, rest :: binary >>, collector) do 
+      JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_array_contents(collector)
     end
 
-    def consume(<< >>), do:  { :error, :unexpected_end_of_buffer } 
-    def consume(json),  do: { :error, { :unexpected_token, json } }
+    def consume(<< >>, _), do:  { :error, :unexpected_end_of_buffer } 
+    def consume(json, _),  do: { :error, { :unexpected_token, json } }
 
 
-    defp consume_array_contents(json) when is_binary(json), do: consume_array_contents([ ], json)
+    defp consume_array_contents(json, collector) when is_binary(json), do: consume_array_contents(collector.array.create(), json, collector)
     
-    defp consume_array_contents(acc, << ?], rest :: binary >>), do: { :ok, Enum.reverse(acc), rest }
-    defp consume_array_contents(_, << >> ), do: { :error,  :unexpected_end_of_buffer }
+    defp consume_array_contents(acc, << ?], rest :: binary >>, collector), do: { :ok, collector.array.close(acc), rest }
+    defp consume_array_contents(_, << >>, _), do: { :error,  :unexpected_end_of_buffer }
     
-    defp consume_array_contents(acc, json) do
-      case JSON.Parse.Bitstring.Whitespace.consume(json) |> JSON.Parse.Bitstring.Value.consume do 
+    defp consume_array_contents(acc, json, collector) do
+      case JSON.Parse.Bitstring.Whitespace.consume(json) |> JSON.Parse.Bitstring.Value.consume(collector) do 
         { :error, error_info } -> { :error, error_info }
         {:ok, value, after_value } ->
           after_value = JSON.Parse.Bitstring.Whitespace.consume(after_value)
           case after_value do
             << ?, , after_comma :: binary >> -> 
-              consume_array_contents([ value | acc ], JSON.Parse.Bitstring.Whitespace.consume(after_comma))
+              consume_array_contents(collector.array.put(acc, value), JSON.Parse.Bitstring.Whitespace.consume(after_comma), collector)
             _ ->  
-              consume_array_contents([ value | acc ], after_value)
+              consume_array_contents(collector.array.put(acc, value), after_value, collector)
           end
       end
     end
