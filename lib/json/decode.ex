@@ -16,13 +16,14 @@ defprotocol JSON.Decode do
   @doc """
   Returns an atom and an Elixir term
   """
-  def from_json(bitstring_or_char_list)
+  @spec from_json(any, JSON.Collector) :: { atom, term }
+  def from_json(bitstring_or_char_list, collector)
 
 end
 
 defimpl JSON.Decode, for: BitString do
-  def from_json(bitstring) do
-    case JSON.Parse.Bitstring.Whitespace.consume(bitstring) |> JSON.Parse.Bitstring.Value.consume do
+  def from_json(bitstring, collector) do
+    case JSON.Parse.Bitstring.Whitespace.consume(bitstring) |> JSON.Parse.Bitstring.Value.consume(collector) do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest } ->
         case JSON.Parse.Bitstring.Whitespace.consume(rest) do
@@ -34,8 +35,8 @@ defimpl JSON.Decode, for: BitString do
 end
 
 defimpl JSON.Decode, for: List do
-  def from_json(charlist) do
-    case JSON.Parse.Charlist.Whitespace.consume(charlist) |> JSON.Parse.Charlist.Value.consume do
+  def from_json(charlist, collector) do
+    case JSON.Parse.Charlist.Whitespace.consume(charlist) |> JSON.Parse.Charlist.Value.consume(collector) do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest } ->
         case JSON.Parse.Charlist.Whitespace.consume(rest) do
