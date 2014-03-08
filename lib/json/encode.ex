@@ -44,23 +44,12 @@ defprotocol JSON.Encode do
 end
 
 defimpl JSON.Encode, for: Tuple do
-  def to_json(term), do: tuple_to_list(term) |> JSON.Encode.to_json
+  def to_json(term), do: tuple_to_list(term) |> JSON.Encode.Helpers.enum_to_json
   def typeof(_), do: :array
 end
 
 defimpl JSON.Encode, for: HashDict do
-  def to_json(dict) do
-    {:ok ,"{" <> Enum.map_join(dict, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
-  end
-
-  defp encode_item(item) do
-    encode_result = JSON.Encode.to_json(item)
-    case encode_result do
-      {:ok, encoded_item} -> encoded_item
-      _ -> encode_result #propagate error, will trigger error in map_join
-    end
-  end
-
+  def to_json(dict), do: JSON.Encode.Helpers.dict_to_json(dict)
   def typeof(_), do: :object
 end
 
@@ -69,17 +58,9 @@ defimpl JSON.Encode, for: List do
 
   def to_json(list) do
     if Keyword.keyword? list do
-      {:ok, "{" <> Enum.map_join(list, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
+      JSON.Encode.Helpers.dict_to_json(list)
     else
-      {:ok, "[" <> Enum.map_join(list, ",", &encode_item(&1)) <> "]"}
-    end
-  end
-
-  defp encode_item(item) do
-    encode_result = JSON.Encode.to_json(item)
-    case encode_result do
-      {:ok, encoded_item} -> encoded_item
-      _ -> encode_result #propagate error, will trigger error in map_join
+      JSON.Encode.Helpers.enum_to_json(list)
     end
   end
 
@@ -152,7 +133,7 @@ defimpl JSON.Encode, for: BitString do
 end
 
 defimpl JSON.Encode, for: Record do
-  def to_json(record), do: record.to_keywords |> JSON.Encode.to_json
+  def to_json(record), do: record.to_keywords |> JSON.Encode.Helpers.dict_to_json
   def typeof(_), do: :object
 end
 
@@ -162,4 +143,33 @@ defimpl JSON.Encode, for: Any do
 
   def to_json(_), do: JSON.Encode.to_json(@any_to_json)
   def typeof(_), do: JSON.Encode.typeof(@any_to_json)
+end
+
+defmodule JSON.Encode.Helpers do
+  @moduledoc """
+  Helper functions for writing JSON.Encode instances.
+  """
+
+  @doc """
+  Given an enumerable encode the enumerable as an array.
+  """
+  def enum_to_json(coll) do
+    {:ok, "[" <> Enum.map_join(coll, ",", &encode_item(&1)) <> "]"}
+  end
+
+  @doc """
+  Given an enumerable that yields tuples of `{key, value}` encode the enumerable
+  as an object.
+  """
+  def dict_to_json(coll) do
+     {:ok, "{" <> Enum.map_join(coll, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
+  end
+
+  defp encode_item(item) do
+    encode_result = JSON.Encode.to_json(item)
+    case encode_result do
+      {:ok, encoded_item} -> encoded_item
+      _ -> encode_result #propagate error, will trigger error in map_join
+    end
+  end
 end
