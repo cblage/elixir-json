@@ -154,6 +154,33 @@ defimpl JSON.Encode, for: Record do
   def typeof(_), do: :object
 end
 
+# Encodes maps into object
+# > {:ok, "{\"a\":1,\"b\":2}"} = JSON.encode(%{a: 1, b: 2})
+defimpl JSON.Encode, for: Map do
+
+  def to_json(map) do
+      {:ok, "{" <> :maps.fold( fn
+        (key, object, "") -> encode_pair(key, object)
+        (key, object, acc) -> acc <> "," <> encode_pair(key, object)
+      end, "", map) <> "}"}
+  end
+
+  defp encode_pair(key, object) do
+    encode_item(key) <> ":" <>  encode_item(object)
+  end
+
+  defp encode_item(item) do
+    encode_result = JSON.Encode.to_json(item)
+    case encode_result do
+      {:ok, encoded_item} -> encoded_item
+      _ -> encode_result #propagate error, will trigger error in map_join
+    end
+  end
+
+  def typeof(_), do: :object
+end
+
+
 #TODO: maybe this should return the result of "inspect" ?
 defimpl JSON.Encode, for: Any do
   @any_to_json "[Elixir.Any]"
