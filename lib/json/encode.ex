@@ -138,6 +138,13 @@ defimpl JSON.Encode, for: Record do
   def typeof(_), do: :object
 end
 
+# Encodes maps into object
+# > {:ok, "{\"a\":1,\"b\":2}"} = JSON.encode(%{a: 1, b: 2})
+defimpl JSON.Encode, for: Map do
+  def to_json(map), do: map |> JSON.Encode.Helpers.dict_to_json
+  def typeof(_), do: :object
+end
+
 #TODO: maybe this should return the result of "inspect" ?
 defimpl JSON.Encode, for: Any do
   @any_to_json "[Elixir.Any]"
