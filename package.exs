@@ -1,10 +1,10 @@
 Expm.Package.new(
   name: "json", 
   description: "Native Elixir library for JSON encoding and decoding",
-  version: "0.2.8", 
+  version: "0.2.9", 
   keywords: ["Elixir", "json", "encoder", "decoder", "encode", "decode"], 
   licenses: [[name: "BSD 3-Clause"]],
   maintainers: [
     [name: "Carlos Brito Lage",  email: "carlos@carloslage.net"],
     [name: "James Alexander Rosen", email: "james.a.rosen@gmail.com"]],
-  repositories: [[github: "cblage/elixir-json", tag: "v0.2.8"]])
+  repositories: [[github: "cblage/elixir-json", tag: "v0.2.9"]])
