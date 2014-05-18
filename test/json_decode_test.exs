@@ -134,7 +134,8 @@ defmodule JSONDecodeTest do
     decodes "float with negative exponent", '903.4e-6', 0.0009034
 
     decodes "empty object", "{}", HashDict.new
-    decodes "simple object", '{"result": "this is awesome"}', HashDict.new([ { "result", "this is awesome" } ])
+    decodes "simple object", '{"result": "this is awesome"}',\
+                              Enum.into([ { "result", "this is awesome" } ], HashDict.new)
 
     decodes "empty array", '  [   ] ', []
     decodes "simple array", '[ 1, 2, "three", 4 ]', [ 1, 2, "three", 4 ]
@@ -151,16 +152,16 @@ defmodule JSONDecodeTest do
                 { "name": "Elga" }
               ]
              }',
-             HashDict.new([
+             Enum.into([
               { "name", "Jenny" },
               { "active", true },
               { "phone", "1.415.555.0000" },
               { "balance", 1.52e+5 },
               { "children", [
-                HashDict.new([ { "name", "Penny" } ]),
-                HashDict.new([ { "name", "Elga" } ])
+                Enum.into([ { "name", "Penny" } ], HashDict.new),
+                Enum.into([ { "name", "Elga" } ], HashDict.new)
               ] }
-            ])
+            ], HashDict.new)
 
     
     cannot_decode "bad literal", 'nul', {:unexpected_token, 'nul'}

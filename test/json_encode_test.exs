@@ -45,7 +45,6 @@ defmodule JSONEncodeTest do
 
   test "convert maps into correct JSON" do
     assert \
-      JSON.encode(%{a: 1, b: %{b1: 21}}) |> IO.inspect \
-      == {:ok, "{\"a\":1,\"b\":{\"b1\":21}}"}
+      JSON.encode(%{a: 1, b: %{b1: 21}}) == {:ok, "{\"a\":1,\"b\":{\"b1\":21}}"}
   end
 end

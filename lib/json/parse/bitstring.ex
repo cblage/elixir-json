@@ -84,7 +84,7 @@ defmodule JSON.Parse.Bitstring do
         {:ok, ["foo", 1, 2, 1.5], " lala" }
 
         iex> JSON.Parse.Bitstring.Value.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal", JSON.Collector.new
-        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
+        {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), " lalal"}
     """
     def consume(<< ?[, _ :: binary >> = bin, collector), do: JSON.Parse.Bitstring.Array.consume(bin, collector)
     def consume(<< ?{, _ :: binary >> = bin, collector), do: JSON.Parse.Bitstring.Object.consume(bin, collector)
@@ -128,7 +128,7 @@ defmodule JSON.Parse.Bitstring do
         {:error, {:unexpected_token, "[\\\"foo\\\", 1, 2, 1.5] lala"}}
 
         iex> JSON.Parse.Bitstring.Object.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal", JSON.Collector.new
-        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), " lalal"}
+        {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), " lalal"}
     """
     def consume(<< ?{, rest :: binary >>, collector) do
       JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_object_contents(collector)
@@ -280,7 +280,7 @@ defmodule JSON.Parse.Bitstring do
     #stop conditions
     defp consume_string_contents(<< >>, _), do: { :error, :unexpected_end_of_buffer }
     defp consume_string_contents(<< ?" :: utf8, rest :: binary >>, acc) do
-      case Elixir.String.from_char_list(acc) do 
+      case Elixir.String.from_char_data(acc) do 
         {:ok, encoded_string } -> { :ok, encoded_string, rest }
         _ -> {:error, { :unexpected_token, rest }}
       end
