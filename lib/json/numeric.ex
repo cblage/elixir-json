@@ -40,7 +40,7 @@ defmodule JSON.Numeric do
 
   def to_numeric(bitstring) when is_binary(bitstring) do
     case bitstring_to_list(bitstring) |> to_numeric do
-      { result, rest } -> {result, iolist_to_binary(rest)}
+      { result, rest } -> {result, iodata_to_binary(rest)}
       :error -> :error
     end
   end
@@ -101,13 +101,13 @@ defmodule JSON.Numeric do
   """
   def to_integer_from_hex(bitstring) when is_binary(bitstring) do
     case bitstring_to_list(bitstring) |> to_integer_from_hex do
-      { result, rest } -> {result, iolist_to_binary(rest)}
+      { result, rest } -> {result, iodata_to_binary(rest)}
       :error -> :error
     end
   end
 
   def to_integer_from_hex(iolist) when is_list(iolist) do
-    if Regex.match?(~r/^[0-9a-fA-F]/, iolist_to_binary(iolist)) do
+    if Regex.match?(~r/^[0-9a-fA-F]/, iodata_to_binary(iolist)) do
       to_integer_from_hex_recursive(iolist, 0)
     else
       :error
