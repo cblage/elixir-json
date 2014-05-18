@@ -28,7 +28,7 @@ defmodule JSON do
   ## Examples
 
       iex> JSON.decode("{\\\"result\\\":\\\"this will be a elixir result\\\"}")
-      {:ok, HashDict.new [{"result", "this will be a elixir result"}]}
+      {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new) }
   """
   @spec decode(bitstring) :: {atom, term}
   @spec decode(char_list) :: {atom, term}
