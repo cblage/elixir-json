@@ -82,9 +82,17 @@ defmodule JSON.Parse.Charlist do
         iex> JSON.Parse.Charlist.Value.consume '{"result": "this will be a elixir result"} lalal', JSON.Collector.new
         {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), ' lalal'}
     """
-    def consume([ ?[ | _ ] = charlist, collector), do: JSON.Parse.Charlist.Array.consume(charlist, collector)
-    def consume([ ?{ | _ ] = charlist, collector), do: JSON.Parse.Charlist.Object.consume(charlist, collector)
-    def consume([ ?" | _ ] = charlist, _), do: JSON.Parse.Charlist.String.consume(charlist)
+    def consume([ ?[ | _ ] = charlist, collector) do
+      JSON.Parse.Charlist.Array.consume(charlist, collector)
+    end
+    
+    def consume([ ?{ | _ ] = charlist, collector) do
+      JSON.Parse.Charlist.Object.consume(charlist, collector)
+    end
+    
+    def consume([ ?" | _ ] = charlist, _) do
+      JSON.Parse.Charlist.String.consume(charlist)
+    end
     
     def consume([ ?- , number | _ ] = charlist, _) when number in ?0..?9 do
       JSON.Parse.Charlist.Number.consume(charlist)
@@ -125,7 +133,8 @@ defmodule JSON.Parse.Charlist do
         {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), ' lalal'}
     """
     def consume([ ?{ | rest ], collector) do
-      JSON.Parse.Charlist.Whitespace.consume(rest) |> consume_object_contents(collector)
+      JSON.Parse.Charlist.Whitespace.consume(rest) 
+        |> consume_object_contents(collector)
     end
 
     def consume([ ], _),  do: {:error, :unexpected_end_of_buffer} 
@@ -154,14 +163,17 @@ defmodule JSON.Parse.Charlist do
           after_value = JSON.Parse.Charlist.Whitespace.consume(after_value)
           case after_value do
             [ ?, | after_comma ] -> 
-              consume_object_contents(acc, JSON.Parse.Charlist.Whitespace.consume(after_comma), collector)
+              consume_object_contents(acc, 
+                JSON.Parse.Charlist.Whitespace.consume(after_comma), collector)
             _ -> 
               consume_object_contents(acc, after_value, collector)
           end
       end
     end
     
-    defp consume_object_contents(json, collector), do: consume_object_contents(collector.object.create(), json, collector)
+    defp consume_object_contents(json, collector) do
+      consume_object_contents(collector.object.create(), json, collector)
+    end
     
     defp consume_object_contents(acc, [ ?" | _ ] = list, collector) do
       case consume_object_key(list) do
@@ -170,7 +182,9 @@ defmodule JSON.Parse.Charlist do
       end
     end
     
-    defp consume_object_contents(acc, [ ?} | rest ], collector), do: { :ok, collector.object.close(acc), rest }
+    defp consume_object_contents(acc, [ ?} | rest ], collector) do
+      { :ok, collector.object.close(acc), rest }
+    end
     
     defp consume_object_contents(_, [ ], _),  do: { :error, :unexpected_end_of_buffer }
     defp consume_object_contents(_, json, _), do: { :error, { :unexpected_token, json } }
@@ -210,21 +224,30 @@ defmodule JSON.Parse.Charlist do
    
     # Array Parsing
 
-    defp consume_array_contents(json, collector) when is_list(json), do: consume_array_contents(collector.array.create(), json, collector)
+    defp consume_array_contents(json, collector) when is_list(json) do
+      consume_array_contents(collector.array.create(), json, collector)
+    end
     
-    defp consume_array_contents(acc, [ ?] | rest ], collector), do: {:ok, collector.array.close(acc), rest }
+    defp consume_array_contents(acc, [ ?] | rest ], collector) do
+        {:ok, collector.array.close(acc), rest }
+    end
+
     defp consume_array_contents(_, [ ], _), do: { :error, :unexpected_end_of_buffer }
 
     defp consume_array_contents(acc, json, collector) do
-      case JSON.Parse.Charlist.Whitespace.consume(json) |> JSON.Parse.Charlist.Value.consume(collector) do 
+      case JSON.Parse.Charlist.Whitespace.consume(json) 
+              |> JSON.Parse.Charlist.Value.consume(collector) 
+      do 
         { :error, error_info } -> { :error, error_info }
         { :ok, value, after_value } ->
           after_value = JSON.Parse.Charlist.Whitespace.consume(after_value)
           case after_value  do
             [ ?, | after_comma ] -> 
-              consume_array_contents(collector.array.put(acc, value), JSON.Parse.Charlist.Whitespace.consume(after_comma), collector)
+              consume_array_contents(collector.array.put(acc, value), 
+                JSON.Parse.Charlist.Whitespace.consume(after_comma), collector)
             _ ->  
-              consume_array_contents(collector.array.put(acc, value), after_value, collector)
+              consume_array_contents(collector.array.put(acc, value), after_value, 
+                collector)
           end
       end
     end
@@ -294,7 +317,9 @@ defmodule JSON.Parse.Charlist do
     end
 
     # omnomnom, eat the next character
-    defp consume_string_contents([ char | rest ], acc), do: consume_string_contents(rest, [ acc, char ])   
+    defp consume_string_contents([ char | rest ], acc) do 
+      consume_string_contents(rest, [ acc, char ])   
+    end
     
     # The only OK stop condition (consumed 4 expected chars successfully)
     defp consume_unicode_escape(json, acc, chars_consumed) when 4 === chars_consumed do

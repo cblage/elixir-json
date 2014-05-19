@@ -131,7 +131,8 @@ defmodule JSON.Parse.Bitstring do
         {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), " lalal"}
     """
     def consume(<< ?{, rest :: binary >>, collector) do
-      JSON.Parse.Bitstring.Whitespace.consume(rest) |> consume_object_contents(collector)
+      JSON.Parse.Bitstring.Whitespace.consume(rest) 
+        |> consume_object_contents(collector)
     end
 
     def consume(<< >>, _), do: { :error, :unexpected_end_of_buffer } 
@@ -161,9 +162,9 @@ defmodule JSON.Parse.Bitstring do
           after_value = JSON.Parse.Bitstring.Whitespace.consume(after_value)
           case after_value do
             << ?,, after_comma :: binary >> ->  
-              consume_object_contents(acc, JSON.Parse.Bitstring.Whitespace.consume(after_comma), collector)
-            _ 
-              -> consume_object_contents(acc, after_value, collector)
+              consume_object_contents acc, JSON.Parse.Bitstring.Whitespace.consume(after_comma), collector
+            _  -> 
+              consume_object_contents acc, after_value, collector
           end
       end
     end
