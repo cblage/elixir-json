@@ -33,8 +33,8 @@ defmodule JSON do
   @spec decode(bitstring, JSON.Collector.t) :: {atom, term}
   @spec decode(char_list, JSON.Collector.t) :: {atom, term}
   def decode(bitstring_or_char_list, collector \\ JSON.Collector.new), do: JSON.Decode.from_json(bitstring_or_char_list, collector)
-  
-  
+
+
   @spec decode!(bitstring, JSON.Collector) :: term
   @spec decode!(char_list, JSON.Collector) :: term
   def decode!(bitstring_or_char_list, collector \\ JSON.Collector.new) do

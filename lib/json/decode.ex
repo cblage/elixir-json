@@ -1,4 +1,3 @@
-
 defmodule JSON.Decode.Error, do: defexception([message: "Invalid JSON - unknown error"])
 defmodule JSON.Decode.UnexpectedEndOfBufferError, do: defexception([message: "Invalid JSON - unexpected end of buffer"])
 defmodule JSON.Decode.UnexpectedTokenError do

@@ -1,4 +1,4 @@
-defmodule JSON.Collector.Array.Behaviour do 
+defmodule JSON.Collector.Array.Behaviour do
   defmacro __using__(_) do
     quote do
       @behaviour JSON.Collector.Array

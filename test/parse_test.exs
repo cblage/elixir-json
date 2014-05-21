@@ -2,7 +2,7 @@ Code.require_file "test_helper.exs", __DIR__
 
 defmodule ParseTest do
   use ExUnit.Case
-  
+
   doctest JSON.Parse.Bitstring
   doctest JSON.Parse.Bitstring.String
   doctest JSON.Parse.Bitstring.Number

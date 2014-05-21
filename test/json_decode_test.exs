@@ -103,7 +103,7 @@ defmodule JSONDecodeTest do
     cannot_decode "bad object", "{foo", {:unexpected_token, "foo"}
 
     cannot_decode "unterminated object", "{\"foo\":\"bar\"", :unexpected_end_of_buffer
-    
+
     cannot_decode "multiple value unterminated object", "{\"foo\":\"bar\", \"omg\":", :unexpected_end_of_buffer
 
     cannot_decode "object with missing colon", "{\"foo\" \"bar\"}", {:unexpected_token, "\"bar\"}"}
@@ -119,9 +119,9 @@ defmodule JSONDecodeTest do
 
     decodes "empty string", '""', ""
     decodes "simple string", '"this is a string"', "this is a string"
-  
+
     decodes "string with quotes", '"I said, \\"Hi.\\""', "I said, \"Hi.\""
-    
+
     decodes "string with unicode escape", '"star -> \\u272d <- star"', "star -> ✭ <- star"
 
     decodes "positive integer", '1337', 1337
@@ -163,7 +163,7 @@ defmodule JSONDecodeTest do
               ] }
             ], HashDict.new)
 
-    
+
     cannot_decode "bad literal", 'nul', {:unexpected_token, 'nul'}
 
     cannot_decode "unterminated string", '"Not a full string', :unexpected_end_of_buffer
@@ -177,7 +177,7 @@ defmodule JSONDecodeTest do
     cannot_decode "bad object", '{foo', {:unexpected_token, 'foo'}
 
     cannot_decode "unterminated object", '{"foo":"bar"', :unexpected_end_of_buffer
-    
+
     cannot_decode "multiple value unterminated object", '{"foo":"bar", "omg":', :unexpected_end_of_buffer
 
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}

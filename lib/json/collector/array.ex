@@ -1,4 +1,4 @@
-defmodule JSON.Collector.Array do 
+defmodule JSON.Collector.Array do
   @moduledoc """
   Defines the behaviour that a JSON Array collector should implement to be used by Elixir JSON
   """
