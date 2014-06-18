@@ -1,7 +1,8 @@
-defexception JSON.Encode.Error, error_info: nil do
+defmodule JSON.Encode.Error do
+  defexception [error_info: nil]
+
   def message(exception) do
     error_message = "An error occurred while encoding the JSON object"
-
     if nil != exception.error_info  do
       error_message <> " >>#{exception.error_info}<<"
     else
@@ -42,7 +43,7 @@ defprotocol JSON.Encode do
 end
 
 defimpl JSON.Encode, for: Tuple do
-  def to_json(term), do: tuple_to_list(term) |> JSON.Encode.to_json
+  def to_json(term), do: Tuple.to_list(term) |> JSON.Encode.to_json
   def typeof(_), do: :array
 end
 
@@ -102,7 +103,7 @@ defimpl JSON.Encode, for: Atom do
   def to_json(nil), do: {:ok, "null"}
   def to_json(false), do: {:ok, "false"}
   def to_json(true),  do: {:ok, "true"}
-  def to_json(atom) when is_atom(atom), do: atom_to_binary(atom) |> JSON.Encode.to_json
+  def to_json(atom) when is_atom(atom), do: Atom.to_string(atom) |> JSON.Encode.to_json
 
   def typeof(boolean) when is_boolean(boolean), do: :boolean
   def typeof(nil), do: :null
@@ -138,7 +139,7 @@ defimpl JSON.Encode, for: BitString do
   defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
 
   defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
-    [integer_to_list(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
+    [Integer.to_char_list(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
   end
 
   defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]
