@@ -1,12 +1,10 @@
 defmodule JSON.Decode do
-
-  defexception Error, message: "Invalid JSON - unknown error"
-
-  defexception UnexpectedTokenError, token: nil do
+  defmodule Error, do: defexception([message: "Invalid JSON - unknown error"])
+  defmodule UnexpectedEndOfBufferError, do: defexception([message: "Invalid JSON - unexpected end of buffer"])
+  defmodule UnexpectedTokenError do
+    defexception [token: nil]
     def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
   end
-
-  defexception UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
 
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
@@ -19,9 +17,9 @@ defmodule JSON.Decode do
   defp consume_whitespace(iolist) when is_list(iolist), do: iolist
 
   def from_json(bitstring) when is_binary(bitstring) do
-    case bitstring_to_list(bitstring) |> from_json do
+    case :erlang.bitstring_to_list(bitstring) |> from_json do
       { :ok, value } -> { :ok, value }
-      { :unexpected_token, tok }       -> { :unexpected_token, iodata_to_binary(tok) }
+      { :unexpected_token, tok }       -> { :unexpected_token, IO.iodata_to_binary(tok) }
       { :unexpected_end_of_buffer, s } -> { :unexpected_end_of_buffer, s }
     end
   end
@@ -132,7 +130,7 @@ defmodule JSON.Decode do
   defp consume_string_contents({ :unexpected_token, s }),         do: { :unexpected_token, s }
   defp consume_string_contents({ :unexpected_end_of_buffer, s }), do: { :unexpected_end_of_buffer, s }
   defp consume_string_contents({ _,  [] }),                       do: { :unexpected_end_of_buffer, "" }
-  defp consume_string_contents({ acc, [ ?" | rest ] }), do: {:ok, Enum.reverse(acc) |> iodata_to_binary, rest }
+  defp consume_string_contents({ acc, [ ?" | rest ] }), do: {:ok, Enum.reverse(acc) |> IO.iodata_to_binary, rest }
 
   #parsing
   defp consume_string_contents({ acc, [ ?\\, ?f  | rest ]}), do: consume_string_contents({ [ ?\f | acc ], rest })
