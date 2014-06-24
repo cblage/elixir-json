@@ -169,7 +169,7 @@ defmodule JSON.Parse.Bitstring do
       end
     end
 
-    defp consume_object_contents(json, collector), do: consume_object_contents(collector.object.create(), json, collector)
+    defp consume_object_contents(json, collector), do: consume_object_contents(collector.object.new, json, collector)
 
     defp consume_object_contents(acc, << ?", _ :: binary >> = bin, collector) do
       case consume_object_key(bin) do
@@ -216,7 +216,7 @@ defmodule JSON.Parse.Bitstring do
     def consume(json, _),  do: { :error, { :unexpected_token, json } }
 
 
-    defp consume_array_contents(json, collector) when is_binary(json), do: consume_array_contents(collector.array.create(), json, collector)
+    defp consume_array_contents(json, collector) when is_binary(json), do: consume_array_contents(collector.array.new, json, collector)
 
     defp consume_array_contents(acc, << ?], rest :: binary >>, collector), do: { :ok, collector.array.close(acc), rest }
     defp consume_array_contents(_, << >>, _), do: { :error,  :unexpected_end_of_buffer }

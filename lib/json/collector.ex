@@ -1,6 +1,6 @@
 defrecord JSON.Collector,
-  array: JSON.Collector.Array.List,
-  object: JSON.Collector.Object.HashDict
+  array: JSON.Collector.Array.SortedList,
+  object: JSON.Collector.Object.Map
 do
   record_type \
     array: JSON.Collector.Array.t,

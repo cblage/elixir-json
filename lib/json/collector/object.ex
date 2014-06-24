@@ -9,7 +9,7 @@ defmodule JSON.Collector.Object do
   @doc """
   Responsible for creating an empty instance of the object collector
   """
-  defcallback create() :: Enumerable.t
+  defcallback new :: Enumerable.t
 
   @doc """
   Responsible for adding items to the object collector

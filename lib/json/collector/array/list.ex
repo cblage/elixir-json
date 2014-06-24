@@ -1,9 +1,7 @@
 defmodule JSON.Collector.Array.List do
-  @behaviour JSON.Collector.Array
+  use JSON.Collector.Array.Behaviour
 
-  def create(), do: []
+  def new, do: []
 
   def put(acc, value), do: [ value | acc ]
-
-  def close(acc), do: Enum.reverse(acc)
 end

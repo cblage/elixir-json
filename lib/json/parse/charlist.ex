@@ -172,7 +172,7 @@ defmodule JSON.Parse.Charlist do
     end
 
     defp consume_object_contents(json, collector) do
-      consume_object_contents(collector.object.create(), json, collector)
+      consume_object_contents(collector.object.new, json, collector)
     end
 
     defp consume_object_contents(acc, [ ?" | _ ] = list, collector) do
@@ -225,7 +225,7 @@ defmodule JSON.Parse.Charlist do
     # Array Parsing
 
     defp consume_array_contents(json, collector) when is_list(json) do
-      consume_array_contents(collector.array.create(), json, collector)
+      consume_array_contents(collector.array.new, json, collector)
     end
 
     defp consume_array_contents(acc, [ ?] | rest ], collector) do
