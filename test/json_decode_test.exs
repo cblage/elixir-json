@@ -34,7 +34,8 @@ defmodule JSONDecodeTest do
   defmodule BitstringCases do
     use ExUnit.Case
     import JSONDecodeTest.DSL
-
+    defp newhashdict(list), do: Enum.into(list, HashDict.new)
+    
     decodes "null",  "null",  nil
     decodes "true",  "true",  true
     decodes "false", "false", false
@@ -61,7 +62,7 @@ defmodule JSONDecodeTest do
     decodes "float with negative exponent", "903.4e-6", 0.0009034
 
     decodes "empty object", "{}", HashDict.new
-    decodes "simple object", "{\"result\": \"this is awesome\"}", HashDict.new([ { "result", "this is awesome" } ])
+    decodes "simple object", "{\"result\": \"this is awesome\"}", newhashdict([ { "result", "this is awesome" } ])
 
     decodes "empty array", "  [   ] ", []
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
@@ -78,14 +79,14 @@ defmodule JSONDecodeTest do
                 { \"name\": \"Éloise\" }
               ]
              }",
-             HashDict.new([
+             newhashdict([
               { "name", "Rafaëlla" },
               { "active", true },
               { "phone", "1.415.555.0000" },
               { "balance", 1.52e+5 },
               { "children", [
-                HashDict.new([ { "name", "Søren" } ]),
-                HashDict.new([ { "name", "Éloise" } ])
+                newhashdict([ { "name", "Søren" } ]),
+                newhashdict([ { "name", "Éloise" } ])
               ] }
             ])
 
@@ -111,6 +112,7 @@ defmodule JSONDecodeTest do
   defmodule CharlistCases do
     use ExUnit.Case
     import JSONDecodeTest.DSL
+    defp newhashdict(list), do: Enum.into(list, HashDict.new)
 
     decodes "null",  'null',  nil
     decodes "true", 'true',  true
@@ -133,7 +135,7 @@ defmodule JSONDecodeTest do
     decodes "float with negative exponent", '903.4e-6', 0.0009034
 
     decodes "empty object", "{}", HashDict.new
-    decodes "simple object", '{"result": "this is awesome"}', HashDict.new([ { "result", "this is awesome" } ])
+    decodes "simple object", '{"result": "this is awesome"}', newhashdict([ { "result", "this is awesome" } ])
 
     decodes "empty array", '  [   ] ', []
     decodes "simple array", '[ 1, 2, "three", 4 ]', [ 1, 2, "three", 4 ]
@@ -150,14 +152,14 @@ defmodule JSONDecodeTest do
                 { "name": "Elga" }
               ]
              }',
-             HashDict.new([
+             newhashdict([
               { "name", "Jenny" },
               { "active", true },
               { "phone", "1.415.555.0000" },
               { "balance", 1.52e+5 },
               { "children", [
-                HashDict.new([ { "name", "Penny" } ]),
-                HashDict.new([ { "name", "Elga" } ])
+                newhashdict([ { "name", "Penny" } ]),
+                newhashdict([ { "name", "Elga" } ])
               ] }
             ])
 
@@ -180,5 +182,5 @@ defmodule JSONDecodeTest do
 
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}
   end
-
+  
 end

@@ -80,7 +80,7 @@ defmodule JSON.Parse.Charlist do
         {:ok, ["foo", 1, 2, 1.5], ' lala' }
 
         iex> JSON.Parse.Charlist.Value.consume '{"result": "this will be a elixir result"} lalal', JSON.Collector.new
-        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
+        {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), ' lalal'}
     """
     def consume([ ?[ | _ ] = charlist, collector), do: JSON.Parse.Charlist.Array.consume(charlist, collector)
     def consume([ ?{ | _ ] = charlist, collector), do: JSON.Parse.Charlist.Object.consume(charlist, collector)
@@ -122,7 +122,7 @@ defmodule JSON.Parse.Charlist do
         {:error, {:unexpected_token, '[]'}}
         
         iex> JSON.Parse.Charlist.Object.consume '{"result": "this will be a elixir result"} lalal', JSON.Collector.new
-        {:ok, HashDict.new([{"result", "this will be a elixir result"}]), ' lalal'}
+        {:ok, Enum.into([{"result", "this will be a elixir result"}], HashDict.new), ' lalal'}
     """
     def consume([ ?{ | rest ], collector) do
       JSON.Parse.Charlist.Whitespace.consume(rest) |> consume_object_contents(collector)
@@ -269,7 +269,7 @@ defmodule JSON.Parse.Charlist do
 
     #stop conditions
     defp consume_string_contents([ ], _), do: { :error, :unexpected_end_of_buffer }
-    defp consume_string_contents([ ?" | rest ], acc), do: { :ok, iolist_to_binary(acc), rest }
+    defp consume_string_contents([ ?" | rest ], acc), do: { :ok, IO.iodata_to_binary(acc), rest }
 
     #parsing
     defp consume_string_contents([ ?\\, ?f  | rest ], acc), do: consume_string_contents(rest, [ acc, ?\f ])

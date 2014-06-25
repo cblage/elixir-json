@@ -1,11 +1,13 @@
-defexception JSON.Decode.Error, message: "Invalid JSON - unknown error"
+defmodule JSON.Decode.Error, do: defexception message: "Invalid JSON - unknown error"
 
-defexception JSON.Decode.UnexpectedTokenError, token: nil do
-  def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
+defmodule JSON.Decode.UnexpectedTokenError do
+  defexception message: nil
+  def exception(token) do
+    %JSON.Decode.UnexpectedTokenError{message: "Invalid JSON - unexpected token >>#{token}<<"}
+  end
 end
 
-defexception JSON.Decode.UnexpectedEndOfBufferError, message: "Invalid JSON - unexpected end of buffer"
-
+defmodule JSON.Decode.UnexpectedEndOfBufferError, do: defexception message: "Invalid JSON - unexpected end of buffer"
 
 defprotocol JSON.Decode do
   @moduledoc """
