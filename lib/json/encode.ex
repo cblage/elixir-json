@@ -119,13 +119,13 @@ defimpl JSON.Encode, for: BitString do
   defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
 
   defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
-    [Integer.to_string(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
+    [Integer.to_string(char, 16) |> zeropad_hexadecimal_unicode_control_character | acc]
   end
 
-  defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]
-  defp zeropad_hexadecimal_unicode_control_character([a, b]),    do: [?0, ?0,  a, b]
-  defp zeropad_hexadecimal_unicode_control_character([a]),       do: [?0, ?0, ?0, a]
-  defp zeropad_hexadecimal_unicode_control_character(iolist) when is_list(iolist), do: iolist
+  defp zeropad_hexadecimal_unicode_control_character(<<a, b, c, d>>), do: [a,  b, c, d]
+  defp zeropad_hexadecimal_unicode_control_character(<<a, b, c>>), do: [?0,  a,  b, c]
+  defp zeropad_hexadecimal_unicode_control_character(<<a, b>>),    do: [?0, ?0,  a, b]
+  defp zeropad_hexadecimal_unicode_control_character(<<a>>),       do: [?0, ?0, ?0, a]
 
   def typeof(_), do: :string
 end

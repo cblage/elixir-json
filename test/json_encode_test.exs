@@ -10,7 +10,7 @@ defmodule JSONEncodeTest do
       JSON.encode([result: "this will be a elixir result"]) \
       == {:ok, "{\"result\":\"this will be a elixir result\"}"}
   end
-  
+
   test "convert keyword with charlist into correct JSON" do
     assert \
       JSON.encode([result: 'this will not be a string']) \
@@ -32,8 +32,8 @@ defmodule JSONEncodeTest do
     acc = HashDict.put(acc, "number", 1234)
     acc = HashDict.put(acc, "array",  ["a", :b, "c"])
     acc = HashDict.put(acc, "object", [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]])
-  
-  
+
+
     assert JSON.encode(acc) \
       == {:ok, "{\"number\":1234,\"false\":false,\"array\":[\"a\",\"b\",\"c\"],\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"null\":null,\"string\":\"this will be a string\"}"}
   end
@@ -41,6 +41,11 @@ defmodule JSONEncodeTest do
   test "convert keyword with '\\' into correct JSON" do
     assert \
       JSON.encode([result: "\\n"]) == {:ok, "{\"result\":\"\\\\n\"}"}
+  end
+
+  test "convert ascii control to correct unicode control in JSON" do
+    assert \
+      JSON.encode([result: "\v"]) == {:ok, "{\"result\":\"\\u000B\"}"}
   end
 
   test "convert maps into correct JSON" do
