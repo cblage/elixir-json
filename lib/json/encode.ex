@@ -26,7 +26,7 @@ defprotocol JSON.Encode do
       {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
 
   """
-  @spec to_json(term) :: bitstring
+  @spec to_json(term) :: {:ok, bitstring} | {:error, term}
   def to_json(term)
 
   @doc """
@@ -74,12 +74,11 @@ defimpl JSON.Encode, for: List do
   end
 end
 
-# TODO: get rid of "Number" when we want to phase out 10.3 support. 
-defimpl JSON.Encode, for: [Number, Integer, Float] do
+defimpl JSON.Encode, for: [Integer, Float] do
   def to_json(number), do: {:ok, "#{number}"} # Elixir convers octal, etc into decimal when putting in strings
   def typeof(_), do: :number
 end
-
+File
 defimpl JSON.Encode, for: Atom do
   def to_json(nil), do: {:ok, "null"}
   def to_json(false), do: {:ok, "false"}

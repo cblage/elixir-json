@@ -4,14 +4,14 @@ defmodule JSON.Mixfile do
   def project do
     [ app: :json,
       version: "0.3.0-dev",
-      elixir: "~> 0.12",
+      elixir: "~> 0.14",
       deps: deps(Mix.env),
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "http://expm.co/json" ]
   end
 
   def application, do: []
-  
+
   def deps(:prod), do: []
 
   def deps(:docs) do

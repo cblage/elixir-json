@@ -9,7 +9,7 @@ defmodule JSON do
       {:ok, "{\\\"result\\\":\\\"this will be a JSON result\\\"}"}
 
   """
-  @spec encode(term) :: {atom, bitstring}
+  @spec encode(term) :: {:ok, bitstring} | {:error, term}
   def encode(term), do: JSON.Encode.to_json(term)
 
   @spec encode!(term) :: bitstring
@@ -31,13 +31,11 @@ defmodule JSON do
       {:ok, Enum.into([{"result", "this will be an Elixir result"}], HashDict.new)}
   """
 
-  @spec decode(bitstring, JSON.Collector.t) :: {atom, term}
-  @spec decode(char_list, JSON.Collector.t) :: {atom, term}
+  @spec decode(bitstring | char_list, JSON.Collector.t) :: {atom, term}
   def decode(bitstring_or_char_list, collector \\ JSON.Collector.new), do: JSON.Decode.from_json(bitstring_or_char_list, collector)
-  
-  
-  @spec decode!(bitstring, JSON.Collector) :: term
-  @spec decode!(char_list, JSON.Collector) :: term
+
+
+  @spec decode!(bitstring | char_list, JSON.Collector.t) :: term
   def decode!(bitstring_or_char_list, collector \\ JSON.Collector.new) do
     case decode(bitstring_or_char_list, collector) do
       { :ok, value } -> value
