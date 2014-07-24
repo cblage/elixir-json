@@ -1,14 +1,14 @@
 
-defmodule JSON.Decode.Error, do: defexception([message: "Invalid JSON - unknown error"])
+defmodule JSON.Decoder.Error, do: defexception([message: "Invalid JSON - unknown error"])
 
-defmodule JSON.Decode.UnexpectedEndOfBufferError, do: defexception([message: "Invalid JSON - unexpected end of buffer"])
+defmodule JSON.Decoder.UnexpectedEndOfBufferError, do: defexception([message: "Invalid JSON - unexpected end of buffer"])
 
-defmodule JSON.Decode.UnexpectedTokenError do
+defmodule JSON.Decoder.UnexpectedTokenError do
   defexception [token: nil]
   def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
 end
 
-defprotocol JSON.Decode do
+defprotocol JSON.Decoder do
   @moduledoc """
   Defines the protocol required for converting raw JSON into Elixir terms
   """
@@ -16,13 +16,12 @@ defprotocol JSON.Decode do
   @doc """
   Returns an atom and an Elixir term
   """
-  @spec from_json(any) :: { atom, term }
-  def from_json(bitstring_or_char_list)
-
+  @spec decode(any) :: { atom, term }
+  def decode(bitstring_or_char_list)
 end
 
-defimpl JSON.Decode, for: BitString do
-  def from_json(bitstring) do
+defimpl JSON.Decoder, for: BitString do
+  def decode(bitstring) do
     case JSON.Parser.Bitstring.trim(bitstring)
           |> JSON.Parser.Bitstring.parse
     do
@@ -36,8 +35,8 @@ defimpl JSON.Decode, for: BitString do
   end
 end
 
-defimpl JSON.Decode, for: List do
-  def from_json(charlist) do
+defimpl JSON.Decoder, for: List do
+  def decode(charlist) do
     case JSON.Parser.Charlist.trim(charlist)
           |> JSON.Parser.Charlist.parse
     do

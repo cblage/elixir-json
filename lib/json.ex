@@ -10,14 +10,16 @@ defmodule JSON do
 
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(term), do: JSON.Encode.to_json(term)
+  def encode(term) do
+    JSON.Encoder.encode(term)
+  end
 
   @spec encode!(term) :: bitstring
   def encode!(term) do
     case encode(term) do
       { :ok, value }         -> value
-      { :error, error_info } -> raise JSON.Encode.Error, error_info: error_info
-      _                      -> raise JSON.Encode.Error
+      { :error, error_info } -> raise JSON.Encoder.Error, error_info: error_info
+      _                      -> raise JSON.Encoder.Error
     end
   end
 
@@ -32,17 +34,18 @@ defmodule JSON do
   """
   @spec decode(bitstring) :: {atom, term}
   @spec decode(char_list) :: {atom, term}
-  def decode(bitstring_or_char_list), do: JSON.Decode.from_json(bitstring_or_char_list)
-
+  def decode(bitstring_or_char_list) do
+    JSON.Decoder.decode(bitstring_or_char_list)
+  end
 
   @spec decode!(bitstring) :: term
   @spec decode!(char_list) :: term
   def decode!(bitstring_or_char_list) do
     case decode(bitstring_or_char_list) do
       { :ok, value } -> value
-      { :error, {:unexpected_token, tok } } -> raise JSON.Decode.UnexpectedTokenError, token: tok
-      { :error, :unexpected_end_of_buffer } -> raise JSON.Decode.UnexpectedEndOfBufferError
-      _ -> raise JSON.Decode.Error
+      { :error, {:unexpected_token, tok } } -> raise JSON.Decoder.UnexpectedTokenError, token: tok
+      { :error, :unexpected_end_of_buffer } -> raise JSON.Decoder.UnexpectedEndOfBufferError
+      _ -> raise JSON.Decoder.Error
     end
   end
 end

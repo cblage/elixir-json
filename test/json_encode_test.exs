@@ -3,7 +3,7 @@ Code.require_file "test_helper.exs", __DIR__
 defmodule JSONEncodeTest do
   use ExUnit.Case
 
-  doctest JSON.Encode
+  doctest JSON.Encoder
 
   test "convert keyword with string into correct JSON" do
     assert \
