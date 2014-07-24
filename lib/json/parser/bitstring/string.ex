@@ -34,43 +34,47 @@ defmodule JSON.Parser.Bitstring.String do
       iex> JSON.Parser.Bitstring.String.parse "\\\"Éloise woot\\\" Éloise"
       {:ok, "Éloise woot", " Éloise" }
   """
-  def parse(<< ?" :: utf8 , rest :: binary >>), do: parse_string_contents(rest, [ ])
+  def parse(<< ?" :: utf8 , tail :: binary >>), do: parse_string_contents(tail, [ ])
   def parse(<< >>), do: { :error, :unexpected_end_of_buffer }
   def parse(json), do: { :error, { :unexpected_token, json } }
 
 
   #stop conditions
   defp parse_string_contents(<< >>, _), do: { :error, :unexpected_end_of_buffer }
-  defp parse_string_contents(<< ?" :: utf8, rest :: binary >>, acc) do
-    case List.to_string(acc) do
-      {:ok, encoded_string } -> { :ok, encoded_string, rest }
-      _ -> {:error, { :unexpected_token, rest }}
+  defp parse_string_contents(<< ?" :: utf8, tail :: binary >>, acc) do
+    case Enum.reverse(acc) |> List.to_string do
+      encoded when is_binary(encoded) ->
+        { :ok, encoded, tail }
+      _ ->
+        {:error, { :unexpected_token, tail }}
     end
   end
 
   #parsing
-  defp parse_string_contents(<< ?\\, ?f,  rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?\f ])
-  defp parse_string_contents(<< ?\\, ?n,  rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?\n ])
-  defp parse_string_contents(<< ?\\, ?r,  rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?\r ])
-  defp parse_string_contents(<< ?\\, ?t,  rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?\t ])
-  defp parse_string_contents(<< ?\\, ?",  rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?"  ])
-  defp parse_string_contents(<< ?\\, ?\\, rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?\\ ])
-  defp parse_string_contents(<< ?\\, ?/,  rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, ?/  ])
+  defp parse_string_contents(<< ?\\, ?f,  tail :: binary >>, acc), do: parse_string_contents(tail, [ ?\f | acc ])
+  defp parse_string_contents(<< ?\\, ?n,  tail :: binary >>, acc), do: parse_string_contents(tail, [ ?\n | acc ])
+  defp parse_string_contents(<< ?\\, ?r,  tail :: binary >>, acc), do: parse_string_contents(tail, [ ?\r | acc ])
+  defp parse_string_contents(<< ?\\, ?t,  tail :: binary >>, acc), do: parse_string_contents(tail, [ ?\t | acc ])
+  defp parse_string_contents(<< ?\\, ?",  tail :: binary >>, acc), do: parse_string_contents(tail, [ ?"  | acc ])
+  defp parse_string_contents(<< ?\\, ?\\, tail :: binary >>, acc), do: parse_string_contents(tail, [ ?\\ | acc ])
+  defp parse_string_contents(<< ?\\, ?/,  tail :: binary >>, acc), do: parse_string_contents(tail, [ ?/  | acc ])
 
-  defp parse_string_contents(<< ?\\, ?u , rest :: binary >> , acc) do
-    case parse_unicode_escape(rest, 0, 0) do
-     { :error, error_info } -> { :error, error_info }
-     { :ok, decoded_codepoint, after_decoded_codepoint} ->
-        case decoded_codepoint do
+  defp parse_string_contents(<< ?\\, ?u , tail :: binary >> , acc) do
+    case parse_unicode_escape(tail, 0, 0) do
+      { :error, error_info } -> { :error, error_info }
+      { :ok, codepoint, after_codepoint} ->
+        case codepoint do
           << _ ::utf8 >> ->
-            parse_string_contents(after_decoded_codepoint, [ acc, decoded_codepoint ])
+            parse_string_contents(after_codepoint, [ codepoint | acc ])
           _ ->
-            { :error, { :unexpected_token, << ?\\, ?u , rest :: binary >> } }
+            { :error, { :unexpected_token, << ?\\, ?u , tail :: binary >> } }
         end
     end
   end
 
-  defp parse_string_contents(<< char :: utf8, rest :: binary >>, acc), do: parse_string_contents(rest, [ acc, char ])
+  defp parse_string_contents(<< char :: utf8, tail :: binary >>, acc) do
+    parse_string_contents(tail, [ char  | acc ])
+  end
 
 
   # The only OK stop condition (parsed 4 expected chars successfully)
@@ -78,19 +82,18 @@ defmodule JSON.Parser.Bitstring.String do
     { :ok, << acc :: utf8 >>, json }
   end
 
+  defp parse_unicode_escape(<< char :: utf8, tail :: binary >>, acc, chars_parsed) when char in ?0..?9 do
+    parse_unicode_escape(tail, 16 * acc + char - ?0, chars_parsed + 1)
+  end
+
+  defp parse_unicode_escape(<< char :: utf8, tail :: binary >>, acc, chars_parsed) when char in ?a..?f do
+    parse_unicode_escape(tail, 16 * acc + 10 + char - ?a, chars_parsed + 1)
+  end
+
+  defp parse_unicode_escape(<< char :: utf8, tail :: binary >>, acc, chars_parsed) when char in ?A..?F do
+    parse_unicode_escape(tail, 16 * acc + 10 + char - ?A, chars_parsed + 1)
+  end
+
   defp parse_unicode_escape(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
-
-  defp parse_unicode_escape(<< char :: utf8, rest :: binary >>, acc, chars_parsed) when char in ?0..?9 do
-    parse_unicode_escape(rest, 16 * acc + char - ?0, chars_parsed + 1)
-  end
-
-  defp parse_unicode_escape(<< char :: utf8, rest :: binary >>, acc, chars_parsed) when char in ?a..?f do
-    parse_unicode_escape(rest, 16 * acc + 10 + char - ?a, chars_parsed + 1)
-  end
-
-  defp parse_unicode_escape(<< char :: utf8, rest :: binary >>, acc, chars_parsed) when char in ?A..?F do
-    parse_unicode_escape(rest, 16 * acc + 10 + char - ?A, chars_parsed + 1)
-  end
-
   defp parse_unicode_escape(json, _, _), do: { :error, { :unexpected_token, json } }
 end
