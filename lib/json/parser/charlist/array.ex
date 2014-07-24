@@ -1,29 +1,29 @@
-defmodule JSON.Parse.Charlist.Array do
+defmodule JSON.Parser.Charlist.Array do
   @doc """
   parses a valid JSON array value, returns its elixir list representation
 
   ## Examples
 
-      iex> JSON.Parse.Charlist.Array.parse ''
+      iex> JSON.Parser.Charlist.Array.parse ''
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Charlist.Array.parse '[1, 2 '
+      iex> JSON.Parser.Charlist.Array.parse '[1, 2 '
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Charlist.Array.parse 'face0ff'
+      iex> JSON.Parser.Charlist.Array.parse 'face0ff'
       {:error, {:unexpected_token, 'face0ff'} }
 
-      iex> JSON.Parse.Charlist.Array.parse '[] lala'
+      iex> JSON.Parser.Charlist.Array.parse '[] lala'
       {:ok, [], ' lala' }
 
-      iex> JSON.Parse.Charlist.Array.parse '[]'
+      iex> JSON.Parser.Charlist.Array.parse '[]'
       {:ok, [], '' }
 
-      iex> JSON.Parse.Charlist.Array.parse '["foo", 1, 2, 1.5] lala'
+      iex> JSON.Parser.Charlist.Array.parse '["foo", 1, 2, 1.5] lala'
       {:ok, ["foo", 1, 2, 1.5], ' lala' }
   """
   def parse([ ?[ | rest ]) do
-    JSON.Parse.Charlist.trim(rest) |> parse_array_contents
+    JSON.Parser.Charlist.trim(rest) |> parse_array_contents
   end
 
   def parse([ ]),  do: { :error, :unexpected_end_of_buffer }
@@ -43,15 +43,15 @@ defmodule JSON.Parse.Charlist.Array do
   defp parse_array_contents(_, [ ]), do: { :error, :unexpected_end_of_buffer }
 
   defp parse_array_contents(acc, json) do
-    case JSON.Parse.Charlist.trim(json)
-            |> JSON.Parse.Charlist.parse
+    case JSON.Parser.Charlist.trim(json)
+            |> JSON.Parser.Charlist.parse
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, after_value } ->
-        after_value = JSON.Parse.Charlist.trim(after_value)
+        after_value = JSON.Parser.Charlist.trim(after_value)
         case after_value  do
           [ ?, | after_comma ] ->
-            parse_array_contents([value | acc], JSON.Parse.Charlist.trim(after_comma))
+            parse_array_contents([value | acc], JSON.Parser.Charlist.trim(after_comma))
           _ ->
             parse_array_contents([value | acc], after_value)
         end

@@ -1,29 +1,29 @@
-defmodule JSON.Parse.Bitstring.Object do
+defmodule JSON.Parser.Bitstring.Object do
   @doc """
   parses a valid JSON object value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.Object.parse ""
+      iex> JSON.Parser.Bitstring.Object.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.Object.parse "face0ff"
+      iex> JSON.Parser.Bitstring.Object.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"} }
 
-      iex> JSON.Parse.Bitstring.Object.parse "[] "
+      iex> JSON.Parser.Bitstring.Object.parse "[] "
       {:error, {:unexpected_token, "[] "}}
 
-      iex> JSON.Parse.Bitstring.Object.parse "[]"
+      iex> JSON.Parser.Bitstring.Object.parse "[]"
       {:error, {:unexpected_token, "[]"}}
 
-      iex> JSON.Parse.Bitstring.Object.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parser.Bitstring.Object.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:error, {:unexpected_token, "[\\\"foo\\\", 1, 2, 1.5] lala"}}
 
-      iex> JSON.Parse.Bitstring.Object.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+      iex> JSON.Parser.Bitstring.Object.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
   def parse(<< ?{, rest :: binary >>) do
-    JSON.Parse.Bitstring.trim(rest)
+    JSON.Parser.Bitstring.trim(rest)
       |> parse_object_contents
   end
 
@@ -32,29 +32,29 @@ defmodule JSON.Parse.Bitstring.Object do
 
   # Object Parsing
   defp parse_object_key(json) do
-    case JSON.Parse.Bitstring.String.parse(json) do
+    case JSON.Parser.Bitstring.String.parse(json) do
       {:error, error_info} -> {:error, error_info}
       {:ok, key, after_key } ->
-        case JSON.Parse.Bitstring.trim(after_key) do
+        case JSON.Parser.Bitstring.trim(after_key) do
           << ?:,  after_colon :: binary >> ->
-            { :ok, key, JSON.Parse.Bitstring.trim(after_colon) }
+            { :ok, key, JSON.Parser.Bitstring.trim(after_colon) }
           << >> ->
             { :error, :unexpected_end_of_buffer}
           _ ->
-            { :error, { :unexpected_token, JSON.Parse.Bitstring.trim(after_key) } }
+            { :error, { :unexpected_token, JSON.Parser.Bitstring.trim(after_key) } }
         end
     end
   end
 
   defp parse_object_value(acc, key, after_key) do
-    case JSON.Parse.Bitstring.parse(after_key) do
+    case JSON.Parser.Bitstring.parse(after_key) do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, after_value } ->
         acc = Map.put(acc, key, value)
-        after_value = JSON.Parse.Bitstring.trim(after_value)
+        after_value = JSON.Parser.Bitstring.trim(after_value)
         case after_value do
           << ?,, after_comma :: binary >> ->
-            parse_object_contents acc, JSON.Parse.Bitstring.trim(after_comma)
+            parse_object_contents acc, JSON.Parser.Bitstring.trim(after_comma)
           _  ->
             parse_object_contents acc, after_value
         end

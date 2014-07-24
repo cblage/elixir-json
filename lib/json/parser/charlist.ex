@@ -1,75 +1,75 @@
-defmodule JSON.Parse.Charlist do
+defmodule JSON.Parser.Charlist do
   @doc """
   parses a valid JSON value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Charlist.parse ''
+      iex> JSON.Parser.Charlist.parse ''
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Charlist.parse 'face0ff'
+      iex> JSON.Parser.Charlist.parse 'face0ff'
       {:error, {:unexpected_token, 'face0ff'} }
 
-      iex> JSON.Parse.Charlist.parse '-hello'
+      iex> JSON.Parser.Charlist.parse '-hello'
       {:error, {:unexpected_token, '-hello'} }
 
-      iex> JSON.Parse.Charlist.parse '129245'
+      iex> JSON.Parser.Charlist.parse '129245'
       {:ok, 129245, '' }
 
-      iex> JSON.Parse.Charlist.parse '7.something'
+      iex> JSON.Parser.Charlist.parse '7.something'
       {:ok, 7, '.something' }
 
-      iex> JSON.Parse.Charlist.parse '-88.22suffix'
+      iex> JSON.Parser.Charlist.parse '-88.22suffix'
       {:ok, -88.22, 'suffix' }
 
-      iex> JSON.Parse.Charlist.parse '-12e4and then some'
+      iex> JSON.Parser.Charlist.parse '-12e4and then some'
       {:ok, -1.2e+5, 'and then some' }
 
-      iex> JSON.Parse.Charlist.parse '7842490016E-12-and more'
+      iex> JSON.Parser.Charlist.parse '7842490016E-12-and more'
       {:ok, 7.842490016e-3, '-and more' }
 
-      iex> JSON.Parse.Charlist.parse 'null'
+      iex> JSON.Parser.Charlist.parse 'null'
       {:ok, nil, '' }
 
-      iex> JSON.Parse.Charlist.parse 'false'
+      iex> JSON.Parser.Charlist.parse 'false'
       {:ok, false, '' }
 
-      iex> JSON.Parse.Charlist.parse 'true'
+      iex> JSON.Parser.Charlist.parse 'true'
       {:ok, true, '' }
 
-      iex> JSON.Parse.Charlist.parse '\\\"7.something\\\"'
+      iex> JSON.Parser.Charlist.parse '\\\"7.something\\\"'
       {:ok, "7.something", '' }
 
-      iex> JSON.Parse.Charlist.parse '\\\"-88.22suffix\\\" foo bar'
+      iex> JSON.Parser.Charlist.parse '\\\"-88.22suffix\\\" foo bar'
       {:ok, "-88.22suffix", ' foo bar' }
 
-      iex> JSON.Parse.Charlist.parse '[]'
+      iex> JSON.Parser.Charlist.parse '[]'
       {:ok, [], '' }
 
-      iex> JSON.Parse.Charlist.parse '["foo", 1, 2, 1.5] lala'
+      iex> JSON.Parser.Charlist.parse '["foo", 1, 2, 1.5] lala'
       {:ok, ["foo", 1, 2, 1.5], ' lala' }
 
-      iex> JSON.Parse.Charlist.parse '{"result": "this will be a elixir result"} lalal'
+      iex> JSON.Parser.Charlist.parse '{"result": "this will be a elixir result"} lalal'
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), ' lalal'}
   """
   def parse([ ?[ | _ ] = charlist) do
-    JSON.Parse.Charlist.Array.parse(charlist)
+    JSON.Parser.Charlist.Array.parse(charlist)
   end
 
   def parse([ ?{ | _ ] = charlist) do
-    JSON.Parse.Charlist.Object.parse(charlist)
+    JSON.Parser.Charlist.Object.parse(charlist)
   end
 
   def parse([ ?" | _ ] = charlist) do
-    JSON.Parse.Charlist.String.parse(charlist)
+    JSON.Parser.Charlist.String.parse(charlist)
   end
 
   def parse([ ?- , number | _ ] = charlist) when number in ?0..?9 do
-    JSON.Parse.Charlist.Number.parse(charlist)
+    JSON.Parser.Charlist.Number.parse(charlist)
   end
 
   def parse([ number | _ ] = charlist) when number in ?0..?9 do
-    JSON.Parse.Charlist.Number.parse(charlist)
+    JSON.Parser.Charlist.Number.parse(charlist)
   end
 
 
@@ -86,16 +86,16 @@ defmodule JSON.Parse.Charlist do
 
   ## Examples
 
-      iex> JSON.Parse.Charlist.trim ''
+      iex> JSON.Parser.Charlist.trim ''
       ''
 
-      iex> JSON.Parse.Charlist.trim 'xkcd'
+      iex> JSON.Parser.Charlist.trim 'xkcd'
       'xkcd'
 
-      iex> JSON.Parse.Charlist.trim '  \\t\\r lalala '
+      iex> JSON.Parser.Charlist.trim '  \\t\\r lalala '
       'lalala '
 
-      iex> JSON.Parse.Charlist.trim ' \\n\\t\\n fooo \\u00dflalalal '
+      iex> JSON.Parser.Charlist.trim ' \\n\\t\\n fooo \\u00dflalalal '
       'fooo \\u00dflalalal '
   """
   def trim(charlist) when is_list(charlist) do

@@ -1,29 +1,29 @@
-defmodule JSON.Parse.Bitstring.Array do
+defmodule JSON.Parser.Bitstring.Array do
   @doc """
   parses a valid JSON array value, returns its elixir list representation
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.Array.parse ""
+      iex> JSON.Parser.Bitstring.Array.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.Array.parse "[1, 2 "
+      iex> JSON.Parser.Bitstring.Array.parse "[1, 2 "
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.Array.parse "face0ff"
+      iex> JSON.Parser.Bitstring.Array.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"} }
 
-      iex> JSON.Parse.Bitstring.Array.parse "[] lala"
+      iex> JSON.Parser.Bitstring.Array.parse "[] lala"
       {:ok, [], " lala" }
 
-      iex> JSON.Parse.Bitstring.Array.parse "[]"
+      iex> JSON.Parser.Bitstring.Array.parse "[]"
       {:ok, [], "" }
 
-      iex> JSON.Parse.Bitstring.Array.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parser.Bitstring.Array.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:ok, ["foo", 1, 2, 1.5], " lala" }
   """
   def parse(<< ?[, rest :: binary >>) do
-    JSON.Parse.Bitstring.trim(rest) |> parse_array_contents
+    JSON.Parser.Bitstring.trim(rest) |> parse_array_contents
   end
 
   def parse(<< >>), do:  { :error, :unexpected_end_of_buffer }
@@ -36,13 +36,13 @@ defmodule JSON.Parse.Bitstring.Array do
   defp parse_array_contents(_, << >>), do: { :error,  :unexpected_end_of_buffer }
 
   defp parse_array_contents(acc, json) do
-    case JSON.Parse.Bitstring.trim(json) |> JSON.Parse.Bitstring.parse do
+    case JSON.Parser.Bitstring.trim(json) |> JSON.Parser.Bitstring.parse do
       { :error, error_info } -> { :error, error_info }
       {:ok, value, after_value } ->
-        after_value = JSON.Parse.Bitstring.trim(after_value)
+        after_value = JSON.Parser.Bitstring.trim(after_value)
         case after_value do
           << ?, , after_comma :: binary >> ->
-            parse_array_contents([value | acc], JSON.Parse.Bitstring.trim(after_comma))
+            parse_array_contents([value | acc], JSON.Parser.Bitstring.trim(after_comma))
           _ ->
             parse_array_contents([value | acc], after_value)
         end

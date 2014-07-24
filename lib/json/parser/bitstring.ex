@@ -1,70 +1,70 @@
-defmodule JSON.Parse.Bitstring do
+defmodule JSON.Parser.Bitstring do
   @doc """
   parses a valid JSON value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.parse ""
+      iex> JSON.Parser.Bitstring.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.parse "face0ff"
+      iex> JSON.Parser.Bitstring.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"} }
 
-      iex> JSON.Parse.Bitstring.parse "-hello"
+      iex> JSON.Parser.Bitstring.parse "-hello"
       {:error, {:unexpected_token, "-hello"} }
 
-      iex> JSON.Parse.Bitstring.parse "129245"
+      iex> JSON.Parser.Bitstring.parse "129245"
       {:ok, 129245, "" }
 
-      iex> JSON.Parse.Bitstring.parse "7.something"
+      iex> JSON.Parser.Bitstring.parse "7.something"
       {:ok, 7, ".something" }
 
-      iex> JSON.Parse.Bitstring.parse "-88.22suffix"
+      iex> JSON.Parser.Bitstring.parse "-88.22suffix"
       {:ok, -88.22, "suffix" }
 
-      iex> JSON.Parse.Bitstring.parse "-12e4and then some"
+      iex> JSON.Parser.Bitstring.parse "-12e4and then some"
       {:ok, -1.2e+5, "and then some" }
 
-      iex> JSON.Parse.Bitstring.parse "7842490016E-12-and more"
+      iex> JSON.Parser.Bitstring.parse "7842490016E-12-and more"
       {:ok, 7.842490016e-3, "-and more" }
 
-      iex> JSON.Parse.Bitstring.parse "null"
+      iex> JSON.Parser.Bitstring.parse "null"
       {:ok, nil, ""}
 
-      iex> JSON.Parse.Bitstring.parse "false"
+      iex> JSON.Parser.Bitstring.parse "false"
       {:ok, false, "" }
 
-      iex> JSON.Parse.Bitstring.parse "true"
+      iex> JSON.Parser.Bitstring.parse "true"
       {:ok, true, "" }
 
-      iex> JSON.Parse.Bitstring.parse "\\\"7.something\\\""
+      iex> JSON.Parser.Bitstring.parse "\\\"7.something\\\""
       {:ok, "7.something", "" }
 
-      iex> JSON.Parse.Bitstring.parse "\\\"-88.22suffix\\\" foo bar"
+      iex> JSON.Parser.Bitstring.parse "\\\"-88.22suffix\\\" foo bar"
       {:ok, "-88.22suffix", " foo bar" }
 
-      iex> JSON.Parse.Bitstring.parse "\\\"star -> \\\\u272d <- star\\\""
+      iex> JSON.Parser.Bitstring.parse "\\\"star -> \\\\u272d <- star\\\""
       {:ok, "star -> ✭ <- star", "" }
 
-      iex> JSON.Parse.Bitstring.parse "[]"
+      iex> JSON.Parser.Bitstring.parse "[]"
       {:ok, [], "" }
 
-      iex> JSON.Parse.Bitstring.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parser.Bitstring.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:ok, ["foo", 1, 2, 1.5], " lala" }
 
-      iex> JSON.Parse.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+      iex> JSON.Parser.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-  def parse(<< ?[, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Array.parse(bin)
-  def parse(<< ?{, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Object.parse(bin)
-  def parse(<< ?", _ :: binary >> = bin), do: JSON.Parse.Bitstring.String.parse(bin)
+  def parse(<< ?[, _ :: binary >> = bin), do: JSON.Parser.Bitstring.Array.parse(bin)
+  def parse(<< ?{, _ :: binary >> = bin), do: JSON.Parser.Bitstring.Object.parse(bin)
+  def parse(<< ?", _ :: binary >> = bin), do: JSON.Parser.Bitstring.String.parse(bin)
 
   def parse(<< ?- , number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    JSON.Parse.Bitstring.Number.parse(bin)
+    JSON.Parser.Bitstring.Number.parse(bin)
   end
 
   def parse(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    JSON.Parse.Bitstring.Number.parse(bin)
+    JSON.Parser.Bitstring.Number.parse(bin)
   end
 
   def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
@@ -79,16 +79,16 @@ defmodule JSON.Parse.Bitstring do
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.trim ""
+      iex> JSON.Parser.Bitstring.trim ""
       ""
 
-      iex> JSON.Parse.Bitstring.trim "xkcd"
+      iex> JSON.Parser.Bitstring.trim "xkcd"
       "xkcd"
 
-      iex> JSON.Parse.Bitstring.trim "  \\t\\r lalala "
+      iex> JSON.Parser.Bitstring.trim "  \\t\\r lalala "
       "lalala "
 
-      iex> JSON.Parse.Bitstring.trim " \\n\\t\\n fooo \\u00dflalalal "
+      iex> JSON.Parser.Bitstring.trim " \\n\\t\\n fooo \\u00dflalalal "
       "fooo \\u00dflalalal "
   """
   def trim(bitstring) when is_binary(bitstring) do

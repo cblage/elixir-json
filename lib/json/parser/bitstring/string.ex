@@ -1,37 +1,37 @@
-defmodule JSON.Parse.Bitstring.String do
+defmodule JSON.Parser.Bitstring.String do
   @doc """
   parses a valid JSON string, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.String.parse ""
+      iex> JSON.Parser.Bitstring.String.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.String.parse "face0ff"
+      iex> JSON.Parser.Bitstring.String.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"} }
 
-      iex> JSON.Parse.Bitstring.String.parse "-hello"
+      iex> JSON.Parser.Bitstring.String.parse "-hello"
       {:error, {:unexpected_token, "-hello"} }
 
-      iex> JSON.Parse.Bitstring.String.parse "129245"
+      iex> JSON.Parser.Bitstring.String.parse "129245"
       {:error, {:unexpected_token, "129245"} }
 
-      iex> JSON.Parse.Bitstring.String.parse "\\\"7.something\\\""
+      iex> JSON.Parser.Bitstring.String.parse "\\\"7.something\\\""
       {:ok, "7.something", "" }
 
-      iex> JSON.Parse.Bitstring.String.parse "\\\"-88.22suffix\\\" foo bar"
+      iex> JSON.Parser.Bitstring.String.parse "\\\"-88.22suffix\\\" foo bar"
       {:ok, "-88.22suffix", " foo bar" }
 
-      iex> JSON.Parse.Bitstring.String.parse "\\\"star -> \\\\u272d <- star\\\""
+      iex> JSON.Parser.Bitstring.String.parse "\\\"star -> \\\\u272d <- star\\\""
       {:ok, "star -> ✭ <- star", "" }
 
-      iex> JSON.Parse.Bitstring.String.parse "\\\"\\\\u00df ist wunderbar\\\""
+      iex> JSON.Parser.Bitstring.String.parse "\\\"\\\\u00df ist wunderbar\\\""
       {:ok, "ß ist wunderbar", "" }
 
-      iex> JSON.Parse.Bitstring.String.parse "\\\"Rafaëlla\\\" foo bar"
+      iex> JSON.Parser.Bitstring.String.parse "\\\"Rafaëlla\\\" foo bar"
       {:ok, "Rafaëlla", " foo bar" }
 
-      iex> JSON.Parse.Bitstring.String.parse "\\\"Éloise woot\\\" Éloise"
+      iex> JSON.Parser.Bitstring.String.parse "\\\"Éloise woot\\\" Éloise"
       {:ok, "Éloise woot", " Éloise" }
   """
   def parse(<< ?" :: utf8 , rest :: binary >>), do: parse_string_contents(rest, [ ])

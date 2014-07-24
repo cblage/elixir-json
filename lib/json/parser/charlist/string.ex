@@ -1,31 +1,31 @@
-defmodule JSON.Parse.Charlist.String do
+defmodule JSON.Parser.Charlist.String do
   @doc """
   parses a valid JSON string, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Charlist.String.parse ''
+      iex> JSON.Parser.Charlist.String.parse ''
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Charlist.String.parse 'face0ff'
+      iex> JSON.Parser.Charlist.String.parse 'face0ff'
       {:error, {:unexpected_token, 'face0ff'} }
 
-      iex> JSON.Parse.Charlist.String.parse '-hello'
+      iex> JSON.Parser.Charlist.String.parse '-hello'
       {:error, {:unexpected_token, '-hello'} }
 
-      iex> JSON.Parse.Charlist.String.parse '129245'
+      iex> JSON.Parser.Charlist.String.parse '129245'
       {:error, {:unexpected_token, '129245'} }
 
-      iex> JSON.Parse.Charlist.String.parse '\\\"7.something\\\"'
+      iex> JSON.Parser.Charlist.String.parse '\\\"7.something\\\"'
       {:ok, "7.something", '' }
 
-      iex> JSON.Parse.Charlist.String.parse '\\\"star -> \\\\u272d <- star\\\"'
+      iex> JSON.Parser.Charlist.String.parse '\\\"star -> \\\\u272d <- star\\\"'
       {:ok, "star -> ✭ <- star", '' }
 
-      iex> JSON.Parse.Charlist.String.parse '\\\"\\\\u00df ist wunderbar\\\"'
+      iex> JSON.Parser.Charlist.String.parse '\\\"\\\\u00df ist wunderbar\\\"'
       {:ok, "ß ist wunderbar", '' }
 
-      iex> JSON.Parse.Charlist.String.parse '\\\"-88.22suffix\\\" foo bar'
+      iex> JSON.Parser.Charlist.String.parse '\\\"-88.22suffix\\\" foo bar'
       {:ok, "-88.22suffix", ' foo bar' }
 
   """

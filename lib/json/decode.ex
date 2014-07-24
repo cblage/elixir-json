@@ -23,12 +23,12 @@ end
 
 defimpl JSON.Decode, for: BitString do
   def from_json(bitstring) do
-    case JSON.Parse.Bitstring.trim(bitstring)
-          |> JSON.Parse.Bitstring.parse
+    case JSON.Parser.Bitstring.trim(bitstring)
+          |> JSON.Parser.Bitstring.parse
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
-        case JSON.Parse.Bitstring.trim(rest) do
+        case JSON.Parser.Bitstring.trim(rest) do
           << >> -> { :ok, value }
           _     -> { :error, { :unexpected_token, rest } }
         end
@@ -38,12 +38,12 @@ end
 
 defimpl JSON.Decode, for: List do
   def from_json(charlist) do
-    case JSON.Parse.Charlist.trim(charlist)
-          |> JSON.Parse.Charlist.parse
+    case JSON.Parser.Charlist.trim(charlist)
+          |> JSON.Parser.Charlist.parse
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
-        case JSON.Parse.Charlist.trim(rest) do
+        case JSON.Parser.Charlist.trim(rest) do
           [] -> { :ok, value }
           _  -> { :error, { :unexpected_token, rest } }
         end

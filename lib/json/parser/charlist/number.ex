@@ -1,34 +1,34 @@
-defmodule JSON.Parse.Charlist.Number do
+defmodule JSON.Parser.Charlist.Number do
   @doc """
   parses a valid JSON numerical value, returns its elixir numerical representation
 
   ## Examples
 
-      iex> JSON.Parse.Charlist.Number.parse ''
+      iex> JSON.Parser.Charlist.Number.parse ''
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Charlist.Number.parse 'face0ff'
+      iex> JSON.Parser.Charlist.Number.parse 'face0ff'
       {:error, {:unexpected_token, 'face0ff'} }
 
-      iex> JSON.Parse.Charlist.Number.parse '-hello'
+      iex> JSON.Parser.Charlist.Number.parse '-hello'
       {:error, {:unexpected_token, 'hello'} }
 
-      iex> JSON.Parse.Charlist.Number.parse '129245'
+      iex> JSON.Parser.Charlist.Number.parse '129245'
       {:ok, 129245, '' }
 
-      iex> JSON.Parse.Charlist.Number.parse '7.something'
+      iex> JSON.Parser.Charlist.Number.parse '7.something'
       {:ok, 7, '.something' }
 
-      iex> JSON.Parse.Charlist.Number.parse '7.4566something'
+      iex> JSON.Parser.Charlist.Number.parse '7.4566something'
       {:ok, 7.4566, 'something' }
 
-      iex> JSON.Parse.Charlist.Number.parse '-88.22suffix'
+      iex> JSON.Parser.Charlist.Number.parse '-88.22suffix'
       {:ok, -88.22, 'suffix' }
 
-      iex> JSON.Parse.Charlist.Number.parse '-12e4and then some'
+      iex> JSON.Parser.Charlist.Number.parse '-12e4and then some'
       {:ok, -1.2e+5, 'and then some' }
 
-      iex> JSON.Parse.Charlist.Number.parse '7842490016E-12-and more'
+      iex> JSON.Parser.Charlist.Number.parse '7842490016E-12-and more'
       {:ok, 7.842490016e-3, '-and more' }
   """
   def parse([ ?- | rest]) do
