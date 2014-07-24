@@ -28,17 +28,17 @@ defmodule JSON do
   ## Examples
 
       iex> JSON.decode("{\\\"result\\\":\\\"this will be an Elixir result\\\"}")
-      {:ok, Enum.into([{"result", "this will be an Elixir result"}], HashDict.new) }
+      {:ok, Enum.into([{"result", "this will be an Elixir result"}], Map.new) }
   """
-  @spec decode(bitstring, JSON.Collector.t) :: {atom, term}
-  @spec decode(char_list, JSON.Collector.t) :: {atom, term}
-  def decode(bitstring_or_char_list, collector \\ JSON.Collector.new), do: JSON.Decode.from_json(bitstring_or_char_list, collector)
+  @spec decode(bitstring) :: {atom, term}
+  @spec decode(char_list) :: {atom, term}
+  def decode(bitstring_or_char_list), do: JSON.Decode.from_json(bitstring_or_char_list)
 
 
-  @spec decode!(bitstring, JSON.Collector) :: term
-  @spec decode!(char_list, JSON.Collector) :: term
-  def decode!(bitstring_or_char_list, collector \\ JSON.Collector.new) do
-    case decode(bitstring_or_char_list, collector) do
+  @spec decode!(bitstring) :: term
+  @spec decode!(char_list) :: term
+  def decode!(bitstring_or_char_list) do
+    case decode(bitstring_or_char_list) do
       { :ok, value } -> value
       { :error, {:unexpected_token, tok } } -> raise JSON.Decode.UnexpectedTokenError, token: tok
       { :error, :unexpected_end_of_buffer } -> raise JSON.Decode.UnexpectedEndOfBufferError

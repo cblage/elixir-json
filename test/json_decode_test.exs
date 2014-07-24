@@ -60,9 +60,9 @@ defmodule JSONDecodeTest do
     decodes "float with positive exponent", "-1.22783E+4", -12278.3
     decodes "float with negative exponent", "903.4e-6", 0.0009034
 
-    decodes "empty object", "{}", HashDict.new
+    decodes "empty object", "{}", Map.new
     decodes "simple object", "{\"result\": \"this is awesome\"}",\
-                  Enum.into([{"result", "this is awesome"}], HashDict.new)
+                  Enum.into([{"result", "this is awesome"}], Map.new)
 
     decodes "empty array", "  [   ] ", []
     decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
@@ -85,10 +85,10 @@ defmodule JSONDecodeTest do
               { "phone", "1.415.555.0000" },
               { "balance", 1.52e+5 },
               { "children", [
-                Enum.into([{"name", "Søren"}], HashDict.new),
-                Enum.into([{"name", "Éloise"}], HashDict.new)
+                Enum.into([{"name", "Søren"}], Map.new),
+                Enum.into([{"name", "Éloise"}], Map.new)
               ] }
-            ], HashDict.new)
+            ], Map.new)
 
     cannot_decode "bad literal", "nul", {:unexpected_token, "nul"}
 
@@ -133,9 +133,9 @@ defmodule JSONDecodeTest do
     decodes "float with positive exponent", '-1.22783E+4', -12278.3
     decodes "float with negative exponent", '903.4e-6', 0.0009034
 
-    decodes "empty object", "{}", HashDict.new
+    decodes "empty object", "{}", Map.new
     decodes "simple object", '{"result": "this is awesome"}',\
-                              Enum.into([ { "result", "this is awesome" } ], HashDict.new)
+                              Enum.into([ { "result", "this is awesome" } ], Map.new)
 
     decodes "empty array", '  [   ] ', []
     decodes "simple array", '[ 1, 2, "three", 4 ]', [ 1, 2, "three", 4 ]
@@ -158,10 +158,10 @@ defmodule JSONDecodeTest do
               { "phone", "1.415.555.0000" },
               { "balance", 1.52e+5 },
               { "children", [
-                Enum.into([ { "name", "Penny" } ], HashDict.new),
-                Enum.into([ { "name", "Elga" } ], HashDict.new)
+                Enum.into([ { "name", "Penny" } ], Map.new),
+                Enum.into([ { "name", "Elga" } ], Map.new)
               ] }
-            ], HashDict.new)
+            ], Map.new)
 
 
     cannot_decode "bad literal", 'nul', {:unexpected_token, 'nul'}

@@ -1,5 +1,8 @@
+
 defmodule JSON.Decode.Error, do: defexception([message: "Invalid JSON - unknown error"])
+
 defmodule JSON.Decode.UnexpectedEndOfBufferError, do: defexception([message: "Invalid JSON - unexpected end of buffer"])
+
 defmodule JSON.Decode.UnexpectedTokenError do
   defexception [token: nil]
   def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
@@ -13,19 +16,19 @@ defprotocol JSON.Decode do
   @doc """
   Returns an atom and an Elixir term
   """
-  @spec from_json(any, JSON.Collector) :: { atom, term }
-  def from_json(bitstring_or_char_list, collector)
+  @spec from_json(any) :: { atom, term }
+  def from_json(bitstring_or_char_list)
 
 end
 
 defimpl JSON.Decode, for: BitString do
-  def from_json(bitstring, collector) do
-    case JSON.Parse.Bitstring.Whitespace.consume(bitstring)
-          |> JSON.Parse.Bitstring.Value.consume(collector)
+  def from_json(bitstring) do
+    case JSON.Parse.Bitstring.trim(bitstring)
+          |> JSON.Parse.Bitstring.consume
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
-        case JSON.Parse.Bitstring.Whitespace.consume(rest) do
+        case JSON.Parse.Bitstring.trim(rest) do
           << >> -> { :ok, value }
           _     -> { :error, { :unexpected_token, rest } }
         end
@@ -34,13 +37,13 @@ defimpl JSON.Decode, for: BitString do
 end
 
 defimpl JSON.Decode, for: List do
-  def from_json(charlist, collector) do
-    case JSON.Parse.Charlist.Whitespace.consume(charlist)
-          |> JSON.Parse.Charlist.Value.consume(collector)
+  def from_json(charlist) do
+    case JSON.Parse.Charlist.trim(charlist)
+          |> JSON.Parse.Charlist.consume
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
-        case JSON.Parse.Charlist.Whitespace.consume(rest) do
+        case JSON.Parse.Charlist.trim(rest) do
           [] -> { :ok, value }
           _  -> { :error, { :unexpected_token, rest } }
         end
