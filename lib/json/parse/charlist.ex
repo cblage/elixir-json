@@ -1,88 +1,88 @@
 defmodule JSON.Parse.Charlist do
   @doc """
-  Consumes a valid JSON value, returns its elixir representation
+  parses a valid JSON value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Charlist.consume ''
+      iex> JSON.Parse.Charlist.parse ''
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Charlist.consume 'face0ff'
+      iex> JSON.Parse.Charlist.parse 'face0ff'
       {:error, {:unexpected_token, 'face0ff'} }
 
-      iex> JSON.Parse.Charlist.consume '-hello'
+      iex> JSON.Parse.Charlist.parse '-hello'
       {:error, {:unexpected_token, '-hello'} }
 
-      iex> JSON.Parse.Charlist.consume '129245'
+      iex> JSON.Parse.Charlist.parse '129245'
       {:ok, 129245, '' }
 
-      iex> JSON.Parse.Charlist.consume '7.something'
+      iex> JSON.Parse.Charlist.parse '7.something'
       {:ok, 7, '.something' }
 
-      iex> JSON.Parse.Charlist.consume '-88.22suffix'
+      iex> JSON.Parse.Charlist.parse '-88.22suffix'
       {:ok, -88.22, 'suffix' }
 
-      iex> JSON.Parse.Charlist.consume '-12e4and then some'
+      iex> JSON.Parse.Charlist.parse '-12e4and then some'
       {:ok, -1.2e+5, 'and then some' }
 
-      iex> JSON.Parse.Charlist.consume '7842490016E-12-and more'
+      iex> JSON.Parse.Charlist.parse '7842490016E-12-and more'
       {:ok, 7.842490016e-3, '-and more' }
 
-      iex> JSON.Parse.Charlist.consume 'null'
+      iex> JSON.Parse.Charlist.parse 'null'
       {:ok, nil, '' }
 
-      iex> JSON.Parse.Charlist.consume 'false'
+      iex> JSON.Parse.Charlist.parse 'false'
       {:ok, false, '' }
 
-      iex> JSON.Parse.Charlist.consume 'true'
+      iex> JSON.Parse.Charlist.parse 'true'
       {:ok, true, '' }
 
-      iex> JSON.Parse.Charlist.consume '\\\"7.something\\\"'
+      iex> JSON.Parse.Charlist.parse '\\\"7.something\\\"'
       {:ok, "7.something", '' }
 
-      iex> JSON.Parse.Charlist.consume '\\\"-88.22suffix\\\" foo bar'
+      iex> JSON.Parse.Charlist.parse '\\\"-88.22suffix\\\" foo bar'
       {:ok, "-88.22suffix", ' foo bar' }
 
-      iex> JSON.Parse.Charlist.consume '[]'
+      iex> JSON.Parse.Charlist.parse '[]'
       {:ok, [], '' }
 
-      iex> JSON.Parse.Charlist.consume '["foo", 1, 2, 1.5] lala'
+      iex> JSON.Parse.Charlist.parse '["foo", 1, 2, 1.5] lala'
       {:ok, ["foo", 1, 2, 1.5], ' lala' }
 
-      iex> JSON.Parse.Charlist.consume '{"result": "this will be a elixir result"} lalal'
+      iex> JSON.Parse.Charlist.parse '{"result": "this will be a elixir result"} lalal'
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), ' lalal'}
   """
-  def consume([ ?[ | _ ] = charlist) do
-    JSON.Parse.Charlist.Array.consume(charlist)
+  def parse([ ?[ | _ ] = charlist) do
+    JSON.Parse.Charlist.Array.parse(charlist)
   end
 
-  def consume([ ?{ | _ ] = charlist) do
-    JSON.Parse.Charlist.Object.consume(charlist)
+  def parse([ ?{ | _ ] = charlist) do
+    JSON.Parse.Charlist.Object.parse(charlist)
   end
 
-  def consume([ ?" | _ ] = charlist) do
-    JSON.Parse.Charlist.String.consume(charlist)
+  def parse([ ?" | _ ] = charlist) do
+    JSON.Parse.Charlist.String.parse(charlist)
   end
 
-  def consume([ ?- , number | _ ] = charlist) when number in ?0..?9 do
-    JSON.Parse.Charlist.Number.consume(charlist)
+  def parse([ ?- , number | _ ] = charlist) when number in ?0..?9 do
+    JSON.Parse.Charlist.Number.parse(charlist)
   end
 
-  def consume([ number | _ ] = charlist) when number in ?0..?9 do
-    JSON.Parse.Charlist.Number.consume(charlist)
+  def parse([ number | _ ] = charlist) when number in ?0..?9 do
+    JSON.Parse.Charlist.Number.parse(charlist)
   end
 
 
-  def consume([ ?n, ?u, ?l, ?l  | rest ]),    do: { :ok, nil,   rest }
-  def consume([ ?t, ?r, ?u, ?e  | rest ]),    do: { :ok, true,  rest }
-  def consume([ ?f, ?a, ?l, ?s, ?e | rest ]), do: { :ok, false, rest }
+  def parse([ ?n, ?u, ?l, ?l  | rest ]),    do: { :ok, nil,   rest }
+  def parse([ ?t, ?r, ?u, ?e  | rest ]),    do: { :ok, true,  rest }
+  def parse([ ?f, ?a, ?l, ?s, ?e | rest ]), do: { :ok, false, rest }
 
-  def consume([ ]),  do:  { :error, :unexpected_end_of_buffer }
-  def consume(json), do:  { :error, { :unexpected_token, json } }
+  def parse([ ]),  do:  { :error, :unexpected_end_of_buffer }
+  def parse(json), do:  { :error, { :unexpected_token, json } }
 
 
   @doc """
-  Consumes valid JSON whitespace if it exists, returns the rest of the buffer
+  parses valid JSON whitespace if it exists, returns the rest of the buffer
 
   ## Examples
 

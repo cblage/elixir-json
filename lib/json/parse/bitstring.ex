@@ -1,81 +1,81 @@
 defmodule JSON.Parse.Bitstring do
   @doc """
-  Consumes a valid JSON value, returns its elixir representation
+  parses a valid JSON value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.consume ""
+      iex> JSON.Parse.Bitstring.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.consume "face0ff"
+      iex> JSON.Parse.Bitstring.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"} }
 
-      iex> JSON.Parse.Bitstring.consume "-hello"
+      iex> JSON.Parse.Bitstring.parse "-hello"
       {:error, {:unexpected_token, "-hello"} }
 
-      iex> JSON.Parse.Bitstring.consume "129245"
+      iex> JSON.Parse.Bitstring.parse "129245"
       {:ok, 129245, "" }
 
-      iex> JSON.Parse.Bitstring.consume "7.something"
+      iex> JSON.Parse.Bitstring.parse "7.something"
       {:ok, 7, ".something" }
 
-      iex> JSON.Parse.Bitstring.consume "-88.22suffix"
+      iex> JSON.Parse.Bitstring.parse "-88.22suffix"
       {:ok, -88.22, "suffix" }
 
-      iex> JSON.Parse.Bitstring.consume "-12e4and then some"
+      iex> JSON.Parse.Bitstring.parse "-12e4and then some"
       {:ok, -1.2e+5, "and then some" }
 
-      iex> JSON.Parse.Bitstring.consume "7842490016E-12-and more"
+      iex> JSON.Parse.Bitstring.parse "7842490016E-12-and more"
       {:ok, 7.842490016e-3, "-and more" }
 
-      iex> JSON.Parse.Bitstring.consume "null"
+      iex> JSON.Parse.Bitstring.parse "null"
       {:ok, nil, ""}
 
-      iex> JSON.Parse.Bitstring.consume "false"
+      iex> JSON.Parse.Bitstring.parse "false"
       {:ok, false, "" }
 
-      iex> JSON.Parse.Bitstring.consume "true"
+      iex> JSON.Parse.Bitstring.parse "true"
       {:ok, true, "" }
 
-      iex> JSON.Parse.Bitstring.consume "\\\"7.something\\\""
+      iex> JSON.Parse.Bitstring.parse "\\\"7.something\\\""
       {:ok, "7.something", "" }
 
-      iex> JSON.Parse.Bitstring.consume "\\\"-88.22suffix\\\" foo bar"
+      iex> JSON.Parse.Bitstring.parse "\\\"-88.22suffix\\\" foo bar"
       {:ok, "-88.22suffix", " foo bar" }
 
-      iex> JSON.Parse.Bitstring.consume "\\\"star -> \\\\u272d <- star\\\""
+      iex> JSON.Parse.Bitstring.parse "\\\"star -> \\\\u272d <- star\\\""
       {:ok, "star -> ✭ <- star", "" }
 
-      iex> JSON.Parse.Bitstring.consume "[]"
+      iex> JSON.Parse.Bitstring.parse "[]"
       {:ok, [], "" }
 
-      iex> JSON.Parse.Bitstring.consume "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parse.Bitstring.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:ok, ["foo", 1, 2, 1.5], " lala" }
 
-      iex> JSON.Parse.Bitstring.consume "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+      iex> JSON.Parse.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-  def consume(<< ?[, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Array.consume(bin)
-  def consume(<< ?{, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Object.consume(bin)
-  def consume(<< ?", _ :: binary >> = bin), do: JSON.Parse.Bitstring.String.consume(bin)
+  def parse(<< ?[, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Array.parse(bin)
+  def parse(<< ?{, _ :: binary >> = bin), do: JSON.Parse.Bitstring.Object.parse(bin)
+  def parse(<< ?", _ :: binary >> = bin), do: JSON.Parse.Bitstring.String.parse(bin)
 
-  def consume(<< ?- , number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    JSON.Parse.Bitstring.Number.consume(bin)
+  def parse(<< ?- , number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
+    JSON.Parse.Bitstring.Number.parse(bin)
   end
 
-  def consume(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    JSON.Parse.Bitstring.Number.consume(bin)
+  def parse(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
+    JSON.Parse.Bitstring.Number.parse(bin)
   end
 
-  def consume(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
-  def consume(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: { :ok, true,  rest }
-  def consume(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: { :ok, false, rest }
+  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
+  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: { :ok, true,  rest }
+  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: { :ok, false, rest }
 
-  def consume(<< >>), do:  {:error, :unexpected_end_of_buffer}
-  def consume(json), do: {:error, { :unexpected_token, json }}
+  def parse(<< >>), do:  {:error, :unexpected_end_of_buffer}
+  def parse(json), do: {:error, { :unexpected_token, json }}
 
   @doc """
-  Consumes valid JSON whitespace if it exists, returns the rest of the buffer
+  parses valid JSON whitespace if it exists, returns the rest of the buffer
 
   ## Examples
 

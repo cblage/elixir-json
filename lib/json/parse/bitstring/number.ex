@@ -1,45 +1,45 @@
 defmodule JSON.Parse.Bitstring.Number do
   @doc """
-  Consumes a valid JSON numerical value, returns its elixir numerical representation
+  parses a valid JSON numerical value, returns its elixir numerical representation
 
   ## Examples
 
-      iex> JSON.Parse.Bitstring.Number.consume ""
+      iex> JSON.Parse.Bitstring.Number.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parse.Bitstring.Number.consume "face0ff"
+      iex> JSON.Parse.Bitstring.Number.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"} }
 
-      iex> JSON.Parse.Bitstring.Number.consume "-hello"
+      iex> JSON.Parse.Bitstring.Number.parse "-hello"
       {:error, {:unexpected_token, "hello"} }
 
-      iex> JSON.Parse.Bitstring.Number.consume "129245"
+      iex> JSON.Parse.Bitstring.Number.parse "129245"
       {:ok, 129245, "" }
 
-      iex> JSON.Parse.Bitstring.Number.consume "7.something"
+      iex> JSON.Parse.Bitstring.Number.parse "7.something"
       {:ok, 7, ".something" }
 
-      iex> JSON.Parse.Bitstring.Number.consume "7.4566something"
+      iex> JSON.Parse.Bitstring.Number.parse "7.4566something"
       {:ok, 7.4566, "something" }
 
-      iex> JSON.Parse.Bitstring.Number.consume "-88.22suffix"
+      iex> JSON.Parse.Bitstring.Number.parse "-88.22suffix"
       {:ok, -88.22, "suffix" }
 
-      iex> JSON.Parse.Bitstring.Number.consume "-12e4and then some"
+      iex> JSON.Parse.Bitstring.Number.parse "-12e4and then some"
       {:ok, -1.2e+5, "and then some" }
 
-      iex> JSON.Parse.Bitstring.Number.consume "7842490016E-12-and more"
+      iex> JSON.Parse.Bitstring.Number.parse "7842490016E-12-and more"
       {:ok, 7.842490016e-3, "-and more" }
   """
-  def consume(<< ?- , rest :: binary >>) do
-    case consume(rest) do
+  def parse(<< ?- , rest :: binary >>) do
+    case parse(rest) do
       { :ok, number, json } -> { :ok, -1 * number, json }
       { :error, error_info } -> { :error, error_info }
     end
   end
 
 
-  def consume(binary) do
+  def parse(binary) do
     case binary do
       << number :: utf8 ,  _ :: binary >> when number in ?0..?9 ->
         to_integer(binary) |> add_fractional |> apply_exponent
@@ -56,7 +56,7 @@ defmodule JSON.Parse.Bitstring.Number do
       << ?., after_dot :: binary >>  ->
         case after_dot do
           << c :: utf8, _ :: binary >> when c in ?0..?9 ->
-            { fractional, rest } = consume_fractional(after_dot, 0, 10.0)
+            { fractional, rest } = parse_fractional(after_dot, 0, 10.0)
             { :ok, acc + fractional, rest }
           _ ->
             { :ok, acc, bin }
@@ -66,11 +66,11 @@ defmodule JSON.Parse.Bitstring.Number do
     end
   end
 
-  defp consume_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
-    consume_fractional(rest, acc + (number - ?0) / power, power * 10)
+  defp parse_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
+    parse_fractional(rest, acc + (number - ?0) / power, power * 10)
   end
 
-  defp consume_fractional(json, acc , _) when is_binary(json), do: { acc, json }
+  defp parse_fractional(json, acc , _) when is_binary(json), do: { acc, json }
 
 
   defp apply_exponent({ :error, error_info }), do: { :error, error_info }

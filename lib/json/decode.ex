@@ -24,7 +24,7 @@ end
 defimpl JSON.Decode, for: BitString do
   def from_json(bitstring) do
     case JSON.Parse.Bitstring.trim(bitstring)
-          |> JSON.Parse.Bitstring.consume
+          |> JSON.Parse.Bitstring.parse
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
@@ -39,7 +39,7 @@ end
 defimpl JSON.Decode, for: List do
   def from_json(charlist) do
     case JSON.Parse.Charlist.trim(charlist)
-          |> JSON.Parse.Charlist.consume
+          |> JSON.Parse.Charlist.parse
     do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
