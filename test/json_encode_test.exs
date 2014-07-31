@@ -3,14 +3,14 @@ Code.require_file "test_helper.exs", __DIR__
 defmodule JSONEncodeTest do
   use ExUnit.Case
 
-  doctest JSON.Encode
+  doctest JSON.Encoder
 
   test "convert keyword with string into correct JSON" do
     assert \
       JSON.encode([result: "this will be a elixir result"]) \
       == {:ok, "{\"result\":\"this will be a elixir result\"}"}
   end
-  
+
   test "convert keyword with charlist into correct JSON" do
     assert \
       JSON.encode([result: 'this will not be a string']) \
@@ -32,8 +32,8 @@ defmodule JSONEncodeTest do
     acc = HashDict.put(acc, "number", 1234)
     acc = HashDict.put(acc, "array",  ["a", :b, "c"])
     acc = HashDict.put(acc, "object", [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]])
-  
-  
+
+
     assert JSON.encode(acc) \
       == {:ok, "{\"number\":1234,\"false\":false,\"array\":[\"a\",\"b\",\"c\"],\"object\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}},\"null\":null,\"string\":\"this will be a string\"}"}
   end
@@ -41,5 +41,15 @@ defmodule JSONEncodeTest do
   test "convert keyword with '\\' into correct JSON" do
     assert \
       JSON.encode([result: "\\n"]) == {:ok, "{\"result\":\"\\\\n\"}"}
+  end
+
+  test "convert keyword with '/' into correct JSON" do
+    assert \
+      JSON.encode([result: "foo/"]) == {:ok, "{\"result\":\"foo/\"}"}
+  end
+
+  test "convert maps into correct JSON" do
+    assert \
+      JSON.encode(%{a: 1, b: %{b1: 21}}) == {:ok, "{\"a\":1,\"b\":{\"b1\":21}}"}
   end
 end

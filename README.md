@@ -35,7 +35,7 @@ end
 Elixir JSON includes a convenient filter for the [Dynamo](https://github.com/elixir-lang/dynamo) web framework.
 
 If you want to use it, simply add Elixir JSON to your project's dependencies, and add the following line to your router:
-```elixir 
+```elixir
 filter JSON.Dynamo.Filter
 ```
 
