@@ -43,6 +43,11 @@ defmodule JSONEncodeTest do
       JSON.encode([result: "\\n"]) == {:ok, "{\"result\":\"\\\\n\"}"}
   end
 
+  test "convert keyword with '/' into correct JSON" do
+    assert \
+      JSON.encode([result: "foo/"]) == {:ok, "{\"result\":\"foo/\"}"}
+  end
+
   test "convert maps into correct JSON" do
     assert \
       JSON.encode(%{a: 1, b: %{b1: 21}}) == {:ok, "{\"a\":1,\"b\":{\"b1\":21}}"}
