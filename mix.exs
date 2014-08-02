@@ -6,6 +6,7 @@ defmodule JSON.Mixfile do
       version: "0.3.0",
       elixir: "~> 0.14",
       deps: deps(Mix.env),
+      description: "Native Elixir library for JSON encoding and decoding",
       package: package,
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "http://expm.co/json" ]
