@@ -28,6 +28,6 @@ defmodule JSON.Mixfile do
   def package do
     [ contributors: ["cblage"],
       licenses: ["BSD 3-Clause"],
-      links: [  %{"GitHub" => "https://github.com/cblage/elixir-json" } ] ]
+      links: %{"GitHub" => "https://github.com/cblage/elixir-json" } ]
   end
 end
