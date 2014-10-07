@@ -9,7 +9,7 @@ defmodule JSON.Mixfile do
       description: "Native Elixir library for JSON encoding and decoding",
       package: package,
       source_url: "https://github.com/cblage/elixir-json",
-      homepage_url: "http://expm.co/json" ]
+      homepage_url: "https://hex.pm/packages/json" ]
   end
 
   def application, do: []
