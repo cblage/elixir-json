@@ -45,7 +45,7 @@ defmodule JSONDecodeTest do
     decodes "quotes", "\"I said, \\\"Hi.\\\"\"", "I said, \"Hi.\""
     decodes "solidi", "\"\\/ \\\\\"", "/ \\"
 
-    decodes "emoji", "\"I love emoji! \\ud83c\\uddfa\\ud83c\\uddf8 So do you!\"", "I love emoji! 🇺🇸 So do you!"
+    decodes "emoji", "\"I \\u2665 emoji! \\ud83c\\uddfa\\ud83c\\uddf8 So do you!\"", "I ♥ emoji! 🇺🇸 So do you!"
 
     decodes "control characters",
             "\"tab\\tnewline\\ncarriage return\\rform feed\\fend\"",
@@ -126,7 +126,7 @@ defmodule JSONDecodeTest do
 
     decodes "string with unicode escape", '"star -> \\u272d <- star"', "star -> ✭ <- star"
 
-    decodes "emoji", '"I love emoji! \\ud83c\\uddfa\\ud83c\\uddf8 So do you!"', "I love emoji! 🇺🇸 So do you!"
+    decodes "emoji", '"I \\u2665 emoji! \\ud83c\\uddfa\\ud83c\\uddf8 So do you!"', "I ♥ emoji! 🇺🇸 So do you!"
 
     decodes "positive integer", '1337', 1337
     decodes "positive float", '13.37', 13.37
