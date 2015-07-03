@@ -94,7 +94,11 @@ defmodule JSON.Parser.Bitstring.String do
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
   # represents a unicode codepoint
   defp parse_escaped_unicode_codepoint(json, acc, chars_parsed) when 4 === chars_parsed do
-    { :ok, << acc :: utf8 >>, json }
+    try do
+      { :ok, << acc :: utf8 >>, json }
+    rescue _ in ArgumentError ->
+      { :error, { :unexpected_token, "\\u#{acc}" } }
+    end
   end
 
   defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?0..?9 do
