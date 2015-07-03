@@ -94,7 +94,7 @@ defmodule JSON.Parser.Charlist.String do
     try do
       { :ok, << acc :: utf8 >>, json }
     rescue _ in ArgumentError ->
-      { :error, { :unexpected_token, "\\u#{acc}" } }
+      { :error, { :unexpected_token, json } }
     end
   end
 
