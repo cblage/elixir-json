@@ -69,7 +69,7 @@ defmodule JSON.Parser.Charlist.String do
 
   # omnomnom, eat the next character
   defp parse_string_contents([ char | json ], acc) do
-    parse_string_contents(json, [  char | acc ])
+    parse_string_contents(json, [ char | acc ])
   end
 
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
