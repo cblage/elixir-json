@@ -61,15 +61,15 @@ defmodule JSON.Parser.Bitstring.String do
   defp parse_string_contents(<< ?\\, ?\\, json :: binary >>, acc), do: parse_string_contents(json, [ ?\\ | acc ])
   defp parse_string_contents(<< ?\\, ?/,  json :: binary >>, acc), do: parse_string_contents(json, [ ?/  | acc ])
 
-  defp parse_string_contents(<< ?\\, ?u , json :: binary >> , acc) do
-    case parse_escaped_unicode_codepoint(json, 0, 0) do
+  defp parse_string_contents(bin = << ?\\, ?u , _ :: binary >> , acc) do
+    case JSON.Parser.Bitstring.Unicode.parse(bin) do
       { :error, error_info } -> { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
           << _ ::utf8 >> ->
             parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
           _ ->
-            { :error, { :unexpected_token, << ?\\, ?u , json :: binary >> } }
+            { :error, { :unexpected_token, bin} }
         end
     end
   end
@@ -77,30 +77,4 @@ defmodule JSON.Parser.Bitstring.String do
   defp parse_string_contents(<< char :: utf8, json :: binary >>, acc) do
     parse_string_contents(json, [ char | acc ])
   end
-
-
-  # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
-  # represents a unicode codepoint
-  defp parse_escaped_unicode_codepoint(json, acc, chars_parsed) when 4 === chars_parsed do
-    try do
-      { :ok, << acc :: utf8 >>, json }
-    rescue _ in ArgumentError ->
-      { :error, { :unexpected_token, json } }
-    end
-  end
-
-  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?0..?9 do
-    parse_escaped_unicode_codepoint(json, 16 * acc + hex - ?0, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?a..?f do
-    parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?a, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?A..?F do
-    parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?A, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
-  defp parse_escaped_unicode_codepoint(json, _, _), do: { :error, { :unexpected_token, json } }
 end
