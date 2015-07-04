@@ -57,13 +57,16 @@ defmodule JSON.Parser.Charlist.String do
   defp parse_string_contents([ ?\\, ?\\ | json ], acc), do: parse_string_contents(json, [ ?\\ | acc ])
   defp parse_string_contents([ ?\\, ?/  | json ], acc), do: parse_string_contents(json, [ ?/  | acc ])
 
-  defp parse_string_contents([ ?\\, ?u  | json ], acc) do
-    case parse_escaped_unicode_codepoint(json, 0, 0) do
-      { :error, error_info } -> { :error, error_info }
+  defp parse_string_contents(char = [ ?\\, ?u  | _ ], acc) do
+    case JSON.Parser.Charlist.Unicode.parse(char) do
+      { :error, error_info } ->
+        { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
-          << _ ::utf8 >> -> parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
-          _ -> { :error, { :unexpected_token, [?\\, ?u | json] } } # copying only in case of error
+          << _ ::utf8 >> ->
+            parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
+          _ ->
+            { :error, { :unexpected_token, char} }
         end
     end
   end
@@ -74,7 +77,6 @@ defmodule JSON.Parser.Charlist.String do
   defp parse_string_contents([ char | json ], acc) do
     parse_string_contents(json, [ char | acc ])
   end
-
 
 
   # Parsing sugorrogate pairs
