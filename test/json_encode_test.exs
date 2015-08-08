@@ -52,4 +52,14 @@ defmodule JSONEncodeTest do
     assert \
       JSON.encode(%{a: 1, b: %{b1: 21}}) == {:ok, "{\"a\":1,\"b\":{\"b1\":21}}"}
   end
+
+  # Simple struct for testing
+  defmodule User do
+    defstruct name: "John", age: 27
+  end
+
+  test "convert a default struct into correct JSON" do
+    assert JSON.encode(%User{}) \
+      == {:ok, "{\"__struct__\":\"Elixir.JSONEncodeTest.User\",\"age\":27,\"name\":\"John\"}"}
+  end
 end
