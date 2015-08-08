@@ -153,6 +153,8 @@ defimpl JSON.Encoder, for: Any do
   end
 
   def encode(_), do: JSON.Encoder.encode(@any_encode)
+
+  def typeof(struct) when is_map(struct), do: :object
   def typeof(_), do: JSON.Encoder.typeof(@any_encode)
 end
 
