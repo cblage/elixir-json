@@ -148,7 +148,13 @@ end
 defimpl JSON.Encoder, for: Any do
   @any_encode "[Elixir.Any]"
 
+  def encode(%{} = struct) do
+    JSON.Encoder.Helpers.dict_encode(Map.to_list(struct))
+  end
+
   def encode(_), do: JSON.Encoder.encode(@any_encode)
+
+  def typeof(struct) when is_map(struct), do: :object
   def typeof(_), do: JSON.Encoder.typeof(@any_encode)
 end
 
