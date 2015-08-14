@@ -63,7 +63,7 @@ defmodule JSON.Parser.Bitstring.String do
   defp parse_string_contents(<< ?\\, ?/,  json :: binary >>, acc), do: parse_string_contents(json, [ ?/  | acc ])
 
   defp parse_string_contents(bin = << ?\\, ?u , _ :: binary >> , acc) do
-    case JSON.Parser.Bitstring.Unicode.parse(bin) do
+    case JSON.Unicode.Bitstring.parse(bin) do
       { :error, error_info } -> { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do

@@ -58,7 +58,7 @@ defmodule JSON.Parser.Charlist.String do
   defp parse_string_contents([ ?\\, ?/  | json ], acc), do: parse_string_contents(json, [ ?/  | acc ])
 
   defp parse_string_contents(char = [ ?\\, ?u  | _ ], acc) do
-    case JSON.Parser.Charlist.Unicode.parse(char) do
+    case JSON.Unicode.Charlist.parse(char) do
       { :error, error_info } ->
         { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
