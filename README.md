@@ -20,14 +20,34 @@ end
 
 ## Usage
 
+Encoding an Elixir type
 ```elixir
-  JSON.encode([result: "this will be a elixir result"])
-  {:ok, "{\"result\":\"this will be a elixir result\"}"}
+  @doc "
+	JSON encode an Elixir list
+  "	
+  list = [key: "this will be a value"]
+  is_list(list)
+  # true
+  list[:key]
+  # "this will be a value"
+  {status, result} = JSON.encode(list)
+  # {:ok, "{\"key\":\"this will be a value\"}"}
+  String.length(result)
+  # 41
 ```
 
+Decoding a list from a string that contains JSON
 ```elixir
-  JSON.decode("{\"result\":\"this will be a elixir result\"}")
-  {:ok, [result: "this will be a elixir result"]}
+  @doc "
+	JSON decode a string into an Elixir list
+  "
+  json_input = "{\"key\":\"this will be a value\"}"
+  {status, list} = JSON.decode(json_input)
+	{:ok, %{"key" => "this will be a value"}}
+  list[:key]
+  # nil
+  list["key"]
+  # "this will be a value"
 ```
 
 ## License
