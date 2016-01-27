@@ -182,7 +182,7 @@ defmodule JSONDecodeTest do
 
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}
   end
-  defmodule EmojiCases do
+  defmodule SurrogatePairsCases do
     use ExUnit.Case
     import JSONDecodeTest.DSL
 
