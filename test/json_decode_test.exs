@@ -182,5 +182,12 @@ defmodule JSONDecodeTest do
 
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}
   end
+  defmodule EmojiCases do
+    use ExUnit.Case
+    import JSONDecodeTest.DSL
 
+    decodes "one emoji", "\"\\ud83d\\ude0d\"", "😍"
+    decodes "several emojis together", "\"\\ud83d\\ude19\\ud83d\\udc8b\\ud83d\\udc60\\ud83d\\udc96\\ud83d\\udca3\\ud83d\\ude3b\"", "😙💋👠💖💣😻"
+
+  end
 end
