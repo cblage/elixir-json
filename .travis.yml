@@ -4,4 +4,4 @@ notifications:
   recipients:
     - carlos@carloslage.net
 otp_release:
-  - 17.0
+  - 17.1

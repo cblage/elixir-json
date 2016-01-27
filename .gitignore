@@ -3,3 +3,5 @@
 erl_crash.dump
 *.ez
 /_build
+.idea
+*.iml
