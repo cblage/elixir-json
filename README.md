@@ -9,7 +9,7 @@ All contributions are welcome.
 
 Simply add ```{:json, "~> 0.3.0"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
-### Example for a project that already uses [Dynamo](https://github.com/elixir-lang/dynamo):
+### Example for a project that already uses [Dynamo](https://github.com/dynamo/dynamo):
 ```elixir
 defp deps do
     [ { :cowboy, "~> 1.0.0" },
