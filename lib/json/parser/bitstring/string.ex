@@ -79,18 +79,14 @@ defmodule JSON.Parser.Bitstring.String do
     parse_string_contents(json, [ char | acc ])
   end
 
-  @doc """
-  Parsing sugorrogate pairs
-  http://unicodebook.readthedocs.org/unicode_encodings.html#utf-16-surrogate-pairs
 
-  Inspired by Poison's function
-  """
+  # Parsing sugorrogate pairs
+  # http://unicodebook.readthedocs.org/unicode_encodings.html#utf-16-surrogate-pairs
+  # Inspired by Poison's function
   defp parse_escaped_unicode_codepoint(<< ?d, hex :: utf8, f1, f2 , ?\\, ?u, ?d, hex2:: utf8, s1, s2, json :: binary >>, acc, 0)
   when (hex >= 56) do
     first_part = (List.to_integer( [?d, hex, f1, f2], 16) &&& 1023) <<< 10
     second_part = List.to_integer( [?d, hex2, s1, s2], 16) &&& 1023
-    IO.inspect first_part
-    IO.inspect second_part
     complete = 0x10000 + first_part + second_part
     {:ok, <<  complete :: utf8 >>, json}
   end
