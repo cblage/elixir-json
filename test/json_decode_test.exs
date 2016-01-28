@@ -182,5 +182,15 @@ defmodule JSONDecodeTest do
 
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}
   end
+  defmodule SurrogatePairsCases do
+    use ExUnit.Case
+    import JSONDecodeTest.DSL
 
+    decodes "one emoji in bitstring", "\"\\ud83d\\ude0d\"", "😍"
+    decodes "several emojis together in bitstring", "\"\\ud83d\\ude19\\ud83d\\udc8b\\ud83d\\udc60\\ud83d\\udc96\\ud83d\\udca3\\ud83d\\ude3b\"", "😙💋👠💖💣😻"
+
+    decodes "one emoji in charlist", '"\\ud83d\\ude0d"', "😍"
+    decodes "several emojis together in charlist", '"\\ud83d\\ude19\\ud83d\\udc8b\\ud83d\\udc60\\ud83d\\udc96\\ud83d\\udca3\\ud83d\\ude3b"', "😙💋👠💖💣😻"
+
+  end
 end

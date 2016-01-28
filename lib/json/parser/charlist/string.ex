@@ -1,4 +1,5 @@
 defmodule JSON.Parser.Charlist.String do
+  use Bitwise
   @doc """
   parses a valid JSON string, returns its elixir representation
 
@@ -67,9 +68,24 @@ defmodule JSON.Parser.Charlist.String do
     end
   end
 
+
+
   # omnomnom, eat the next character
   defp parse_string_contents([ char | json ], acc) do
     parse_string_contents(json, [  char | acc ])
+  end
+
+
+
+  # Parsing sugorrogate pairs
+  # http://unicodebook.readthedocs.org/unicode_encodings.html#utf-16-surrogate-pairs
+  # Inspired by Poison's function
+  defp parse_escaped_unicode_codepoint([ ?d, hex, f1, f2 , ?\\, ?u, ?d, hex2, s1, s2 |json ], acc, 0)
+  when (hex >= 56) do
+    first_part = (List.to_integer( [?d, hex, f1, f2], 16) &&& 1023) <<< 10
+    second_part = List.to_integer( [?d, hex2, s1, s2], 16) &&& 1023
+    complete = 0x10000 + first_part + second_part
+    {:ok, <<  complete :: utf8 >>, json}
   end
 
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
