@@ -26,7 +26,7 @@ defmodule JSON.Mixfile do
   def deps(_), do: deps(:prod)
 
   def package do
-    [ contributors: ["cblage"],
+    [ maintainers: ["cblage"],
       licenses: ["BSD 3-Clause"],
       links: %{"GitHub" => "https://github.com/cblage/elixir-json" } ]
   end
