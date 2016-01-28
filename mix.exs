@@ -19,7 +19,7 @@ defmodule JSON.Mixfile do
   def deps(:docs) do
     deps(:prod) ++ [
       { :ex_doc, github: "elixir-lang/ex_doc" },
-      { :earmark, github: "pragdave/earmark" }
+      { :earmark, ">= 0.0.0"}
     ]
   end
 
