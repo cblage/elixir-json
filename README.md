@@ -13,7 +13,7 @@ Simply add ```{:json, "~> 0.3.0"}``` to your project's ```mix.exs``` file, in th
 ```elixir
 defp deps do
     [ { :cowboy, "~> 1.0.0" },
-      { :dynamo, github: "elixir-lang/dynamo" },
+      { :dynamo, github: "dynamo/dynamo" },
       { :json,   "~> 0.3.0"} ]
 end
 ```
