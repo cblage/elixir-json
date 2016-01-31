@@ -3,20 +3,6 @@ defmodule JSON.Unicode.Bitstring do
   parses a valid chain of escaped unicode and returns the string representation,
   plus the remainder of the string
 
-String.fromCodePoint(42);       // "*"
-String.fromCodePoint(65, 90);   // "AZ"
-String.fromCodePoint(0x404);    // "\u0404"
-String.fromCodePoint(0x2F804);  // "\uD87E\uDC04"
-String.fromCodePoint(194564);   // "\uD87E\uDC04"
-String.fromCodePoint(0x1D306, 0x61, 0x1D307) // "\uD834\uDF06a\uD834\uDF07"
-
-String.fromCodePoint('_');      // RangeError
-String.fromCodePoint(Infinity); // RangeError
-String.fromCodePoint(-1);       // RangeError
-String.fromCodePoint(3.14);     // RangeError
-String.fromCodePoint(3e-2);     // RangeError
-String.fromCodePoint(NaN);      // RangeError
-
   ## Examples
 
       iex> JSON.Parser.Bitstring.parse ""
