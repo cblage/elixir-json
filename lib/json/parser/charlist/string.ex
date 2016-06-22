@@ -80,7 +80,7 @@ defmodule JSON.Parser.Charlist.String do
   # Parsing sugorrogate pairs
   # http://unicodebook.readthedocs.org/unicode_encodings.html#utf-16-surrogate-pairs
   # Inspired by Poison's function
-  defp parse_escaped_unicode_codepoint([ ?d, hex, f1, f2 , ?\\, ?u, ?d, hex2, s1, s2 |json ], acc, 0)
+  defp parse_escaped_unicode_codepoint([ ?d, hex, f1, f2 , ?\\, ?u, ?d, hex2, s1, s2 |json ], _, 0)
   when (hex >= 56) do
     first_part = (List.to_integer( [?d, hex, f1, f2], 16) &&& 1023) <<< 10
     second_part = List.to_integer( [?d, hex2, s1, s2], 16) &&& 1023
