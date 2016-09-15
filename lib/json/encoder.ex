@@ -144,18 +144,17 @@ defimpl JSON.Encoder, for: Map do
   def typeof(_), do: :object
 end
 
-#TODO: maybe this should return the result of "inspect" ?
 defimpl JSON.Encoder, for: Any do
-  @any_encode "[Elixir.Any]"
-
   def encode(%{} = struct) do
-    JSON.Encoder.Helpers.dict_encode(Map.to_list(struct))
+    struct
+    |> Map.to_list()
+    |> JSON.Encoder.Helpers.dict_encode()
   end
 
-  def encode(_), do: JSON.Encoder.encode(@any_encode)
+  def encode(x), do: JSON.Encoder.encode("#{inspect x}")
 
   def typeof(struct) when is_map(struct), do: :object
-  def typeof(_), do: JSON.Encoder.typeof(@any_encode)
+  def typeof(_), do: :string
 end
 
 defmodule JSON.Encoder.Helpers do
@@ -179,10 +178,9 @@ defmodule JSON.Encoder.Helpers do
   end
 
   defp encode_item(item) do
-    encode_result = JSON.Encoder.encode(item)
-    case encode_result do
+    case JSON.Encoder.encode(item) do
       {:ok, encoded_item} -> encoded_item
-      _ -> encode_result #propagate error, will trigger error in map_join
+      err -> err #propagate error, will trigger error in map_join
     end
   end
 end

@@ -32,7 +32,7 @@ defmodule JSONDecodeTest do
   end
 
   defmodule BitstringCases do
-    use ExUnit.Case
+    use ExUnit.Case, async: true
     import JSONDecodeTest.DSL
 
     decodes "null",  "null",  nil
@@ -112,7 +112,7 @@ defmodule JSONDecodeTest do
   end
 
   defmodule CharlistCases do
-    use ExUnit.Case
+    use ExUnit.Case, async: true
     import JSONDecodeTest.DSL
 
     decodes "null",  'null',  nil
@@ -187,7 +187,7 @@ defmodule JSONDecodeTest do
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}
   end
   defmodule SurrogatePairsCases do
-    use ExUnit.Case
+    use ExUnit.Case, async: true
     import JSONDecodeTest.DSL
 
     decodes "one emoji in bitstring", "\"\\ud83d\\ude0d\"", "😍"
