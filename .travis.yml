@@ -3,5 +3,6 @@ env: MIX_ENV=test
 notifications:
   recipients:
     - carlos@carloslage.net
-otp_release:
-  - 17.0
+elixir:
+  - 1.3
+

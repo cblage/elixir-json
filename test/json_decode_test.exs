@@ -32,7 +32,7 @@ defmodule JSONDecodeTest do
   end
 
   defmodule BitstringCases do
-    use ExUnit.Case
+    use ExUnit.Case, async: true
     import JSONDecodeTest.DSL
 
     decodes "null",  "null",  nil
@@ -44,6 +44,8 @@ defmodule JSONDecodeTest do
     decodes "unicode string", "\"µ¥ ß†®îñ©\"",  "µ¥ ß†®îñ©"
     decodes "quotes", "\"I said, \\\"Hi.\\\"\"", "I said, \"Hi.\""
     decodes "solidi", "\"\\/ \\\\\"", "/ \\"
+
+    decodes "emoji", "\"I \\u2665 emoji! So do you \\ud83c\\uddfa\\ud83c\\uddf8!\"", "I ♥ emoji! So do you 🇺🇸!"
 
     decodes "control characters",
             "\"tab\\tnewline\\ncarriage return\\rform feed\\fend\"",
@@ -110,7 +112,7 @@ defmodule JSONDecodeTest do
   end
 
   defmodule CharlistCases do
-    use ExUnit.Case
+    use ExUnit.Case, async: true
     import JSONDecodeTest.DSL
 
     decodes "null",  'null',  nil
@@ -123,6 +125,8 @@ defmodule JSONDecodeTest do
     decodes "string with quotes", '"I said, \\"Hi.\\""', "I said, \"Hi.\""
 
     decodes "string with unicode escape", '"star -> \\u272d <- star"', "star -> ✭ <- star"
+
+    decodes "emoji", '"I \\u2665 emoji! So do you \\ud83c\\uddfa\\ud83c\\uddf8!"', "I ♥ emoji! So do you 🇺🇸!"
 
     decodes "positive integer", '1337', 1337
     decodes "positive float", '13.37', 13.37
@@ -183,7 +187,7 @@ defmodule JSONDecodeTest do
     cannot_decode "object with missing colon", '{"foo" "bar"}', {:unexpected_token, '"bar"}'}
   end
   defmodule SurrogatePairsCases do
-    use ExUnit.Case
+    use ExUnit.Case, async: true
     import JSONDecodeTest.DSL
 
     decodes "one emoji in bitstring", "\"\\ud83d\\ude0d\"", "😍"

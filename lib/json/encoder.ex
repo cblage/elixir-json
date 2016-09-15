@@ -12,6 +12,7 @@ defmodule JSON.Encoder.Error do
 end
 
 defprotocol JSON.Encoder do
+  @compile [:native, {:hipe, [:o3]}]
   @fallback_to_any true
 
   @moduledoc """
@@ -45,16 +46,19 @@ defprotocol JSON.Encoder do
 end
 
 defimpl JSON.Encoder, for: Tuple do
+  @compile [:native, {:hipe, [:o3]}]
   def encode(term), do: Tuple.to_list(term) |> JSON.Encoder.Helpers.enum_encode
   def typeof(_), do: :array
 end
 
 defimpl JSON.Encoder, for: HashDict do
+  @compile [:native, {:hipe, [:o3]}]
   def encode(dict), do: JSON.Encoder.Helpers.dict_encode(dict)
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encoder, for: List do
+  @compile [:native, {:hipe, [:o3]}]
   def encode([]), do: {:ok, "[]"}
 
   def encode(list) do
@@ -94,6 +98,8 @@ defimpl JSON.Encoder, for: Atom do
 end
 
 defimpl JSON.Encoder, for: BitString do
+  @compile [:native, {:hipe, [:o3]}]
+
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
@@ -133,32 +139,39 @@ defimpl JSON.Encoder, for: BitString do
 end
 
 defimpl JSON.Encoder, for: Record do
-  def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode
+  @compile [:native, {:hipe, [:o3]}]
+  def encode(record), do: record.to_keywords() |> JSON.Encoder.Helpers.dict_encode()
   def typeof(_), do: :object
 end
 
 # Encodes maps into object
 # > {:ok, "{\"a\":1,\"b\":2}"} = JSON.encode(%{a: 1, b: 2})
 defimpl JSON.Encoder, for: Map do
-  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode
+  @compile [:native, {:hipe, [:o3]}]
+  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode()
   def typeof(_), do: :object
 end
 
-#TODO: maybe this should return the result of "inspect" ?
 defimpl JSON.Encoder, for: Any do
-  @any_encode "[Elixir.Any]"
-
+  @compile [:native, {:hipe, [:o3]}]
   def encode(%{} = struct) do
-    JSON.Encoder.Helpers.dict_encode(Map.to_list(struct))
+    struct
+    |> Map.to_list()
+    |> JSON.Encoder.Helpers.dict_encode()
   end
 
-  def encode(_), do: JSON.Encoder.encode(@any_encode)
+  def encode(x) do
+    x
+    |> Kernel.inspect()
+    |> JSON.Encoder.encode()
+  end
 
   def typeof(struct) when is_map(struct), do: :object
-  def typeof(_), do: JSON.Encoder.typeof(@any_encode)
+  def typeof(_), do: :string
 end
 
 defmodule JSON.Encoder.Helpers do
+  @compile [:native, {:hipe, [:o3]}]
   @moduledoc """
   Helper functions for writing JSON.Encoder instances.
   """
@@ -179,10 +192,9 @@ defmodule JSON.Encoder.Helpers do
   end
 
   defp encode_item(item) do
-    encode_result = JSON.Encoder.encode(item)
-    case encode_result do
+    case JSON.Encoder.encode(item) do
       {:ok, encoded_item} -> encoded_item
-      _ -> encode_result #propagate error, will trigger error in map_join
+      err -> err #propagate error, will trigger error in map_join
     end
   end
 end

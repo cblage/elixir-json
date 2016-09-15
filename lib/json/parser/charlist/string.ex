@@ -1,4 +1,5 @@
 defmodule JSON.Parser.Charlist.String do
+  @compile [:native, {:hipe, [:o3]}]
   use Bitwise
   @doc """
   parses a valid JSON string, returns its elixir representation
@@ -57,56 +58,23 @@ defmodule JSON.Parser.Charlist.String do
   defp parse_string_contents([ ?\\, ?\\ | json ], acc), do: parse_string_contents(json, [ ?\\ | acc ])
   defp parse_string_contents([ ?\\, ?/  | json ], acc), do: parse_string_contents(json, [ ?/  | acc ])
 
-  defp parse_string_contents([ ?\\, ?u  | json ], acc) do
-    case parse_escaped_unicode_codepoint(json, 0, 0) do
-      { :error, error_info } -> { :error, error_info }
+  defp parse_string_contents(char = [ ?\\, ?u  | _ ], acc) do
+    case JSON.Parser.Charlist.Unicode.parse(char) do
+      { :error, error_info } ->
+        { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
-          << _ ::utf8 >> -> parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
-          _ -> { :error, { :unexpected_token, [?\\, ?u | json] } } # copying only in case of error
+          << _ ::utf8 >> ->
+            parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
+          _ ->
+            { :error, { :unexpected_token, char} }
         end
     end
   end
 
 
-
   # omnomnom, eat the next character
   defp parse_string_contents([ char | json ], acc) do
-    parse_string_contents(json, [  char | acc ])
+    parse_string_contents(json, [ char | acc ])
   end
-
-
-
-  # Parsing sugorrogate pairs
-  # http://unicodebook.readthedocs.org/unicode_encodings.html#utf-16-surrogate-pairs
-  # Inspired by Poison's function
-  defp parse_escaped_unicode_codepoint([ ?d, hex, f1, f2 , ?\\, ?u, ?d, hex2, s1, s2 |json ], _, 0)
-  when (hex >= 56) do
-    first_part = (List.to_integer( [?d, hex, f1, f2], 16) &&& 1023) <<< 10
-    second_part = List.to_integer( [?d, hex2, s1, s2], 16) &&& 1023
-    complete = 0x10000 + first_part + second_part
-    {:ok, <<  complete :: utf8 >>, json}
-  end
-
-  # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
-  # represents a unicode codepoint
-  defp parse_escaped_unicode_codepoint(json, acc, chars_parsed) when 4 === chars_parsed do
-    { :ok, << acc :: utf8 >>, json }
-  end
-
-  defp parse_escaped_unicode_codepoint([ ], _, _), do: { :error, :unexpected_end_of_buffer }
-
-  defp parse_escaped_unicode_codepoint([ hex | json], acc, chars_parsed) when hex in ?0..?9 do
-    parse_escaped_unicode_codepoint(json, 16 * acc + hex - ?0, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint([ hex | json], acc, chars_parsed) when hex in ?a..?f do
-    parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?a, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint([ hex | json], acc, chars_parsed) when hex in ?A..?F do
-    parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?A, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint(json, _, _), do: { :error, { :unexpected_token, json } }
 end

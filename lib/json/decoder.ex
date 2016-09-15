@@ -25,10 +25,13 @@ defprotocol JSON.Decoder do
 end
 
 defimpl JSON.Decoder, for: BitString do
+  @compile [:native, {:hipe, [:o3]}]
+
   def decode(bitstring) do
-    case JSON.Parser.Bitstring.trim(bitstring)
-          |> JSON.Parser.Bitstring.parse
-    do
+    bitstring
+    |> JSON.Parser.Bitstring.trim()
+    |> JSON.Parser.Bitstring.parse()
+    |> case do
       { :error, error_info } -> { :error, error_info }
       { :ok, value, rest }   ->
         case JSON.Parser.Bitstring.trim(rest) do
@@ -40,12 +43,15 @@ defimpl JSON.Decoder, for: BitString do
 end
 
 defimpl JSON.Decoder, for: List do
+  @compile [:native, {:hipe, [:o3]}]
+
   def decode(charlist) do
-    case JSON.Parser.Charlist.trim(charlist)
-          |> JSON.Parser.Charlist.parse
-    do
+    charlist
+    |> JSON.Parser.Charlist.trim()
+    |> JSON.Parser.Charlist.parse()
+    |> case do
       { :error, error_info } -> { :error, error_info }
-      { :ok, value, rest }   ->
+      { :ok, value, rest } ->
         case JSON.Parser.Charlist.trim(rest) do
           [] -> { :ok, value }
           _  -> { :error, { :unexpected_token, rest } }

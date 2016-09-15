@@ -1,4 +1,5 @@
 defmodule JSON.Parser.Charlist.Object do
+  @compile [:native, {:hipe, [:o3]}]
   @doc """
   parses a valid JSON object value, returns its elixir Map representation
 
