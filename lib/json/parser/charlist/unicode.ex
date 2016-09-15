@@ -1,4 +1,5 @@
 defmodule JSON.Parser.Charlist.Unicode do
+  @compile [:native, {:hipe, [:o3]}]
   use Bitwise
 
   @doc """

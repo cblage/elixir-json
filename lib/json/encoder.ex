@@ -12,6 +12,7 @@ defmodule JSON.Encoder.Error do
 end
 
 defprotocol JSON.Encoder do
+  @compile [:native, {:hipe, [:o3]}]
   @fallback_to_any true
 
   @moduledoc """
@@ -45,16 +46,19 @@ defprotocol JSON.Encoder do
 end
 
 defimpl JSON.Encoder, for: Tuple do
+  @compile [:native, {:hipe, [:o3]}]
   def encode(term), do: Tuple.to_list(term) |> JSON.Encoder.Helpers.enum_encode
   def typeof(_), do: :array
 end
 
 defimpl JSON.Encoder, for: HashDict do
+  @compile [:native, {:hipe, [:o3]}]
   def encode(dict), do: JSON.Encoder.Helpers.dict_encode(dict)
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encoder, for: List do
+  @compile [:native, {:hipe, [:o3]}]
   def encode([]), do: {:ok, "[]"}
 
   def encode(list) do
@@ -94,6 +98,8 @@ defimpl JSON.Encoder, for: Atom do
 end
 
 defimpl JSON.Encoder, for: BitString do
+  @compile [:native, {:hipe, [:o3]}]
+
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
@@ -133,18 +139,21 @@ defimpl JSON.Encoder, for: BitString do
 end
 
 defimpl JSON.Encoder, for: Record do
-  def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode
+  @compile [:native, {:hipe, [:o3]}]
+  def encode(record), do: record.to_keywords() |> JSON.Encoder.Helpers.dict_encode()
   def typeof(_), do: :object
 end
 
 # Encodes maps into object
 # > {:ok, "{\"a\":1,\"b\":2}"} = JSON.encode(%{a: 1, b: 2})
 defimpl JSON.Encoder, for: Map do
-  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode
+  @compile [:native, {:hipe, [:o3]}]
+  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode()
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encoder, for: Any do
+  @compile [:native, {:hipe, [:o3]}]
   def encode(%{} = struct) do
     struct
     |> Map.to_list()
@@ -162,6 +171,7 @@ defimpl JSON.Encoder, for: Any do
 end
 
 defmodule JSON.Encoder.Helpers do
+  @compile [:native, {:hipe, [:o3]}]
   @moduledoc """
   Helper functions for writing JSON.Encoder instances.
   """

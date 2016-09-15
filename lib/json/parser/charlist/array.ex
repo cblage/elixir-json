@@ -1,4 +1,5 @@
 defmodule JSON.Parser.Charlist.Array do
+  @compile [:native, {:hipe, [:o3]}]
   @doc """
   parses a valid JSON array value, returns its elixir list representation
 

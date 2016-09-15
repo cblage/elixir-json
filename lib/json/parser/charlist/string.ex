@@ -1,4 +1,5 @@
 defmodule JSON.Parser.Charlist.String do
+  @compile [:native, {:hipe, [:o3]}]
   use Bitwise
   @doc """
   parses a valid JSON string, returns its elixir representation
@@ -70,6 +71,7 @@ defmodule JSON.Parser.Charlist.String do
         end
     end
   end
+
 
   # omnomnom, eat the next character
   defp parse_string_contents([ char | json ], acc) do

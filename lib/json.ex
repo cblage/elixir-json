@@ -1,4 +1,5 @@
 defmodule JSON do
+  @compile [:native, {:hipe, [:o3]}]
 
   @doc """
   Returns a JSON string representation of the Elixir term
