@@ -3,8 +3,8 @@ defmodule JSON.Mixfile do
 
   def project do
     [ app: :json,
-      version: "0.3.3",
-      elixir: ">= 1.0.0",
+      version: "1.0.0-dev",
+      elixir: "~> 1.3",
       deps: deps(Mix.env),
       description: "Native Elixir library for JSON encoding and decoding",
       package: package,

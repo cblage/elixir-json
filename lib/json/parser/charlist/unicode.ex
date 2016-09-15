@@ -1,6 +1,6 @@
 defmodule JSON.Parser.Charlist.Unicode do
   use Bitwise
-  
+
   @doc """
   parses a valid chain of escaped unicode and returns the string representation,
   plus the remainder of the string
