@@ -14,7 +14,7 @@ Simply add ```{:json, "~> 1.0"}``` to your project's ```mix.exs``` file, in the 
 defp deps do
     [ { :cowboy, "~> 1.0.0" },
       { :dynamo, github: "dynamo/dynamo" },
-      { :json,   "~> 0.3.0"} ]
+      { :json,   "~> 1.0.0"} ]
 end
 ```
 
