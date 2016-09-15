@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.11.4">
-    <title>JSON.Dynamo.Filter – json v0.3.3</title>
+    <title>JSON.Parser.Bitstring.Unicode – json v1.0.0</title>
     <link rel="stylesheet" href="dist/app-ddd9717ad9.css" />
     <script src="dist/sidebar_items.js"></script>
   </head>
@@ -27,7 +27,7 @@
         json
       </h1>
       <h2 class="sidebar-projectVersion">
-        v0.3.3
+        v1.0.0
       </h2>
     </div>
     
@@ -63,11 +63,11 @@
 
 
       <h1>
-        <small class="visible-xs">json v0.3.3</small>
-        JSON.Dynamo.Filter
+        <small class="visible-xs">json v1.0.0</small>
+        JSON.Parser.Bitstring.Unicode
         
         
-          <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/dynamo/filter.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/bitstring/unicode.ex#L1" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -92,8 +92,12 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#finalize/1">finalize(conn)</a>
+    <a href="#parse/1">parse(json)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>parses a valid chain of escaped unicode and returns the string representation,
+plus the remainder of the string</p>
+</div>
   
 </div>
 
@@ -117,21 +121,32 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="finalize/1">
+          <div class="detail" id="parse/1">
   <div class="detail-header">
-    <a href="#finalize/1" class="detail-link" title="Link to this function">
+    <a href="#parse/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">finalize(conn)</span>
+    <span class="signature">parse(json)</span>
       
-      <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/dynamo/filter.ex#L19" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/bitstring/unicode.ex#L21" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
   </div>
   
   <section class="docstring">
-    
+    <p>parses a valid chain of escaped unicode and returns the string representation,
+plus the remainder of the string</p>
+<h2>Examples</h2>
+<pre><code class="iex elixir">iex&gt; JSON.Parser.Bitstring.parse &quot;&quot;
+{:error, :unexpected_end_of_buffer}
+
+iex&gt; JSON.Parser.Bitstring.parse &quot;face0ff&quot;
+{:error, {:unexpected_token, &quot;face0ff&quot;} }
+
+iex&gt; JSON.Parser.Bitstring.parse &quot;-hello&quot;
+{:error, {:unexpected_token, &quot;-hello&quot;} }</code></pre>
+
   </section>
 </div>
 

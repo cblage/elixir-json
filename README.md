@@ -7,7 +7,7 @@ This library provides a natively implemented JSON encoder and decoder for Elixir
 All contributions are welcome.
 ## Installing
 
-Simply add ```{:json, "~> 0.3.0"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
+Simply add ```{:json, "~> 1.0"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
 ### Example for a project that already uses [Dynamo](https://github.com/dynamo/dynamo):
 ```elixir
