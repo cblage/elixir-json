@@ -151,7 +151,11 @@ defimpl JSON.Encoder, for: Any do
     |> JSON.Encoder.Helpers.dict_encode()
   end
 
-  def encode(x), do: JSON.Encoder.encode("#{inspect x}")
+  def encode(x) do
+    x
+    |> Kernel.inspect()
+    |> JSON.Encoder.encode()
+  end
 
   def typeof(struct) when is_map(struct), do: :object
   def typeof(_), do: :string
