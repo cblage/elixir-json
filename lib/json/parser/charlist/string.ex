@@ -57,13 +57,16 @@ defmodule JSON.Parser.Charlist.String do
   defp parse_string_contents([ ?\\, ?\\ | json ], acc), do: parse_string_contents(json, [ ?\\ | acc ])
   defp parse_string_contents([ ?\\, ?/  | json ], acc), do: parse_string_contents(json, [ ?/  | acc ])
 
-  defp parse_string_contents([ ?\\, ?u  | json ], acc) do
-    case parse_escaped_unicode_codepoint(json, 0, 0) do
-      { :error, error_info } -> { :error, error_info }
+  defp parse_string_contents(char = [ ?\\, ?u  | _ ], acc) do
+    case JSON.Unicode.Charlist.parse(char) do
+      { :error, error_info } ->
+        { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
-          << _ ::utf8 >> -> parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
-          _ -> { :error, { :unexpected_token, [?\\, ?u | json] } } # copying only in case of error
+          << _ ::utf8 >> ->
+            parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
+          _ ->
+            { :error, { :unexpected_token, char} }
         end
     end
   end
@@ -72,9 +75,8 @@ defmodule JSON.Parser.Charlist.String do
 
   # omnomnom, eat the next character
   defp parse_string_contents([ char | json ], acc) do
-    parse_string_contents(json, [  char | acc ])
+    parse_string_contents(json, [ char | acc ])
   end
-
 
 
   # Parsing sugorrogate pairs
@@ -91,7 +93,11 @@ defmodule JSON.Parser.Charlist.String do
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
   # represents a unicode codepoint
   defp parse_escaped_unicode_codepoint(json, acc, chars_parsed) when 4 === chars_parsed do
-    { :ok, << acc :: utf8 >>, json }
+    try do
+      { :ok, << acc :: utf8 >>, json }
+    rescue _ in ArgumentError ->
+      { :error, { :unexpected_token, json } }
+    end
   end
 
   defp parse_escaped_unicode_codepoint([ ], _, _), do: { :error, :unexpected_end_of_buffer }
