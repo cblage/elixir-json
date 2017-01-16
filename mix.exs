@@ -7,7 +7,7 @@ defmodule JSON.Mixfile do
       elixir: "~> 1.3",
       deps: deps(Mix.env),
       description: "Native Elixir library for JSON encoding and decoding",
-      package: package,
+      package: package(),
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "https://hex.pm/packages/json" ]
   end
