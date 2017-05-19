@@ -14,12 +14,10 @@ defmodule JSON.Mixfile do
 
   def application, do: []
 
-  def deps(:prod), do: []
-
-  def deps(:docs) do
-    deps(:prod) ++ [
-      { :ex_doc, github: "elixir-lang/ex_doc" },
-      { :earmark, ">= 0.0.0"}
+  def deps(:prod) do
+    [
+      { :ex_doc, ">= 0.0.0", only: :dev},
+      { :earmark, ">= 0.0.0", only: :dev}
     ]
   end
 
