@@ -46,7 +46,7 @@ defmodule JSON.Parser.Bitstring.String do
 
   # found the closing ", lets reverse the acc and encode it as a string!
   defp parse_string_contents(<< ?" :: utf8, json :: binary >>, acc) do
-    case Enum.reverse(acc) |> List.to_string do
+    case acc |> Enum.reverse |> List.to_string do
       encoded when is_binary(encoded) ->
         { :ok, encoded, json }
       _ ->
@@ -55,23 +55,37 @@ defmodule JSON.Parser.Bitstring.String do
   end
 
   #parsing
-  defp parse_string_contents(<< ?\\, ?f,  json :: binary >>, acc), do: parse_string_contents(json, [ ?\f | acc ])
-  defp parse_string_contents(<< ?\\, ?n,  json :: binary >>, acc), do: parse_string_contents(json, [ ?\n | acc ])
-  defp parse_string_contents(<< ?\\, ?r,  json :: binary >>, acc), do: parse_string_contents(json, [ ?\r | acc ])
-  defp parse_string_contents(<< ?\\, ?t,  json :: binary >>, acc), do: parse_string_contents(json, [ ?\t | acc ])
-  defp parse_string_contents(<< ?\\, ?",  json :: binary >>, acc), do: parse_string_contents(json, [ ?"  | acc ])
-  defp parse_string_contents(<< ?\\, ?\\, json :: binary >>, acc), do: parse_string_contents(json, [ ?\\ | acc ])
-  defp parse_string_contents(<< ?\\, ?/,  json :: binary >>, acc), do: parse_string_contents(json, [ ?/  | acc ])
+  defp parse_string_contents(<< ?\\, ?f,  json :: binary >>, acc) do
+    parse_string_contents(json, [ ?\f | acc ])
+  end
+  defp parse_string_contents(<< ?\\, ?n,  json :: binary >>, acc) do
+    parse_string_contents(json, [ ?\n | acc ])
+  end
+  defp parse_string_contents(<< ?\\, ?r,  json :: binary >>, acc) do
+    parse_string_contents(json, [ ?\r | acc ])
+  end
+  defp parse_string_contents(<< ?\\, ?t,  json :: binary >>, acc) do
+    parse_string_contents(json, [ ?\t | acc ])
+  end
+  defp parse_string_contents(<< ?\\, ?",  json :: binary >>, acc)  do
+    parse_string_contents(json, [ ?"  | acc ])
+  end
+  defp parse_string_contents(<< ?\\, ?\\, json :: binary >>, acc)  do
+    parse_string_contents(json, [ ?\\ | acc ])
+  end
+  defp parse_string_contents(<< ?\\, ?/,  json :: binary >>, acc) do
+    parse_string_contents(json, [ ?/  | acc ])
+  end
 
-  defp parse_string_contents(bin = << ?\\, ?u , _ :: binary >> , acc) do
-    case JSON.Parser.Bitstring.Unicode.parse(bin) do
+  defp parse_string_contents(<< ?\\, ?u , rest :: binary >>, acc) do
+    case JSON.Parser.Bitstring.Unicode.parse(<< ?\\, ?u , rest :: binary >>) do
       { :error, error_info } -> { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
           << _ ::utf8 >> ->
             parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
           _ ->
-            { :error, { :unexpected_token, bin} }
+            { :error, { :unexpected_token, << ?\\, ?u , rest :: binary >>} }
         end
     end
   end
@@ -79,4 +93,5 @@ defmodule JSON.Parser.Bitstring.String do
   defp parse_string_contents(<< char :: utf8, json :: binary >>, acc) do
     parse_string_contents(json, [ char | acc ])
   end
+  
 end
