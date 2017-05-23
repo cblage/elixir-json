@@ -1,5 +1,5 @@
 defmodule JSON do
-
+  @vsn "1.0.2"
 
   @doc """
   Returns a JSON string representation of the Elixir term
