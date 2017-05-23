@@ -77,15 +77,15 @@ defmodule JSON.Parser.Bitstring.String do
     parse_string_recursive(json, [ ?/  | acc ])
   end
 
-  defp parse_string_recursive(<< ?\\, ?u , rest :: binary >>, acc) do
-    case JSON.Parser.Bitstring.Unicode.parse(<< ?\\, ?u , rest :: binary >>) do
+  defp parse_string_recursive(<< ?\\, ?u , json :: binary >>, acc) do
+    case JSON.Parser.Bitstring.Unicode.parse(<< ?\\, ?u , json :: binary >>) do
       { :error, error_info } -> { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
           << _ ::utf8 >> ->
             parse_string_recursive(after_codepoint, [ decoded_unicode_codepoint | acc ])
           _ ->
-            { :error, { :unexpected_token, << ?\\, ?u , rest :: binary >>} }
+            { :error, { :unexpected_token, << ?\\, ?u , json :: binary >>} }
         end
     end
   end

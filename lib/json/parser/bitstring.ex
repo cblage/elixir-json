@@ -57,6 +57,7 @@ defmodule JSON.Parser.Bitstring do
       iex> JSON.Parser.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
+
   def parse(<< ?[, _ :: binary >> = bin), do: JSON.Parser.Bitstring.Array.parse(bin)
   def parse(<< ?{, _ :: binary >> = bin), do: JSON.Parser.Bitstring.Object.parse(bin)
   def parse(<< ?", _ :: binary >> = bin), do: JSON.Parser.Bitstring.String.parse(bin)
