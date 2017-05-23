@@ -24,7 +24,7 @@ defmodule JSON.Parser.Bitstring.Array do
       {:ok, ["foo", 1, 2, 1.5], " lala" }
   """
   def parse(<< ?[, rest :: binary >>) do
-    JSON.Parser.Bitstring.trim(rest) |> parse_array_contents
+    rest |> JSON.Parser.Bitstring.trim |> parse_array_contents
   end
 
   def parse(<< >>), do:  { :error, :unexpected_end_of_buffer }
@@ -37,7 +37,7 @@ defmodule JSON.Parser.Bitstring.Array do
   defp parse_array_contents(_, << >>), do: { :error,  :unexpected_end_of_buffer }
 
   defp parse_array_contents(acc, json) do
-    case JSON.Parser.Bitstring.trim(json) |> JSON.Parser.Bitstring.parse do
+    case json |> JSON.Parser.Bitstring.trim |> JSON.Parser.Bitstring.parse do
       { :error, error_info } -> { :error, error_info }
       {:ok, value, after_value } ->
         after_value = JSON.Parser.Bitstring.trim(after_value)

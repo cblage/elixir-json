@@ -39,33 +39,18 @@ defmodule JSON.Parser.Bitstring.Number do
     end
   end
 
-
-  def parse(binary) do
-    case binary do
-      << number :: utf8 ,  _ :: binary >> when number in ?0..?9 ->
-        to_integer(binary) |> add_fractional |> apply_exponent
-      << >> ->  { :error, :unexpected_end_of_buffer }
-      _  -> { :error, { :unexpected_token, binary } }
-    end
+  def parse(<< number :: utf8 ,  rest:: binary >>) when number in ?0..?9 do
+    << number :: utf8 ,  rest:: binary >> |> to_integer |> add_fractional |> apply_exponent
   end
-
+  def parse(<< >>), do: { :error, :unexpected_end_of_buffer }
+  def parse(json), do: { :error, { :unexpected_token, json } }
 
   defp add_fractional({ :error, error_info }), do: { :error, error_info }
-
-  defp add_fractional({ :ok, acc, bin })  do
-    case bin do
-      << ?., after_dot :: binary >>  ->
-        case after_dot do
-          << c :: utf8, _ :: binary >> when c in ?0..?9 ->
-            { fractional, rest } = parse_fractional(after_dot, 0, 10.0)
-            { :ok, acc + fractional, rest }
-          _ ->
-            { :ok, acc, bin }
-        end
-      _ ->
-        { :ok, acc, bin }
-    end
+  defp add_fractional({ :ok, acc, << ?., c :: utf8, rest :: binary >>}) when c in ?0..?9 do
+   { fractional, rest } = parse_fractional(<< c :: utf8, rest :: binary >>, 0, 10.0)
+   { :ok, acc + fractional, rest }
   end
+  defp add_fractional(result), do: result
 
   defp parse_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
     parse_fractional(rest, acc + (number - ?0) / power, power * 10)
@@ -87,7 +72,6 @@ defmodule JSON.Parser.Bitstring.Number do
 
 
   defp to_integer(<< >>), do: { :error,  :unexpected_end_of_buffer }
-
   defp to_integer(binary) do
     case Integer.parse(binary) do
       { :error, _ } -> { :error, { :unexpected_token, binary } }

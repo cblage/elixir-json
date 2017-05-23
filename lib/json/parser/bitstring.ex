@@ -93,14 +93,10 @@ defmodule JSON.Parser.Bitstring do
       iex> JSON.Parser.Bitstring.trim " \\n\\t\\n fooo \\u00dflalalal "
       "fooo \\u00dflalalal "
   """
-  def trim(bitstring) when is_binary(bitstring) do
-    case bitstring do
-      #32 = ascii space, clearer than using "? ", I think
-      << 32  :: utf8, rest :: binary >> -> trim rest
-      << ?\t :: utf8, rest :: binary >> -> trim rest
-      << ?\r :: utf8, rest :: binary >> -> trim rest
-      << ?\n :: utf8, rest :: binary >> -> trim rest
-      _ -> bitstring
-    end
-  end
+  #32 = ascii space, clearer than using "? ", I think
+  def trim(<< 32  :: utf8, rest :: binary >>), do: trim(rest)
+  def trim(<< ?\t :: utf8, rest :: binary >>), do: trim(rest)
+  def trim(<< ?\r :: utf8, rest :: binary >>), do: trim(rest)
+  def trim(<< ?\n :: utf8, rest :: binary >>), do: trim(rest)
+  def trim(bitstring), do: bitstring
 end
