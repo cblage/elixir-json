@@ -63,10 +63,11 @@ defmodule JSON.Parser.Bitstring do
   def parse(<< ?{, json :: binary >>), do: json |> trim |> parse_object_contents(Map.new)
   def parse(<< ?", json :: binary >>), do: parse_string_recursive(json, [])
 
-  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
-  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: { :ok, true,  rest }
-  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: { :ok, false, rest }
+  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: terminate_literal(nil, rest)
+  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: terminate_literal(true, rest)
+  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: terminate_literal(false, rest)
 
+  # TODO: optimize
   def parse(<< ?- , number :: utf8, rest :: binary >>) when number in ?0..?9 do
     case parse(<< number :: utf8, rest:: binary >>) do
       { :ok, number, json } -> { :ok, -1 * number, json }
@@ -74,13 +75,18 @@ defmodule JSON.Parser.Bitstring do
     end
   end
 
+  # TODO: optimize
   def parse(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
     bin |> to_integer |> add_fractional |> apply_exponent
   end
 
   def parse(<< >>), do: { :error, :unexpected_end_of_buffer }
-  def parse(<< json :: binary >>), do: {:error, { :unexpected_token, json }}
+  def parse(json), do: {:error, { :unexpected_token, json }}
 
+  # Literal Parsing
+  defp terminate_literal(lit, << rest :: binary >>), do: { :ok, lit, rest }
+
+  # Array Parsing
   defp parse_array_contents(<< >>, _), do: { :error,  :unexpected_end_of_buffer }
   defp parse_array_contents(<< ?], rest :: binary >>, acc), do: terminate_array_contents(rest, acc)
   defp parse_array_contents(<< json :: binary >>, acc) do
@@ -94,9 +100,7 @@ defmodule JSON.Parser.Bitstring do
     end
   end
 
-  defp terminate_array_contents(<< rest :: binary >>, acc) do
-    { :ok, Enum.reverse(acc), rest }
-  end
+  defp terminate_array_contents(<< rest :: binary >>, acc), do:  { :ok, Enum.reverse(acc), rest }
 
   # Object Parsing
   defp parse_object_key(<< json:: binary >>) do
@@ -133,10 +137,8 @@ defmodule JSON.Parser.Bitstring do
   end
   defp parse_object_contents(json, _), do: { :error, { :unexpected_token, json } }
 
-  defp terminate_object_contents(<< rest :: binary >>, acc) do
-    { :ok, acc, rest }
-  end
-
+  defp terminate_object_contents(<< rest :: binary >>, acc), do: { :ok, acc, rest }
+  
   #String parsing
 
   #stop conditions
@@ -191,7 +193,7 @@ defmodule JSON.Parser.Bitstring do
   end
 
   defp parse_escaped_unicode_codepoint(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
-  defp parse_escaped_unicode_codepoint(<< json :: binary >>, _, _), do: { :error, { :unexpected_token, json } }
+  defp parse_escaped_unicode_codepoint(json, _, _), do: { :error, { :unexpected_token, json } }
 
 
   # Numbers
@@ -205,7 +207,7 @@ defmodule JSON.Parser.Bitstring do
   defp parse_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
     parse_fractional(rest, acc + (number - ?0) / power, power * 10)
   end
-  defp parse_fractional(json, acc , _) when is_binary(json), do: { acc, json }
+  defp parse_fractional(json, acc , _), do: { acc, json }
 
 
   defp apply_exponent({ :error, error_info }), do: { :error, error_info }
@@ -218,7 +220,7 @@ defmodule JSON.Parser.Bitstring do
   defp apply_exponent({ :ok, acc, json }), do: { :ok, acc, json }
 
   defp to_integer(<< >>), do: { :error,  :unexpected_end_of_buffer }
-  defp to_integer(<< json :: binary >>) do
+  defp to_integer(json) do
     case Integer.parse(json) do
       :error -> { :error, { :unexpected_token, json } }
       { result, rest } -> {:ok, result, rest}
