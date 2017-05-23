@@ -60,7 +60,7 @@ defmodule JSON.Parser.Bitstring do
 
   def parse(<< >>), do:  {:error, :unexpected_end_of_buffer}
   def parse(<< ?[, json :: binary >>), do: json |> trim |> parse_array_contents([])
-  def parse(<< ?{, json :: binary >>), do: json|> trim |> parse_object_contents(Map.new)
+  def parse(<< ?{, json :: binary >>), do: json |> trim |> parse_object_contents(Map.new)
   def parse(<< ?", json :: binary >>), do: parse_string_recursive(json, [])
 
   def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
