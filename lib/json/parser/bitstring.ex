@@ -138,14 +138,15 @@ defmodule JSON.Parser.Bitstring do
   defp parse_object_contents(json, _), do: { :error, { :unexpected_token, json } }
 
   defp terminate_object_contents(<< rest :: binary >>, acc), do: { :ok, acc, rest }
-  
+
   #String parsing
+  #defp parse_string_iterative(<< json :: binary >>) do
+  #end
 
   #stop conditions
   defp parse_string_recursive(<< >>, _), do: { :error, :unexpected_end_of_buffer }
-
   # found the closing ", lets reverse the acc and encode it as a string!
-  defp parse_string_recursive(<< ?" :: utf8, json :: binary >>, acc), do: terminate_string_parsing(json, acc)
+  defp parse_string_recursive(<< ?", json :: binary >>, acc), do: terminate_string_parsing(json, acc)
 
   #parsing
   defp parse_string_recursive(<< ?\\, ?f,  json :: binary >>, acc), do: parse_string_recursive(json, [ ?\f | acc ])
@@ -161,7 +162,7 @@ defmodule JSON.Parser.Bitstring do
       { :ok, decoded_unicode_codepoint, after_codepoint} -> parse_string_recursive(after_codepoint, [ decoded_unicode_codepoint | acc ])
     end
   end
-  defp parse_string_recursive(<< char :: utf8, json :: binary >>, acc), do: parse_string_recursive(json, [ char | acc ])
+  defp parse_string_recursive(<< char :: binary - 1, json :: binary >>, acc), do: parse_string_recursive(json, [ char | acc ])
 
   defp terminate_string_parsing(<< json :: binary >>, acc), do: { :ok, acc |> Enum.reverse |> List.to_string, json }
 
