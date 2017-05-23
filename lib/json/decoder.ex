@@ -25,7 +25,7 @@ defprotocol JSON.Decoder do
 end
 
 defimpl JSON.Decoder, for: BitString do
-  @compile [:native, {:hipe, [:o3]}]
+
 
   def decode(bitstring) do
     bitstring
@@ -43,7 +43,7 @@ defimpl JSON.Decoder, for: BitString do
 end
 
 defimpl JSON.Decoder, for: List do
-  @compile [:native, {:hipe, [:o3]}]
+
 
   def decode(charlist) do
     charlist

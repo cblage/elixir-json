@@ -1,5 +1,5 @@
 defmodule JSON.Parser.Bitstring.String do
-  @compile [:native, {:hipe, [:o3]}]
+
   use Bitwise
   @doc """
   parses a valid JSON string, returns its elixir representation

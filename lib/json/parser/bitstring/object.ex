@@ -1,5 +1,5 @@
 defmodule JSON.Parser.Bitstring.Object do
-  @compile [:native, {:hipe, [:o3]}]
+
   @doc """
   parses a valid JSON object value, returns its elixir representation
 

@@ -1,5 +1,5 @@
 defmodule JSON.Parser.Charlist.Number do
-  @compile [:native, {:hipe, [:o3]}]
+
   @doc """
   parses a valid JSON numerical value, returns its elixir numerical representation
 

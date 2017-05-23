@@ -1,5 +1,5 @@
 defmodule JSON.Parser.Bitstring.Unicode do
-  @compile [:native, {:hipe, [:o3]}]
+
   use Bitwise
 
   @doc """
