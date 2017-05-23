@@ -143,47 +143,25 @@ defmodule JSON.Parser.Bitstring do
   defp parse_string_recursive(<< >>, _), do: { :error, :unexpected_end_of_buffer }
 
   # found the closing ", lets reverse the acc and encode it as a string!
-  defp parse_string_recursive(<< ?" :: utf8, json :: binary >>, acc) do
-    terminate_string_parsing(json, acc)
-  end
+  defp parse_string_recursive(<< ?" :: utf8, json :: binary >>, acc), do: terminate_string_parsing(json, acc)
 
   #parsing
-  defp parse_string_recursive(<< ?\\, ?f,  json :: binary >>, acc) do
-    parse_string_recursive(json, [ ?\f | acc ])
-  end
-  defp parse_string_recursive(<< ?\\, ?n,  json :: binary >>, acc) do
-    parse_string_recursive(json, [ ?\n | acc ])
-  end
-  defp parse_string_recursive(<< ?\\, ?r,  json :: binary >>, acc) do
-    parse_string_recursive(json, [ ?\r | acc ])
-  end
-  defp parse_string_recursive(<< ?\\, ?t,  json :: binary >>, acc) do
-    parse_string_recursive(json, [ ?\t | acc ])
-  end
-  defp parse_string_recursive(<< ?\\, ?",  json :: binary >>, acc)  do
-    parse_string_recursive(json, [ ?"  | acc ])
-  end
-  defp parse_string_recursive(<< ?\\, ?\\, json :: binary >>, acc)  do
-    parse_string_recursive(json, [ ?\\ | acc ])
-  end
-  defp parse_string_recursive(<< ?\\, ?/,  json :: binary >>, acc) do
-    parse_string_recursive(json, [ ?/  | acc ])
-  end
-
+  defp parse_string_recursive(<< ?\\, ?f,  json :: binary >>, acc), do: parse_string_recursive(json, [ ?\f | acc ])
+  defp parse_string_recursive(<< ?\\, ?n,  json :: binary >>, acc), do: parse_string_recursive(json, [ ?\n | acc ])
+  defp parse_string_recursive(<< ?\\, ?r,  json :: binary >>, acc), do: parse_string_recursive(json, [ ?\r | acc ])
+  defp parse_string_recursive(<< ?\\, ?t,  json :: binary >>, acc), do: parse_string_recursive(json, [ ?\t | acc ])
+  defp parse_string_recursive(<< ?\\, ?",  json :: binary >>, acc), do: parse_string_recursive(json, [ ?"  | acc ])
+  defp parse_string_recursive(<< ?\\, ?\\, json :: binary >>, acc), do: parse_string_recursive(json, [ ?\\ | acc ])
+  defp parse_string_recursive(<< ?\\, ?/,  json :: binary >>, acc), do: parse_string_recursive(json, [ ?/  | acc ])
   defp parse_string_recursive(<< ?\\, ?u , json :: binary >>, acc) do
     case parse_escaped_unicode_codepoint(json, 0, 0) do
       { :error, error_info } -> { :error, error_info }
       { :ok, decoded_unicode_codepoint, after_codepoint} -> parse_string_recursive(after_codepoint, [ decoded_unicode_codepoint | acc ])
     end
   end
+  defp parse_string_recursive(<< char :: utf8, json :: binary >>, acc), do: parse_string_recursive(json, [ char | acc ])
 
-  defp parse_string_recursive(<< char :: utf8, json :: binary >>, acc) do
-    parse_string_recursive(json, [ char | acc ])
-  end
-
-  defp terminate_string_parsing(<< json :: binary >>, acc) do
-    { :ok, acc |> Enum.reverse |> List.to_string, json }
-  end
+  defp terminate_string_parsing(<< json :: binary >>, acc), do: { :ok, acc |> Enum.reverse |> List.to_string, json }
 
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
   # represents a unicode codepoint
@@ -242,7 +220,7 @@ defmodule JSON.Parser.Bitstring do
   defp to_integer(<< >>), do: { :error,  :unexpected_end_of_buffer }
   defp to_integer(<< json :: binary >>) do
     case Integer.parse(json) do
-      { :error, _ } -> { :error, { :unexpected_token, json } }
+      :error -> { :error, { :unexpected_token, json } }
       { result, rest } -> {:ok, result, rest}
     end
   end
