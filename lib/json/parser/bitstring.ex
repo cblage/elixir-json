@@ -67,19 +67,21 @@ defmodule JSON.Parser.Bitstring do
   def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: terminate_literal(true, rest)
   def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: terminate_literal(false, rest)
 
-  def parse(<< ?- , number :: utf8, rest :: binary >>) when number in ?0..?9 do
-    case parse_number(<< number :: utf8, rest:: binary >>) do
-      { :ok, number, json } -> { :ok, -1 * number, json }
-      { :error, error_info } -> { :error, error_info }
+  def parse(<< json :: binary >>) do
+    case json do
+      << ?- , number :: utf8, rest :: binary >> when number in ?0..?9 ->
+        case parse_number(<< number :: utf8, rest:: binary >>) do
+          { :ok, number, << json :: binary >>} -> { :ok, -1 * number, json }
+          { :error, error_info } -> { :error, error_info }
+        end
+      << number :: utf8, rest :: binary >> when number in ?0..?9 ->
+        parse_number(<< number :: utf8, rest:: binary >>)
+      << >> ->
+        { :error, :unexpected_end_of_buffer }
+      << json :: binary >> ->
+        {:error, { :unexpected_token, json }}
     end
   end
-
-  def parse(<< number :: utf8, rest :: binary >>) when number in ?0..?9 do
-    parse_number(<< number :: utf8, rest:: binary >>)
-  end
-
-  def parse(<< >>), do: { :error, :unexpected_end_of_buffer }
-  def parse(json), do: {:error, { :unexpected_token, json }}
 
   # Literal Parsing
   defp terminate_literal(lit, << rest :: binary >>), do: { :ok, lit, rest }
@@ -95,7 +97,7 @@ defmodule JSON.Parser.Bitstring do
   defp parse_array_contents(<< json :: binary >>, acc) do
     case json |> trim |> parse do
       { :error, error_info } -> { :error, error_info }
-      {:ok, value, after_value } ->
+      {:ok, value, << after_value :: binary >>} ->
         case trim(after_value) do
           << ?, , after_comma :: binary >> -> parse_array_contents(trim(after_comma), [value | acc])
           something -> parse_array_contents(something, [value | acc])
@@ -171,7 +173,8 @@ defmodule JSON.Parser.Bitstring do
 
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
   # represents a unicode codepoint
-  defp parse_escaped_unicode_codepoint(json, acc, 4), do: { :ok, << acc :: utf8 >>, json }
+  defp parse_escaped_unicode_codepoint(<< json::binary >>, acc, 4), do: { :ok, << acc :: utf8 >>, json }
+  defp parse_escaped_unicode_codepoint(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
 
   # Parsing sugorrogate pairs
   # http://unicodebook.readthedocs.org/unicode_encodings.html#utf-16-surrogate-pairs
@@ -184,22 +187,18 @@ defmodule JSON.Parser.Bitstring do
     {:ok, <<  complete :: utf8 >>, json}
   end
 
-  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?0..?9 do
-    parse_escaped_unicode_codepoint(json, 16 * acc + hex - ?0, chars_parsed + 1)
+  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) do
+    case hex do
+      hex when hex in ?0..?9 ->
+        parse_escaped_unicode_codepoint(json, 16 * acc + hex - ?0, chars_parsed + 1)
+      hex when hex in ?a..?f ->
+        parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?a, chars_parsed + 1)
+      hex when hex in ?A..?F ->
+        parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?A, chars_parsed + 1)
+      _ -> { :error, { :unexpected_token, json } }
+    end
   end
-
-  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?a..?f do
-    parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?a, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint(<< hex :: utf8, json :: binary >>, acc, chars_parsed) when hex in ?A..?F do
-    parse_escaped_unicode_codepoint(json, 16 * acc + 10 + hex - ?A, chars_parsed + 1)
-  end
-
-  defp parse_escaped_unicode_codepoint(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
   defp parse_escaped_unicode_codepoint(json, _, _), do: { :error, { :unexpected_token, json } }
-
-
   # Numbers
   defp add_fractional({ :error, error_info }), do: { :error, error_info }
   defp add_fractional({ :ok, acc, << ?., c :: utf8, rest :: binary >>}) when c in ?0..?9 do
@@ -211,7 +210,7 @@ defmodule JSON.Parser.Bitstring do
   defp parse_fractional(<< number :: utf8, rest :: binary >>, acc, power) when number in ?0..?9 do
     parse_fractional(rest, acc + (number - ?0) / power, power * 10)
   end
-  defp parse_fractional(json, acc , _), do: { acc, json }
+  defp parse_fractional(<< json :: binary >>, acc , _), do: { acc, json }
 
 
   defp apply_exponent({ :error, error_info }), do: { :error, error_info }
