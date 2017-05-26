@@ -96,7 +96,7 @@ defmodule JSONDecodeTest do
 
     cannot_decode "unterminated string", "\"Not a full string", :unexpected_end_of_buffer
 
-    cannot_decode "bad Unicode escape", "\"bzzt: \\u27qp wrong\"", {:unexpected_token, "qp wrong\""}
+    cannot_decode "bad Unicode escape", "\"bzzt: \\u27qp wrong\"", {:unexpected_token, "p wrong\""}
 
     cannot_decode "number with trailing .", "889.foo", {:unexpected_token, ".foo"}
 
