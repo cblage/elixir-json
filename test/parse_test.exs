@@ -4,10 +4,6 @@ defmodule ParseTest do
   use ExUnit.Case
 
   doctest JSON.Parser.Bitstring
-  doctest JSON.Parser.Bitstring.String
-  doctest JSON.Parser.Bitstring.Number
-  doctest JSON.Parser.Bitstring.Array
-  doctest JSON.Parser.Bitstring.Object
 
   doctest JSON.Parser.Charlist
   doctest JSON.Parser.Charlist.String

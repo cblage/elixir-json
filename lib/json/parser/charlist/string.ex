@@ -41,12 +41,7 @@ defmodule JSON.Parser.Charlist.String do
 
   # found the closing ", lets reverse the acc and encode it as a string!
   defp parse_string_contents([ ?" | json ], acc) do
-    case Enum.reverse(acc) |> List.to_string do
-      encoded when is_binary(encoded) ->
-        { :ok, encoded, json }
-      _ ->
-        {:error, { :unexpected_token, json }}
-    end
+    { :ok, acc |> Enum.reverse |> List.to_string, json }
   end
 
   #parsing

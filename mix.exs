@@ -17,7 +17,8 @@ defmodule JSON.Mixfile do
   def deps(:prod) do
     [
       { :ex_doc, ">= 0.0.0", only: :dev},
-      { :earmark, ">= 0.0.0", only: :dev}
+      { :earmark, ">= 0.0.0", only: :dev},
+      {:dialyxir, "~> 0.5", only: :dev, runtime: false}
     ]
   end
 

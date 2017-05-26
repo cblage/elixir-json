@@ -15,7 +15,7 @@ defmodule JSON do
     JSON.Encoder.encode(term)
   end
 
-  @spec encode!(term) :: bitstring
+  @spec encode!(term) :: bitstring | no_return
   def encode!(term) do
     case encode(term) do
       { :ok, value }         -> value
@@ -39,8 +39,8 @@ defmodule JSON do
     JSON.Decoder.decode(bitstring_or_char_list)
   end
 
-  @spec decode!(bitstring) :: term
-  @spec decode!(char_list) :: term
+  @spec decode!(bitstring) :: term | no_return
+  @spec decode!(char_list) :: term | no_return
   def decode!(bitstring_or_char_list) do
     case decode(bitstring_or_char_list) do
       { :ok, value } -> value
