@@ -67,17 +67,15 @@ defmodule JSON.Parser.Bitstring do
   def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: terminate_literal(true, rest)
   def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: terminate_literal(false, rest)
 
-  # TODO: optimize
   def parse(<< ?- , number :: utf8, rest :: binary >>) when number in ?0..?9 do
-    case parse(<< number :: utf8, rest:: binary >>) do
+    case parse_number(<< number :: utf8, rest:: binary >>) do
       { :ok, number, json } -> { :ok, -1 * number, json }
       { :error, error_info } -> { :error, error_info }
     end
   end
 
-  # TODO: optimize
-  def parse(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    bin |> to_integer |> add_fractional |> apply_exponent
+  def parse(<< number :: utf8, rest :: binary >>) when number in ?0..?9 do
+    parse_number(<< number :: utf8, rest:: binary >>)
   end
 
   def parse(<< >>), do: { :error, :unexpected_end_of_buffer }
@@ -85,6 +83,11 @@ defmodule JSON.Parser.Bitstring do
 
   # Literal Parsing
   defp terminate_literal(lit, << rest :: binary >>), do: { :ok, lit, rest }
+
+  # Number parsing
+  defp parse_number(<< json :: binary >>) do
+    json |> to_integer |> add_fractional |> apply_exponent
+  end
 
   # Array Parsing
   defp parse_array_contents(<< >>, _), do: { :error,  :unexpected_end_of_buffer }

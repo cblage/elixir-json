@@ -57,13 +57,8 @@ defmodule JSON.Parser.Charlist.String do
     case JSON.Parser.Charlist.Unicode.parse(char) do
       { :error, error_info } ->
         { :error, error_info }
-      { :ok, decoded_unicode_codepoint, after_codepoint} ->
-        case decoded_unicode_codepoint do
-          << _ ::utf8 >> ->
-            parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
-          _ ->
-            { :error, { :unexpected_token, char} }
-        end
+      { :ok, << decoded_unicode_codepoint :: utf8 >>, after_codepoint} ->
+        parse_string_contents(after_codepoint, [ decoded_unicode_codepoint | acc ])
     end
   end
 
