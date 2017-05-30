@@ -59,13 +59,13 @@ defmodule JSON.Parser.Bitstring do
   """
 
   def parse(<< >>), do:  {:error, :unexpected_end_of_buffer}
-  def parse(<< ?[, json :: binary >>), do: json |> trim |> parse_array_contents([])
-  def parse(<< ?{, json :: binary >>), do: json |> trim |> parse_object_contents(Map.new)
-  def parse(<< ?", json :: binary >>), do: parse_string_recursive(json, <<>>)
+  def parse("[" <> json), do: json |> trim |> parse_array_contents([])
+  def parse("{" <> json), do: json |> trim |> parse_object_contents(Map.new)
+  def parse("\"" <> json), do: parse_string_recursive(json, << >>)
 
-  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: terminate_literal(nil, rest)
-  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: terminate_literal(true, rest)
-  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: terminate_literal(false, rest)
+  def parse("null" <> rest), do: { :ok, nil, rest }
+  def parse("true" <> rest), do: { :ok, true, rest }
+  def parse("false" <> rest), do: { :ok, false, rest }
 
   def parse(<< json :: binary >>) do
     case json do
@@ -77,14 +77,11 @@ defmodule JSON.Parser.Bitstring do
       << number :: utf8, rest :: binary >> when number in ?0..?9 ->
         parse_number(<< number :: utf8, rest:: binary >>)
       << >> ->
-        { :error, :unexpected_end_of_buffer }
+        {:error, :unexpected_end_of_buffer}
       << json :: binary >> ->
         {:error, { :unexpected_token, json }}
     end
   end
-
-  # Literal Parsing
-  defp terminate_literal(lit, << rest :: binary >>), do: { :ok, lit, rest }
 
   # Number parsing
   defp parse_number(<< json :: binary >>) do
@@ -93,19 +90,17 @@ defmodule JSON.Parser.Bitstring do
 
   # Array Parsing
   defp parse_array_contents(<< >>, _), do: { :error,  :unexpected_end_of_buffer }
-  defp parse_array_contents(<< ?], rest :: binary >>, acc), do: terminate_array_contents(rest, acc)
+  defp parse_array_contents("]" <> rest, acc), do: { :ok, Enum.reverse(acc), rest }
   defp parse_array_contents(<< json :: binary >>, acc) do
     case json |> trim |> parse do
       { :error, error_info } -> { :error, error_info }
       {:ok, value, << after_value :: binary >>} ->
         case trim(after_value) do
-          << ?, , after_comma :: binary >> -> parse_array_contents(trim(after_comma), [value | acc])
+          "," <> after_comma -> parse_array_contents(trim(after_comma), [value | acc])
           something -> parse_array_contents(something, [value | acc])
         end
     end
   end
-
-  defp terminate_array_contents(<< rest :: binary >>, acc), do:  { :ok, Enum.reverse(acc), rest }
 
   # Object Parsing
   defp parse_object_key(<< json:: binary >>) do
@@ -132,7 +127,7 @@ defmodule JSON.Parser.Bitstring do
     end
   end
 
-  defp parse_object_contents(<< ?}, rest :: binary >>, acc), do: terminate_object_contents(rest, acc)
+  defp parse_object_contents(<< ?}, rest :: binary >>, acc), do: { :ok, acc, rest }
   defp parse_object_contents(<< >>, _), do: { :error, :unexpected_end_of_buffer }
   defp parse_object_contents(<< ?", rest :: binary >>, acc) do
     case parse_object_key(rest) do
@@ -142,16 +137,11 @@ defmodule JSON.Parser.Bitstring do
   end
   defp parse_object_contents(json, _), do: { :error, { :unexpected_token, json } }
 
-  defp terminate_object_contents(<< rest :: binary >>, acc), do: { :ok, acc, rest }
-
-  #String parsing
-  #defp parse_string_iterative(<< json :: binary >>) do
-  #end
 
   #stop conditions
   defp parse_string_recursive(<< >>, _), do: { :error, :unexpected_end_of_buffer }
-  # found the closing ", lets reverse the acc and encode it as a string!
-  defp parse_string_recursive(<< ?", json :: binary >>, acc), do: terminate_string_parsing(json, acc)
+  # found the closing "
+  defp parse_string_recursive("\"" <> json, << acc :: binary >>), do: { :ok, acc, json }
 
   #parsing
   defp parse_string_recursive(<< ?\\, ?f,  json :: binary >>, acc), do: parse_string_recursive(json, acc <> "\f")
@@ -169,11 +159,9 @@ defmodule JSON.Parser.Bitstring do
   end
   defp parse_string_recursive(<< char :: binary - 1, json :: binary >>, acc), do: parse_string_recursive(json, acc <> char)
 
-  defp terminate_string_parsing(<< json :: binary >>, << acc :: binary >>), do: { :ok, acc, json }
-
   # parse_escaped_unicode_codepoint tries to parse a valid hexadecimal (composed of 4 characters) value that potentially
   # represents a unicode codepoint
-  defp parse_escaped_unicode_codepoint(<< json::binary >>, acc, 4), do: { :ok, << acc :: utf8 >>, json }
+  defp parse_escaped_unicode_codepoint(<< json :: binary >>, acc, 4), do: { :ok, << acc :: utf8 >>, json }
   defp parse_escaped_unicode_codepoint(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
 
   # Parsing sugorrogate pairs
@@ -199,6 +187,8 @@ defmodule JSON.Parser.Bitstring do
     end
   end
   defp parse_escaped_unicode_codepoint(json, _, _), do: { :error, { :unexpected_token, json } }
+
+
   # Numbers
   defp add_fractional({ :error, error_info }), do: { :error, error_info }
   defp add_fractional({ :ok, acc, << ?., c :: utf8, rest :: binary >>}) when c in ?0..?9 do
