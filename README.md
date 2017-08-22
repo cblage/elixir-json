@@ -1,6 +1,6 @@
 # Elixir JSON
 
-[![Build Status](https://travis-ci.org/cblage/elixir-json.png?branch=master)](https://travis-ci.org/cblage/elixir-json)
+[![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json)
 
 This library provides a natively implemented JSON encoder and decoder for Elixir.
 
