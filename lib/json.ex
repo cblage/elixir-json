@@ -34,13 +34,13 @@ defmodule JSON do
       {:ok, Enum.into([{"result", "this will be an Elixir result"}], Map.new) }
   """
   @spec decode(bitstring) :: {atom, term}
-  @spec decode(char_list) :: {atom, term}
+  @spec decode(charlist) :: {atom, term}
   def decode(bitstring_or_char_list) do
     JSON.Decoder.decode(bitstring_or_char_list)
   end
 
   @spec decode!(bitstring) :: term
-  @spec decode!(char_list) :: term
+  @spec decode!(charlist) :: term
   def decode!(bitstring_or_char_list) do
     case decode(bitstring_or_char_list) do
       { :ok, value } -> value
