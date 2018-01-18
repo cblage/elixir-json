@@ -90,6 +90,7 @@ defmodule JSON.Parser.Bitstring.Number do
 
   defp to_integer(binary) do
     case Integer.parse(binary) do
+      :error -> { :error, { :unexpected_token, binary } }
       { :error, _ } -> { :error, { :unexpected_token, binary } }
       { result, rest } -> {:ok, result, rest}
     end
