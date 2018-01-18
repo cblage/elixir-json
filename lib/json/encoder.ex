@@ -29,7 +29,7 @@ defprotocol JSON.Encoder do
       {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
 
   """
-  @spec encode(term) :: bitstring
+  @spec encode(term) :: {atom, bitstring}
   def encode(term)
 
   @doc """
