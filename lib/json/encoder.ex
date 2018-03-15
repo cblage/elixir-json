@@ -127,7 +127,7 @@ defimpl JSON.Encoder, for: BitString do
   defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
 
   defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
-    [Integer.to_char_list(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
+    [Integer.to_charlist(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
   end
 
   defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]
