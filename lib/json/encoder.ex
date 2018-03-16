@@ -47,7 +47,7 @@ end
 
 defimpl JSON.Encoder, for: Tuple do
 
-  def encode(term), do: Tuple.to_list(term) |> JSON.Encoder.Helpers.enum_encode
+  def encode(term), do: term |> Tuple.to_list |> JSON.Encoder.Helpers.enum_encode
   def typeof(_), do: :array
 end
 
@@ -72,7 +72,7 @@ defimpl JSON.Encoder, for: List do
   def typeof([]), do: :array
 
   def typeof(list) do
-    if (Keyword.keyword? list) do
+    if Keyword.keyword? list do
       :object
     else
       :array
@@ -90,7 +90,7 @@ defimpl JSON.Encoder, for: Atom do
   def encode(nil), do: {:ok, "null"}
   def encode(false), do: {:ok, "false"}
   def encode(true),  do: {:ok, "true"}
-  def encode(atom) when is_atom(atom), do: Atom.to_string(atom) |> JSON.Encoder.encode
+  def encode(atom) when is_atom(atom), do: atom |> Atom.to_string |> JSON.Encoder.encode
 
   def typeof(boolean) when is_boolean(boolean), do: :boolean
   def typeof(nil), do: :null
@@ -109,7 +109,7 @@ defimpl JSON.Encoder, for: BitString do
     encode_binary_recursive(tail, encode_binary_character(head, acc))
   end
 
-  defp encode_binary_recursive(<<>>, acc), do: Enum.reverse(acc) |> to_string
+  defp encode_binary_recursive(<<>>, acc), do: acc |> Enum.reverse |> to_string
 
 
   defp encode_binary_character(?",   acc),  do: [?", ?\\  | acc]
@@ -124,10 +124,10 @@ defimpl JSON.Encoder, for: BitString do
   end
 
   #anything else besides these control characters, just let it through
-  defp encode_binary_character(char, acc) when is_number(char), do: [ char | acc ]
+  defp encode_binary_character(char, acc) when is_number(char), do: [char | acc]
 
   defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
-    [Integer.to_charlist(char, 16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
+    [char |> Integer.to_charlist(16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
   end
 
   defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]

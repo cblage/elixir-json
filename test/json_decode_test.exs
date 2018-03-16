@@ -11,8 +11,8 @@ defmodule JSONDecodeTest do
         test "decodes " <> prefix(unquote(input)) <> unquote(name) do
           decode_result = JSON.decode(unquote(input))
           case decode_result do
-            { :ok, actual } -> assert unquote(output) == actual
-            decode_result -> flunk "Expected { :ok, "<> inspect(unquote(output)) <> "} }, got { "<> inspect(decode_result) <>"} }"
+            {:ok, actual} -> assert unquote(output) == actual
+            decode_result -> flunk "Expected {:ok, " <> inspect(unquote(output)) <> "}}, got {" <> inspect(decode_result) <> "}}"
           end
         end
       end
@@ -23,8 +23,8 @@ defmodule JSONDecodeTest do
         test "cannot decode " <> prefix(unquote(input)) <> unquote(name) do
           decode_result = JSON.decode(unquote(input))
           case decode_result do
-            { :error, actual } -> assert unquote(error_info) == actual
-            decode_result -> flunk "Expected { :error,"<> inspect(unquote(error_info)) <> "} }, got { "<> inspect(decode_result) <>"} }"
+            {:error, actual} -> assert unquote(error_info) == actual
+            decode_result -> flunk "Expected {:error," <> inspect(unquote(error_info)) <> "}}, got {" <> inspect(decode_result) <> "}}"
           end
         end
       end
@@ -59,16 +59,16 @@ defmodule JSONDecodeTest do
     decodes "negative float", "-13.37", -13.37
 
     decodes "integer with exponent", "98e2", 9800
-    decodes "float with positive exponent", "-1.22783E+4", -12278.3
+    decodes "float with positive exponent", "-1.22783E+4", -12_278.3
     decodes "float with negative exponent", "903.4e-6", 0.0009034
 
     decodes "empty object", "{}", Map.new
-    decodes "simple object", "{\"result\": \"this is awesome\"}",\
+    decodes "simple object", "{\"result\": \"this is awesome\"}", \
                   Enum.into([{"result", "this is awesome"}], Map.new)
 
-    decodes "empty array", "  [   ] ", []
-    decodes "simple array", "[ 1, 2, \"three\", 4 ]", [ 1, 2, "three", 4 ]
-    decodes "nested array", " [ null, [ false, \"five\" ], [ 3, true ] ] ", [nil, [false, "five"], [3, true]]
+    decodes "empty array", "  [ ] ", []
+    decodes "simple array", "[1, 2, \"three\", 4]", [1, 2, "three", 4]
+    decodes "nested array", " [null, [false, \"five\"], [3, true]] ", [nil, [false, "five"], [3, true]]
 
     decodes "complex object",
             "{
@@ -77,20 +77,20 @@ defmodule JSONDecodeTest do
               \"phone\": \"1.415.555.0000\",
               \"balance\": 1.52E+5,
               \"children\": [
-                { \"name\": \"Søren\" },
-                { \"name\": \"Éloise\" }
-              ]
-             }",
+                {\"name\": \"Søren\"},
+                {\"name\": \"Éloise\"}
+             ]
+            }",
              Enum.into([
-              { "name", "Rafaëlla" },
-              { "active", true },
-              { "phone", "1.415.555.0000" },
-              { "balance", 1.52e+5 },
-              { "children", [
+              {"name", "Rafaëlla"},
+              {"active", true},
+              {"phone", "1.415.555.0000"},
+              {"balance", 1.52e+5},
+              {"children", [
                 Enum.into([{"name", "Søren"}], Map.new),
                 Enum.into([{"name", "Éloise"}], Map.new)
-              ] }
-            ], Map.new)
+             ]}
+           ], Map.new)
 
     cannot_decode "bad literal", "nul", {:unexpected_token, "nul"}
 
@@ -134,16 +134,16 @@ defmodule JSONDecodeTest do
     decodes "negative float", '-13.37', -13.37
 
     decodes "integer with exponent", '98e2', 9800
-    decodes "float with positive exponent", '-1.22783E+4', -12278.3
+    decodes "float with positive exponent", '-1.22783E+4', -12_278.3
     decodes "float with negative exponent", '903.4e-6', 0.0009034
 
     decodes "empty object", "{}", Map.new
     decodes "simple object", '{"result": "this is awesome"}',\
-                              Enum.into([ { "result", "this is awesome" } ], Map.new)
+                              Enum.into([{"result", "this is awesome"}], Map.new)
 
-    decodes "empty array", '  [   ] ', []
-    decodes "simple array", '[ 1, 2, "three", 4 ]', [ 1, 2, "three", 4 ]
-    decodes "nested array", ' [ null, [ false, "five" ], [ 3, true ] ] ', [nil, [false, "five"], [3, true]]
+    decodes "empty array", '  [ ] ', []
+    decodes "simple array", '[1, 2, "three", 4]', [1, 2, "three", 4]
+    decodes "nested array", ' [null, [false, "five"], [3, true]] ', [nil, [false, "five"], [3, true]]
 
     decodes "complex object",
             '{
@@ -152,20 +152,20 @@ defmodule JSONDecodeTest do
               "phone": "1.415.555.0000",
               "balance": 1.52E+5,
               "children": [
-                { "name": "Penny" },
-                { "name": "Elga" }
-              ]
-             }',
+                {"name": "Penny"},
+                {"name": "Elga"}
+             ]
+            }',
              Enum.into([
-              { "name", "Jenny" },
-              { "active", true },
-              { "phone", "1.415.555.0000" },
-              { "balance", 1.52e+5 },
-              { "children", [
-                Enum.into([ { "name", "Penny" } ], Map.new),
-                Enum.into([ { "name", "Elga" } ], Map.new)
-              ] }
-            ], Map.new)
+              {"name", "Jenny"},
+              {"active", true},
+              {"phone", "1.415.555.0000"},
+              {"balance", 1.52e+5},
+              {"children", [
+                Enum.into([{"name", "Penny"}], Map.new),
+                Enum.into([{"name", "Elga"}], Map.new)
+             ]}
+           ], Map.new)
 
 
     cannot_decode "bad literal", 'nul', {:unexpected_token, 'nul'}

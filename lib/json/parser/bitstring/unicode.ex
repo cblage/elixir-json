@@ -1,4 +1,7 @@
 defmodule JSON.Parser.Bitstring.Unicode do
+  @moduledoc """
+  Implements a JSON Unicode Parser for Bitstring values
+  """
 
   use Bitwise
 
@@ -12,15 +15,15 @@ defmodule JSON.Parser.Bitstring.Unicode do
       {:error, :unexpected_end_of_buffer}
 
       iex> JSON.Parser.Bitstring.parse "face0ff"
-      {:error, {:unexpected_token, "face0ff"} }
+      {:error, {:unexpected_token, "face0ff"}}
 
       iex> JSON.Parser.Bitstring.parse "-hello"
-      {:error, {:unexpected_token, "-hello"} }
+      {:error, {:unexpected_token, "-hello"}}
 
   """
   def parse(<< ?\\, ?u , json :: binary >>), do: parse_escaped_unicode_codepoint(json, 0, 0)
   def parse(<< >>), do:  {:error, :unexpected_end_of_buffer}
-  def parse(json), do: {:error, { :unexpected_token, json }}
+  def parse(json), do: {:error, {:unexpected_token, json}}
 
 
   # Parsing sugorrogate pairs
@@ -28,8 +31,8 @@ defmodule JSON.Parser.Bitstring.Unicode do
   # Inspired by Poison's function
   defp parse_escaped_unicode_codepoint(<< ?d, hex :: utf8, f1, f2 , ?\\, ?u, ?d, hex2:: utf8, s1, s2, json :: binary >>, _, 0)
   when (hex >= 56) do
-    first_part = (List.to_integer( [?d, hex, f1, f2], 16) &&& 1023) <<< 10
-    second_part = List.to_integer( [?d, hex2, s1, s2], 16) &&& 1023
+    first_part = (List.to_integer([?d, hex, f1, f2], 16) &&& 1023) <<< 10
+    second_part = List.to_integer([?d, hex2, s1, s2], 16) &&& 1023
     complete = 0x10000 + first_part + second_part
     {:ok, <<  complete :: utf8 >>, json}
   end
@@ -38,9 +41,9 @@ defmodule JSON.Parser.Bitstring.Unicode do
   # represents a unicode codepoint
   defp parse_escaped_unicode_codepoint(json, acc, chars_parsed) when 4 === chars_parsed do
     try do
-      { :ok, << acc :: utf8 >>, json }
+      {:ok, << acc :: utf8 >>, json}
     rescue _ in ArgumentError ->
-      { :error, { :unexpected_token, json } }
+      {:error, {:unexpected_token, json}}
     end
   end
 
@@ -57,5 +60,5 @@ defmodule JSON.Parser.Bitstring.Unicode do
   end
 
   defp parse_escaped_unicode_codepoint(<< >>, _, _), do: {:error, :unexpected_end_of_buffer}
-  defp parse_escaped_unicode_codepoint(json, _, _), do: { :error, { :unexpected_token, json } }
+  defp parse_escaped_unicode_codepoint(json, _, _), do: {:error, {:unexpected_token, json}}
 end

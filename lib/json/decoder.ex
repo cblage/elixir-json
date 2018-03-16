@@ -20,7 +20,7 @@ defprotocol JSON.Decoder do
   @doc """
   Returns an atom and an Elixir term
   """
-  @spec decode(any) :: { atom, term }
+  @spec decode(any) :: {atom, term}
   def decode(bitstring_or_char_list)
 end
 
@@ -29,14 +29,14 @@ defimpl JSON.Decoder, for: BitString do
 
   def decode(bitstring) do
     bitstring
-    |> JSON.Parser.Bitstring.trim()
+    |> JSON.Parser.Bitstring.trim
     |> JSON.Parser.Bitstring.parse()
     |> case do
-      { :error, error_info } -> { :error, error_info }
-      { :ok, value, rest }   ->
+      {:error, error_info} -> {:error, error_info}
+      {:ok, value, rest}   ->
         case JSON.Parser.Bitstring.trim(rest) do
-          << >> -> { :ok, value }
-          _     -> { :error, { :unexpected_token, rest } }
+          << >> -> {:ok, value}
+          _     -> {:error, {:unexpected_token, rest}}
         end
     end
   end
@@ -47,14 +47,14 @@ defimpl JSON.Decoder, for: List do
 
   def decode(charlist) do
     charlist
-    |> JSON.Parser.Charlist.trim()
-    |> JSON.Parser.Charlist.parse()
+    |> JSON.Parser.Charlist.trim
+    |> JSON.Parser.Charlist.parse
     |> case do
-      { :error, error_info } -> { :error, error_info }
-      { :ok, value, rest } ->
+      {:error, error_info} -> {:error, error_info}
+      {:ok, value, rest} ->
         case JSON.Parser.Charlist.trim(rest) do
-          [] -> { :ok, value }
-          _  -> { :error, { :unexpected_token, rest } }
+          [] -> {:ok, value}
+          _  -> {:error, {:unexpected_token, rest}}
         end
     end
   end

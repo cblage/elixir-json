@@ -1,5 +1,7 @@
 defmodule JSON.Parser.Bitstring do
-
+  @moduledoc """
+  Implements a JSON Parser for Bitstring values
+  """
 
   @doc """
   parses a valid JSON value, returns its elixir representation
@@ -10,49 +12,49 @@ defmodule JSON.Parser.Bitstring do
       {:error, :unexpected_end_of_buffer}
 
       iex> JSON.Parser.Bitstring.parse "face0ff"
-      {:error, {:unexpected_token, "face0ff"} }
+      {:error, {:unexpected_token, "face0ff"}}
 
       iex> JSON.Parser.Bitstring.parse "-hello"
-      {:error, {:unexpected_token, "-hello"} }
+      {:error, {:unexpected_token, "-hello"}}
 
       iex> JSON.Parser.Bitstring.parse "129245"
-      {:ok, 129245, "" }
+      {:ok, 129245, ""}
 
       iex> JSON.Parser.Bitstring.parse "7.something"
-      {:ok, 7, ".something" }
+      {:ok, 7, ".something"}
 
       iex> JSON.Parser.Bitstring.parse "-88.22suffix"
-      {:ok, -88.22, "suffix" }
+      {:ok, -88.22, "suffix"}
 
       iex> JSON.Parser.Bitstring.parse "-12e4and then some"
-      {:ok, -1.2e+5, "and then some" }
+      {:ok, -1.2e+5, "and then some"}
 
       iex> JSON.Parser.Bitstring.parse "7842490016E-12-and more"
-      {:ok, 7.842490016e-3, "-and more" }
+      {:ok, 7.842490016e-3, "-and more"}
 
       iex> JSON.Parser.Bitstring.parse "null"
       {:ok, nil, ""}
 
       iex> JSON.Parser.Bitstring.parse "false"
-      {:ok, false, "" }
+      {:ok, false, ""}
 
       iex> JSON.Parser.Bitstring.parse "true"
-      {:ok, true, "" }
+      {:ok, true, ""}
 
       iex> JSON.Parser.Bitstring.parse "\\\"7.something\\\""
-      {:ok, "7.something", "" }
+      {:ok, "7.something", ""}
 
       iex> JSON.Parser.Bitstring.parse "\\\"-88.22suffix\\\" foo bar"
-      {:ok, "-88.22suffix", " foo bar" }
+      {:ok, "-88.22suffix", " foo bar"}
 
       iex> JSON.Parser.Bitstring.parse "\\\"star -> \\\\u272d <- star\\\""
-      {:ok, "star -> ✭ <- star", "" }
+      {:ok, "star -> ✭ <- star", ""}
 
       iex> JSON.Parser.Bitstring.parse "[]"
-      {:ok, [], "" }
+      {:ok, [], ""}
 
       iex> JSON.Parser.Bitstring.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
-      {:ok, ["foo", 1, 2, 1.5], " lala" }
+      {:ok, ["foo", 1, 2, 1.5], " lala"}
 
       iex> JSON.Parser.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
@@ -69,12 +71,12 @@ defmodule JSON.Parser.Bitstring do
     JSON.Parser.Bitstring.Number.parse(bin)
   end
 
-  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: { :ok, nil,   rest }
-  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: { :ok, true,  rest }
-  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: { :ok, false, rest }
+  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: {:ok, nil,   rest}
+  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: {:ok, true,  rest}
+  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: {:ok, false, rest}
 
   def parse(<< >>), do:  {:error, :unexpected_end_of_buffer}
-  def parse(json), do: {:error, { :unexpected_token, json }}
+  def parse(json), do: {:error, {:unexpected_token, json}}
 
   @doc """
   parses valid JSON whitespace if it exists, returns the rest of the buffer

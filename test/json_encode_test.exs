@@ -17,7 +17,7 @@ defmodule JSONEncodeTest do
 
   test "convert complex keyword into correct JSON" do
     assert \
-      JSON.encode([this_is_null: nil, this_is_false: false, this_is_a_number: 1234, this_is_an_array: ["a", :b, "c"], this_is_a_subobject: [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]]]) \
+      JSON.encode([this_is_null: nil, this_is_false: false, this_is_a_number: 1234, this_is_an_array: ["a", :b, "c"], this_is_a_subobject: [omg: 1337, sub_sub_array: [1, 2, 3], sub_sub_object: [woot: 123]]]) \
       == {:ok, "{\"this_is_null\":null,\"this_is_false\":false,\"this_is_a_number\":1234,\"this_is_an_array\":[\"a\",\"b\",\"c\"],\"this_is_a_subobject\":{\"omg\":1337,\"sub_sub_array\":[1,2,3],\"sub_sub_object\":{\"woot\":123}}}"}
   end
 
@@ -29,7 +29,7 @@ defmodule JSONEncodeTest do
     acc = Map.put(acc, "string", "this will be a string")
     acc = Map.put(acc, "number", 1234)
     acc = Map.put(acc, "array",  ["a", :b, "c"])
-    acc = Map.put(acc, "object", [omg: 1337, sub_sub_array: [1,2,3], sub_sub_object: [woot: 123]])
+    acc = Map.put(acc, "object", [omg: 1337, sub_sub_array: [1, 2, 3], sub_sub_object: [woot: 123]])
 
 
     assert JSON.encode(acc) \
