@@ -1,6 +1,6 @@
 # Elixir JSON
 
-[![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json)
+[![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json)
 
 This library provides a natively implemented JSON encoder and decoder for Elixir.
 
@@ -9,7 +9,7 @@ All contributions are welcome.
 
 Simply add ```{:json, "~> 1.0"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
-### Example for a project that already uses [Plug](https://github.com/dynamo/dynamo):
+### Example for a project that already uses [Plug](https://github.com/elixir-plug/plug):
 ```elixir
 defp deps do
   [{:cowboy, "~> 1.0.0"},

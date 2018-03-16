@@ -7,4 +7,6 @@ elixir:
   - 1.4
   - 1.5
   - 1.6
-
+after_script:
+  - MIX_ENV=docs mix deps.get
+  - MIX_ENV=docs mix inch.report

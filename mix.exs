@@ -3,8 +3,8 @@ defmodule JSON.Mixfile do
 
   def project do
     [ app: :json,
-      version: "1.0.2",
-      elixir: "~> 1.4",
+      version: "1.0.3",
+      elixir: "~> 1.6",
       deps: deps(Mix.env),
       description: "Native Elixir library for JSON encoding and decoding",
       package: package(),
@@ -17,7 +17,8 @@ defmodule JSON.Mixfile do
   def deps(:prod) do
     [
       { :ex_doc, ">= 0.0.0", only: :dev},
-      { :earmark, ">= 0.0.0", only: :dev}
+      { :earmark, ">= 0.0.0", only: :dev},
+      { :inch_ex, only: :docs }
     ]
   end
 
