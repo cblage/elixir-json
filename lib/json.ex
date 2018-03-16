@@ -19,6 +19,15 @@ defmodule JSON do
     JSON.Encoder.encode(term)
   end
 
+  @doc """
+  Returns a JSON string representation of the Elixir term, raises errors when something bad happens
+
+  ## Examples
+
+      iex> JSON.encode!([result: "this will be a JSON result"])
+      "{\\\"result\\\":\\\"this will be a JSON result\\\"}"
+
+  """
   @spec encode!(term) :: bitstring
   def encode!(term) do
     case encode(term) do
@@ -43,6 +52,14 @@ defmodule JSON do
     JSON.Decoder.decode(bitstring_or_char_list)
   end
 
+  @doc """
+  Converts a valid JSON string into an Elixir term, raises errors when something bad happens
+
+  ## Examples
+
+      iex> JSON.decode!("{\\\"result\\\":\\\"this will be an Elixir result\\\"}")
+      Enum.into([{"result", "this will be an Elixir result"}], Map.new)
+  """
   @spec decode!(bitstring) :: term
   @spec decode!(charlist) :: term
   def decode!(bitstring_or_char_list) do
