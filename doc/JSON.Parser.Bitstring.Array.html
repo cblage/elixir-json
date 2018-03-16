@@ -145,16 +145,16 @@ iex&gt; JSON.Parser.Bitstring.Array.parse &quot;[1, 2 &quot;
 {:error, :unexpected_end_of_buffer}
 
 iex&gt; JSON.Parser.Bitstring.Array.parse &quot;face0ff&quot;
-{:error, {:unexpected_token, &quot;face0ff&quot;} }
+{:error, {:unexpected_token, &quot;face0ff&quot;}}
 
 iex&gt; JSON.Parser.Bitstring.Array.parse &quot;[] lala&quot;
-{:ok, [], &quot; lala&quot; }
+{:ok, [], &quot; lala&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Array.parse &quot;[]&quot;
-{:ok, [], &quot;&quot; }
+{:ok, [], &quot;&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Array.parse &quot;[\&quot;foo\&quot;, 1, 2, 1.5] lala&quot;
-{:ok, [&quot;foo&quot;, 1, 2, 1.5], &quot; lala&quot; }</code></pre>
+{:ok, [&quot;foo&quot;, 1, 2, 1.5], &quot; lala&quot;}</code></pre>
 
   </section>
 </div>

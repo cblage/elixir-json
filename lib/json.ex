@@ -1,4 +1,8 @@
 defmodule JSON do
+  @moduledoc """
+  Provides a RFC 7159, ECMA 404, and JSONTestSuite compliant JSON Encoder / Decoder
+  """
+
   @vsn "1.0.2"
 
   @doc """
@@ -18,9 +22,9 @@ defmodule JSON do
   @spec encode!(term) :: bitstring
   def encode!(term) do
     case encode(term) do
-      { :ok, value }         -> value
-      { :error, error_info } -> raise JSON.Encoder.Error, error_info: error_info
-      _                      -> raise JSON.Encoder.Error
+      {:ok, value}         -> value
+      {:error, error_info} -> raise JSON.Encoder.Error, error_info: error_info
+      _                    -> raise JSON.Encoder.Error
     end
   end
 
@@ -31,7 +35,7 @@ defmodule JSON do
   ## Examples
 
       iex> JSON.decode("{\\\"result\\\":\\\"this will be an Elixir result\\\"}")
-      {:ok, Enum.into([{"result", "this will be an Elixir result"}], Map.new) }
+      {:ok, Enum.into([{"result", "this will be an Elixir result"}], Map.new)}
   """
   @spec decode(bitstring) :: {atom, term}
   @spec decode(charlist) :: {atom, term}
@@ -43,9 +47,9 @@ defmodule JSON do
   @spec decode!(charlist) :: term
   def decode!(bitstring_or_char_list) do
     case decode(bitstring_or_char_list) do
-      { :ok, value } -> value
-      { :error, {:unexpected_token, tok } } -> raise JSON.Decoder.UnexpectedTokenError, token: tok
-      { :error, :unexpected_end_of_buffer } -> raise JSON.Decoder.UnexpectedEndOfBufferError
+      {:ok, value} -> value
+      {:error, {:unexpected_token, tok}} -> raise JSON.Decoder.UnexpectedTokenError, token: tok
+      {:error, :unexpected_end_of_buffer} -> raise JSON.Decoder.UnexpectedEndOfBufferError
       _ -> raise JSON.Decoder.Error
     end
   end

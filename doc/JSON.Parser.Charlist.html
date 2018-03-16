@@ -151,46 +151,46 @@
 {:error, :unexpected_end_of_buffer}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;face0ff&#39;
-{:error, {:unexpected_token, &#39;face0ff&#39;} }
+{:error, {:unexpected_token, &#39;face0ff&#39;}}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;-hello&#39;
-{:error, {:unexpected_token, &#39;-hello&#39;} }
+{:error, {:unexpected_token, &#39;-hello&#39;}}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;129245&#39;
-{:ok, 129245, &#39;&#39; }
+{:ok, 129245, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;7.something&#39;
-{:ok, 7, &#39;.something&#39; }
+{:ok, 7, &#39;.something&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;-88.22suffix&#39;
-{:ok, -88.22, &#39;suffix&#39; }
+{:ok, -88.22, &#39;suffix&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;-12e4and then some&#39;
-{:ok, -1.2e+5, &#39;and then some&#39; }
+{:ok, -1.2e+5, &#39;and then some&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;7842490016E-12-and more&#39;
-{:ok, 7.842490016e-3, &#39;-and more&#39; }
+{:ok, 7.842490016e-3, &#39;-and more&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;null&#39;
-{:ok, nil, &#39;&#39; }
+{:ok, nil, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;false&#39;
-{:ok, false, &#39;&#39; }
+{:ok, false, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;true&#39;
-{:ok, true, &#39;&#39; }
+{:ok, true, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;\&quot;7.something\&quot;&#39;
-{:ok, &quot;7.something&quot;, &#39;&#39; }
+{:ok, &quot;7.something&quot;, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;\&quot;-88.22suffix\&quot; foo bar&#39;
-{:ok, &quot;-88.22suffix&quot;, &#39; foo bar&#39; }
+{:ok, &quot;-88.22suffix&quot;, &#39; foo bar&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;[]&#39;
-{:ok, [], &#39;&#39; }
+{:ok, [], &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;[&quot;foo&quot;, 1, 2, 1.5] lala&#39;
-{:ok, [&quot;foo&quot;, 1, 2, 1.5], &#39; lala&#39; }
+{:ok, [&quot;foo&quot;, 1, 2, 1.5], &#39; lala&#39;}
 
 iex&gt; JSON.Parser.Charlist.parse &#39;{&quot;result&quot;: &quot;this will be a elixir result&quot;} lalal&#39;
 {:ok, Enum.into([{&quot;result&quot;, &quot;this will be a elixir result&quot;}], Map.new), &#39; lalal&#39;}</code></pre>

@@ -142,7 +142,7 @@
 {:error, :unexpected_end_of_buffer}
 
 iex&gt; JSON.Parser.Bitstring.Object.parse &quot;face0ff&quot;
-{:error, {:unexpected_token, &quot;face0ff&quot;} }
+{:error, {:unexpected_token, &quot;face0ff&quot;}}
 
 iex&gt; JSON.Parser.Bitstring.Object.parse &quot;[] &quot;
 {:error, {:unexpected_token, &quot;[] &quot;}}

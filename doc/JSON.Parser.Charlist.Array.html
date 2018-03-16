@@ -145,16 +145,16 @@ iex&gt; JSON.Parser.Charlist.Array.parse &#39;[1, 2 &#39;
 {:error, :unexpected_end_of_buffer}
 
 iex&gt; JSON.Parser.Charlist.Array.parse &#39;face0ff&#39;
-{:error, {:unexpected_token, &#39;face0ff&#39;} }
+{:error, {:unexpected_token, &#39;face0ff&#39;}}
 
 iex&gt; JSON.Parser.Charlist.Array.parse &#39;[] lala&#39;
-{:ok, [], &#39; lala&#39; }
+{:ok, [], &#39; lala&#39;}
 
 iex&gt; JSON.Parser.Charlist.Array.parse &#39;[]&#39;
-{:ok, [], &#39;&#39; }
+{:ok, [], &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.Array.parse &#39;[&quot;foo&quot;, 1, 2, 1.5] lala&#39;
-{:ok, [&quot;foo&quot;, 1, 2, 1.5], &#39; lala&#39; }</code></pre>
+{:ok, [&quot;foo&quot;, 1, 2, 1.5], &#39; lala&#39;}</code></pre>
 
   </section>
 </div>

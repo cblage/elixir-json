@@ -142,25 +142,25 @@
 {:error, :unexpected_end_of_buffer}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;face0ff&#39;
-{:error, {:unexpected_token, &#39;face0ff&#39;} }
+{:error, {:unexpected_token, &#39;face0ff&#39;}}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;-hello&#39;
-{:error, {:unexpected_token, &#39;-hello&#39;} }
+{:error, {:unexpected_token, &#39;-hello&#39;}}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;129245&#39;
-{:error, {:unexpected_token, &#39;129245&#39;} }
+{:error, {:unexpected_token, &#39;129245&#39;}}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;\&quot;7.something\&quot;&#39;
-{:ok, &quot;7.something&quot;, &#39;&#39; }
+{:ok, &quot;7.something&quot;, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;\&quot;star -&gt; \\u272d &lt;- star\&quot;&#39;
-{:ok, &quot;star -&gt; ✭ &lt;- star&quot;, &#39;&#39; }
+{:ok, &quot;star -&gt; ✭ &lt;- star&quot;, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;\&quot;\\u00df ist wunderbar\&quot;&#39;
-{:ok, &quot;ß ist wunderbar&quot;, &#39;&#39; }
+{:ok, &quot;ß ist wunderbar&quot;, &#39;&#39;}
 
 iex&gt; JSON.Parser.Charlist.String.parse &#39;\&quot;-88.22suffix\&quot; foo bar&#39;
-{:ok, &quot;-88.22suffix&quot;, &#39; foo bar&#39; }</code></pre>
+{:ok, &quot;-88.22suffix&quot;, &#39; foo bar&#39;}</code></pre>
 
   </section>
 </div>

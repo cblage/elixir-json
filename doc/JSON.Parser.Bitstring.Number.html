@@ -142,28 +142,28 @@
 {:error, :unexpected_end_of_buffer}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;face0ff&quot;
-{:error, {:unexpected_token, &quot;face0ff&quot;} }
+{:error, {:unexpected_token, &quot;face0ff&quot;}}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;-hello&quot;
-{:error, {:unexpected_token, &quot;hello&quot;} }
+{:error, {:unexpected_token, &quot;hello&quot;}}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;129245&quot;
-{:ok, 129245, &quot;&quot; }
+{:ok, 129245, &quot;&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;7.something&quot;
-{:ok, 7, &quot;.something&quot; }
+{:ok, 7, &quot;.something&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;7.4566something&quot;
-{:ok, 7.4566, &quot;something&quot; }
+{:ok, 7.4566, &quot;something&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;-88.22suffix&quot;
-{:ok, -88.22, &quot;suffix&quot; }
+{:ok, -88.22, &quot;suffix&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;-12e4and then some&quot;
-{:ok, -1.2e+5, &quot;and then some&quot; }
+{:ok, -1.2e+5, &quot;and then some&quot;}
 
 iex&gt; JSON.Parser.Bitstring.Number.parse &quot;7842490016E-12-and more&quot;
-{:ok, 7.842490016e-3, &quot;-and more&quot; }</code></pre>
+{:ok, 7.842490016e-3, &quot;-and more&quot;}</code></pre>
 
   </section>
 </div>
