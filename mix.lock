@@ -1,8 +1,8 @@
 %{
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
-  "credo": {:git, "https://github.com/cblage/credo.git", "b648f0b6fa83e895d3d458ec97610aa8fcafd306", [branch: "master"]},
+  "credo": {:git, "https://github.com/cblage/credo.git", "621173ddadaac1b929bdf18ba81989ef1182bf14", [branch: "master"]},
   "earmark": {:hex, :earmark, "1.2.4", "99b637c62a4d65a20a9fb674b8cffb8baa771c04605a80c911c4418c69b75439", [:mix], [], "hexpm"},
   "ex_doc": {:hex, :ex_doc, "0.18.3", "f4b0e4a2ec6f333dccf761838a4b253d75e11f714b85ae271c9ae361367897b7", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}], "hexpm"},
-  "inch_ex": {:git, "https://github.com/cblage/inch_ex.git", "cce23f9db30b90e62cdb76c6ab8b4d619de01a50", [branch: "master"]},
-  "json": {:hex, :json, "1.0.2", "fa75ed4f355cd4ab468c25588171f8002a7274d3d5fb376c18822ddfc7c33f1f", [:mix], [], "hexpm"},
+  "inch_ex": {:git, "https://github.com/cblage/inch_ex.git", "0d5a3a471d1cf41c7c6e2dcdc5f83b1029089ffb", [branch: "master"]},
+  "json": {:hex, :json, "1.0.3", "547d58dbbd864c0a560c0ca3789ee8848974e8c517cdb7827c3303e3b42e754d", [:mix], [], "hexpm"},
 }
