@@ -14,15 +14,14 @@ defmodule ElixirJSON_103.Mixfile do
 
   def application, do: []
 
-  def deps(:prod) do
+  def deps(:prod), do: []
+  def deps(_) do
     [
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
       {:credo, github: "cblage/credo", branch: "master", only: [:dev, :test], runtime: false}
-   ]
+    ]
   end
-
-  def deps(_), do: deps(:prod)
 
   def package do
     [maintainers: ["cblage"],
