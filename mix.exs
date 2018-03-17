@@ -19,6 +19,7 @@ defmodule ElixirJSON_104_SNAPSHOT.Mixfile do
   def deps(:prod), do: []
   def deps(:dev), do: [ex_doc()]
   def deps(:test), do: [ex_doc()]
+
   def deps(:docs) do
     [
       {:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
