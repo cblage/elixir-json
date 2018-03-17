@@ -2,8 +2,6 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/json.svg?style=flat-square)](https://hex.pm/packages/json)
 [![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json) 
-[![Deps Status](https://beta.hexfaktor.org/badge/all/github/cblage/elixir-json.svg)](https://beta.hexfaktor.org/github/cblage/elixir-json)
-[![Deps Status](https://beta.hexfaktor.org/badge/prod/github/cblage/elixir-json.svg)](https://beta.hexfaktor.org/github/cblage/elixir-json)
 [![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) 
                                                                                                                                                                                                                                          
   
