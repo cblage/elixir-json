@@ -10,7 +10,7 @@ elixir:
   - 1.6
 script:
   - MIX_ENV=test mix test
-  - ./test/check_formatted.sh
+  - MIX_ENV=prod mix format --check-formatted
 after_script:
   - MIX_ENV=docs mix deps.get
   - MIX_ENV=docs mix inch.report
