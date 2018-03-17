@@ -61,22 +61,24 @@ defmodule JSON.Parser.Charlist do
       iex> JSON.Parser.Charlist.parse '{"result": "this will be a elixir result"} lalal'
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), ' lalal'}
   """
-  def parse([?[| _] = charlist), do: ArrayParser.parse(charlist)
-  def parse([?{| _] = charlist), do: ObjectParser.parse(charlist)
+  def parse([?[ | _] = charlist), do: ArrayParser.parse(charlist)
+  def parse([?{ | _] = charlist), do: ObjectParser.parse(charlist)
   def parse([?" | _] = charlist), do: StringParser.parse(charlist)
-  def parse([?- , number | _] = charlist) when number in ?0..?9 do
+
+  def parse([?-, number | _] = charlist) when number in ?0..?9 do
     NumberParser.parse(charlist)
   end
+
   def parse([number | _] = charlist) when number in ?0..?9 do
     NumberParser.parse(charlist)
   end
 
-  def parse([?n, ?u, ?l, ?l  | rest]),    do: {:ok, nil,   rest}
-  def parse([?t, ?r, ?u, ?e  | rest]),    do: {:ok, true,  rest}
+  def parse([?n, ?u, ?l, ?l | rest]), do: {:ok, nil, rest}
+  def parse([?t, ?r, ?u, ?e | rest]), do: {:ok, true, rest}
   def parse([?f, ?a, ?l, ?s, ?e | rest]), do: {:ok, false, rest}
 
-  def parse([]),  do:  {:error, :unexpected_end_of_buffer}
-  def parse(json), do:  {:error, {:unexpected_token, json}}
+  def parse([]), do: {:error, :unexpected_end_of_buffer}
+  def parse(json), do: {:error, {:unexpected_token, json}}
 
   @doc """
   parses valid JSON whitespace if it exists, returns the rest of the buffer
@@ -97,12 +99,21 @@ defmodule JSON.Parser.Charlist do
   """
   def trim(charlist) when is_list(charlist) do
     case charlist do
-      #32 = ascii space, clearer than using "? ", I think
-      [32  | rest] -> trim(rest)
-      [?\t | rest] -> trim(rest)
-      [?\r | rest] -> trim(rest)
-      [?\n | rest] -> trim(rest)
-      _ -> charlist
+      # 32 = ascii space, clearer than using "? ", I think
+      [32 | rest] ->
+        trim(rest)
+
+      [?\t | rest] ->
+        trim(rest)
+
+      [?\r | rest] ->
+        trim(rest)
+
+      [?\n | rest] ->
+        trim(rest)
+
+      _ ->
+        charlist
     end
   end
 end

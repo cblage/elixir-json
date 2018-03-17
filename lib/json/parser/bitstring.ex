@@ -65,22 +65,23 @@ defmodule JSON.Parser.Bitstring do
       iex> JSON.Parser.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-  def parse(<< ?[, _ :: binary >> = bin), do: ArrayParser.parse(bin)
-  def parse(<< ?{, _ :: binary >> = bin), do: ObjectParser.parse(bin)
-  def parse(<< ?", _ :: binary >> = bin), do: StringParser.parse(bin)
+  def parse(<<?[, _::binary>> = bin), do: ArrayParser.parse(bin)
+  def parse(<<?{, _::binary>> = bin), do: ObjectParser.parse(bin)
+  def parse(<<?", _::binary>> = bin), do: StringParser.parse(bin)
 
-  def parse(<< ?- , number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    NumberParser.parse(bin)
-  end
-  def parse(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
+  def parse(<<?-, number::utf8, _::binary>> = bin) when number in ?0..?9 do
     NumberParser.parse(bin)
   end
 
-  def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: {:ok, nil,   rest}
-  def parse(<< ?t, ?r, ?u, ?e, rest :: binary >>), do: {:ok, true,  rest}
-  def parse(<< ?f, ?a, ?l, ?s, ?e, rest :: binary >>), do: {:ok, false, rest}
+  def parse(<<number::utf8, _::binary>> = bin) when number in ?0..?9 do
+    NumberParser.parse(bin)
+  end
 
-  def parse(<< >>), do:  {:error, :unexpected_end_of_buffer}
+  def parse(<<?n, ?u, ?l, ?l, rest::binary>>), do: {:ok, nil, rest}
+  def parse(<<?t, ?r, ?u, ?e, rest::binary>>), do: {:ok, true, rest}
+  def parse(<<?f, ?a, ?l, ?s, ?e, rest::binary>>), do: {:ok, false, rest}
+
+  def parse(<<>>), do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
   @doc """
@@ -102,12 +103,21 @@ defmodule JSON.Parser.Bitstring do
   """
   def trim(bitstring) when is_binary(bitstring) do
     case bitstring do
-      #32 = ascii space, clearer than using "? ", I think
-      << 32  :: utf8, rest :: binary >> -> trim rest
-      << ?\t :: utf8, rest :: binary >> -> trim rest
-      << ?\r :: utf8, rest :: binary >> -> trim rest
-      << ?\n :: utf8, rest :: binary >> -> trim rest
-      _ -> bitstring
+      # 32 = ascii space, clearer than using "? ", I think
+      <<32::utf8, rest::binary>> ->
+        trim(rest)
+
+      <<?\t::utf8, rest::binary>> ->
+        trim(rest)
+
+      <<?\r::utf8, rest::binary>> ->
+        trim(rest)
+
+      <<?\n::utf8, rest::binary>> ->
+        trim(rest)
+
+      _ ->
+        bitstring
     end
   end
 end

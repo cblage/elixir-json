@@ -34,9 +34,9 @@ defmodule JSON do
   @spec encode!(term) :: bitstring
   def encode!(term) do
     case Encoder.encode(term) do
-      {:ok, value}         -> value
+      {:ok, value} -> value
       {:error, error_info} -> raise JSON.Encoder.Error, error_info: error_info
-      _                    -> raise JSON.Encoder.Error
+      _ -> raise JSON.Encoder.Error
     end
   end
 
@@ -66,12 +66,17 @@ defmodule JSON do
   @spec decode!(charlist) :: term
   def decode!(bitstring_or_char_list) do
     case Decoder.decode(bitstring_or_char_list) do
-      {:ok, value} -> value
+      {:ok, value} ->
+        value
+
       {:error, {:unexpected_token, tok}} ->
         raise JSON.Decoder.UnexpectedTokenError, token: tok
+
       {:error, :unexpected_end_of_buffer} ->
         raise JSON.Decoder.UnexpectedEndOfBufferError
-      _ -> raise JSON.Decoder.Error
+
+      _ ->
+        raise JSON.Decoder.Error
     end
   end
 end

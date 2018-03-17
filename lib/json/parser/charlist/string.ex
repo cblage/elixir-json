@@ -37,39 +37,42 @@ defmodule JSON.Parser.Charlist.String do
 
   """
   def parse([?" | tail]), do: parse_string_contents(tail, [])
-  def parse([]),  do: {:error, :unexpected_end_of_buffer}
+  def parse([]), do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
-  #stop conditions
+  # stop conditions
   defp parse_string_contents([], _), do: {:error, :unexpected_end_of_buffer}
 
   # found the closing ", lets reverse the acc and encode it as a string!
   defp parse_string_contents([?" | json], acc) do
-    case acc |> Enum.reverse |> List.to_string do
+    case acc |> Enum.reverse() |> List.to_string() do
       encoded when is_binary(encoded) ->
         {:ok, encoded, json}
+
       _ ->
         {:error, {:unexpected_token, json}}
     end
   end
 
-  #parsing
-  defp parse_string_contents([?\\, ?f  | json], acc), do: parse_string_contents(json, [?\f | acc])
-  defp parse_string_contents([?\\, ?n  | json], acc), do: parse_string_contents(json, [?\n | acc])
-  defp parse_string_contents([?\\, ?r  | json], acc), do: parse_string_contents(json, [?\r | acc])
-  defp parse_string_contents([?\\, ?t  | json], acc), do: parse_string_contents(json, [?\t | acc])
-  defp parse_string_contents([?\\, ?"  | json], acc), do: parse_string_contents(json, [?"  | acc])
+  # parsing
+  defp parse_string_contents([?\\, ?f | json], acc), do: parse_string_contents(json, [?\f | acc])
+  defp parse_string_contents([?\\, ?n | json], acc), do: parse_string_contents(json, [?\n | acc])
+  defp parse_string_contents([?\\, ?r | json], acc), do: parse_string_contents(json, [?\r | acc])
+  defp parse_string_contents([?\\, ?t | json], acc), do: parse_string_contents(json, [?\t | acc])
+  defp parse_string_contents([?\\, ?" | json], acc), do: parse_string_contents(json, [?" | acc])
   defp parse_string_contents([?\\, ?\\ | json], acc), do: parse_string_contents(json, [?\\ | acc])
-  defp parse_string_contents([?\\, ?/  | json], acc), do: parse_string_contents(json, [?/  | acc])
+  defp parse_string_contents([?\\, ?/ | json], acc), do: parse_string_contents(json, [?/ | acc])
 
-  defp parse_string_contents([?\\, ?u  | _] = char, acc) do
+  defp parse_string_contents([?\\, ?u | _] = char, acc) do
     case UnicodeParser.parse(char) do
-      {:error, error_info} -> {:error, error_info}
+      {:error, error_info} ->
+        {:error, error_info}
+
       {:ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
-          << _ ::utf8 >> ->
-            parse_string_contents(after_codepoint,
-              [decoded_unicode_codepoint | acc])
+          <<_::utf8>> ->
+            parse_string_contents(after_codepoint, [decoded_unicode_codepoint | acc])
+
           _ ->
             {:error, {:unexpected_token, char}}
         end

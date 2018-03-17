@@ -29,11 +29,11 @@ defmodule JSON.Parser.Charlist.Array do
       iex> JSON.Parser.Charlist.Array.parse '["foo", 1, 2, 1.5] lala'
       {:ok, ["foo", 1, 2, 1.5], ' lala'}
   """
-  def parse([?[| rest]) do
+  def parse([?[ | rest]) do
     rest |> trim |> parse_array_contents
   end
 
-  def parse([]),  do: {:error, :unexpected_end_of_buffer}
+  def parse([]), do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
   # Array Parsing
@@ -42,22 +42,25 @@ defmodule JSON.Parser.Charlist.Array do
   end
 
   defp parse_array_contents(acc, [?] | rest]) do
-      {:ok, Enum.reverse(acc), rest}
+    {:ok, Enum.reverse(acc), rest}
   end
 
   defp parse_array_contents(_, []), do: {:error, :unexpected_end_of_buffer}
 
   defp parse_array_contents(acc, json) do
     case json
-          |> trim
-          |> CharlistParser.parse
-    do
-      {:error, error_info} -> {:error, error_info}
+         |> trim
+         |> CharlistParser.parse() do
+      {:error, error_info} ->
+        {:error, error_info}
+
       {:ok, value, after_value} ->
         trimmed_after_value = trim(after_value)
+
         case trimmed_after_value do
           [?, | after_comma] ->
             parse_array_contents([value | acc], trim(after_comma))
+
           _ ->
             parse_array_contents([value | acc], trimmed_after_value)
         end

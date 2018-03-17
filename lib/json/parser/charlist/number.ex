@@ -37,7 +37,7 @@ defmodule JSON.Parser.Charlist.Number do
   """
   def parse([?- | rest]) do
     case parse(rest) do
-      {:ok, number, json} ->  {:ok, -1 * number, json}
+      {:ok, number, json} -> {:ok, -1 * number, json}
       {:error, error_info} -> {:error, error_info}
     end
   end
@@ -46,9 +46,11 @@ defmodule JSON.Parser.Charlist.Number do
     case charlist do
       [number | _] when number in ?0..?9 ->
         charlist |> to_integer |> add_fractional |> apply_exponent
+
       [] ->
         {:error, :unexpected_end_of_buffer}
-      _  ->
+
+      _ ->
         {:error, {:unexpected_token, charlist}}
     end
   end
@@ -63,14 +65,15 @@ defmodule JSON.Parser.Charlist.Number do
     end
   end
 
-  #fractional
+  # fractional
   defp add_fractional({:error, error_info}), do: {:error, error_info}
 
   defp add_fractional({:ok, acc, [?. | after_dot]}) do
     case after_dot do
-      [c | _] when c in ?0..?9  ->
+      [c | _] when c in ?0..?9 ->
         {fractional, after_fractional} = parse_fractional(after_dot, 0, 10.0)
         {:ok, acc + fractional, after_fractional}
+
       _ ->
         {:ok, acc, [?. | after_dot]}
     end
@@ -82,9 +85,9 @@ defmodule JSON.Parser.Charlist.Number do
     parse_fractional(rest, acc + (number - ?0) / power, power * 10)
   end
 
-  defp parse_fractional(json, acc , _), do: {acc, json}
+  defp parse_fractional(json, acc, _), do: {acc, json}
 
-  #exponent
+  # exponent
   defp apply_exponent({:error, error_info}), do: {:error, error_info}
 
   defp apply_exponent({:ok, acc, [exponent | rest]}) when exponent in 'eE' do

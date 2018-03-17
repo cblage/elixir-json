@@ -2,14 +2,15 @@ defmodule JSON.Encoder.Error do
   @moduledoc """
   Thrown when an encoder error happens
   """
-  defexception [error_info: nil]
+  defexception error_info: nil
 
   @doc """
     Invalid Term
   """
   def message(exception) do
     error_message = "An error occurred while encoding the JSON object"
-    if nil != exception.error_info  do
+
+    if nil != exception.error_info do
       error_message <> " >>#{exception.error_info}<<"
     else
       error_message
@@ -71,7 +72,7 @@ defimpl JSON.Encoder, for: Tuple do
   Encodes an Elixir tuple into a JSON array
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(term), do: term |> Tuple.to_list |> JSON.Encoder.Helpers.enum_encode
+  def encode(term), do: term |> Tuple.to_list() |> JSON.Encoder.Helpers.enum_encode()
 
   @doc """
   Returns an atom that represents the JSON type for the term
@@ -100,8 +101,9 @@ defimpl JSON.Encoder, for: List do
   """
   @spec encode(term) :: {atom, bitstring}
   def encode([]), do: {:ok, "[]"}
+
   def encode(list) do
-    if Keyword.keyword? list do
+    if Keyword.keyword?(list) do
       JSON.Encoder.Helpers.dict_encode(list)
     else
       JSON.Encoder.Helpers.enum_encode(list)
@@ -113,8 +115,9 @@ defimpl JSON.Encoder, for: List do
   """
   @spec typeof(term) :: atom
   def typeof([]), do: :array
+
   def typeof(list) do
-    if Keyword.keyword? list do
+    if Keyword.keyword?(list) do
       :object
     else
       :array
@@ -127,7 +130,8 @@ defimpl JSON.Encoder, for: [Integer, Float] do
   Converts Elixir Integer and Floats into JSON Numbers
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(number), do: {:ok, "#{number}"} # Elixir converts octal, etc into decimal when putting in strings
+  # Elixir converts octal, etc into decimal when putting in strings
+  def encode(number), do: {:ok, "#{number}"}
 
   @doc """
   Returns an atom that represents the JSON type for the term
@@ -143,8 +147,8 @@ defimpl JSON.Encoder, for: Atom do
   @spec encode(term) :: {atom, bitstring}
   def encode(nil), do: {:ok, "null"}
   def encode(false), do: {:ok, "false"}
-  def encode(true),  do: {:ok, "true"}
-  def encode(atom) when is_atom(atom), do: atom |> Atom.to_string |> JSON.Encoder.encode
+  def encode(true), do: {:ok, "true"}
+  def encode(atom) when is_atom(atom), do: atom |> Atom.to_string() |> JSON.Encoder.encode()
 
   @doc """
   Returns an atom that represents the JSON type for the term
@@ -156,7 +160,7 @@ defimpl JSON.Encoder, for: Atom do
 end
 
 defimpl JSON.Encoder, for: BitString do
-  #32 = ascii space, cleaner than using "? ", I think
+  # 32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
   @doc """
@@ -165,37 +169,41 @@ defimpl JSON.Encoder, for: BitString do
   @spec encode(term) :: {atom, bitstring}
   def encode(bitstring), do: {:ok, <<?">> <> encode_binary_recursive(bitstring, []) <> <<?">>}
 
-  defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, acc) do
+  defp encode_binary_recursive(<<head::utf8, tail::binary>>, acc) do
     encode_binary_recursive(tail, encode_binary_character(head, acc))
   end
 
-  #stop cond
-  defp encode_binary_recursive(<<>>, acc), do: acc |> Enum.reverse |> to_string
+  # stop cond
+  defp encode_binary_recursive(<<>>, acc), do: acc |> Enum.reverse() |> to_string
 
-  defp encode_binary_character(?",   acc),  do: [?", ?\\  | acc]
-  defp encode_binary_character(?\b,  acc),  do: [?b, ?\\  | acc]
-  defp encode_binary_character(?\f,  acc),  do: [?f, ?\\  | acc]
-  defp encode_binary_character(?\n,  acc),  do: [?n, ?\\  | acc]
-  defp encode_binary_character(?\r,  acc),  do: [?r, ?\\  | acc]
-  defp encode_binary_character(?\t,  acc),  do: [?t, ?\\  | acc]
-  defp encode_binary_character(?\\,  acc),  do: [?\\, ?\\ | acc]
+  defp encode_binary_character(?", acc), do: [?", ?\\ | acc]
+  defp encode_binary_character(?\b, acc), do: [?b, ?\\ | acc]
+  defp encode_binary_character(?\f, acc), do: [?f, ?\\ | acc]
+  defp encode_binary_character(?\n, acc), do: [?n, ?\\ | acc]
+  defp encode_binary_character(?\r, acc), do: [?r, ?\\ | acc]
+  defp encode_binary_character(?\t, acc), do: [?t, ?\\ | acc]
+  defp encode_binary_character(?\\, acc), do: [?\\, ?\\ | acc]
+
   defp encode_binary_character(char, acc) when is_number(char) and char < @acii_space do
-    encode_hexadecimal_unicode_control_character(char, [?u,  ?\\ | acc])
+    encode_hexadecimal_unicode_control_character(char, [?u, ?\\ | acc])
   end
 
-  #anything else besides these control characters, just let it through
+  # anything else besides these control characters, just let it through
   defp encode_binary_character(char, acc) when is_number(char), do: [char | acc]
 
   defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
-    [char
+    [
+      char
       |> Integer.to_charlist(16)
       |> zeropad_hexadecimal_unicode_control_character
-      |> Enum.reverse | acc]
+      |> Enum.reverse()
+      | acc
+    ]
   end
 
-  defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]
-  defp zeropad_hexadecimal_unicode_control_character([a, b]),    do: [?0, ?0,  a, b]
-  defp zeropad_hexadecimal_unicode_control_character([a]),       do: [?0, ?0, ?0, a]
+  defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0, a, b, c]
+  defp zeropad_hexadecimal_unicode_control_character([a, b]), do: [?0, ?0, a, b]
+  defp zeropad_hexadecimal_unicode_control_character([a]), do: [?0, ?0, ?0, a]
   defp zeropad_hexadecimal_unicode_control_character(iolist) when is_list(iolist), do: iolist
 
   @doc """
@@ -210,7 +218,7 @@ defimpl JSON.Encoder, for: Record do
   Encodes elixir records into json objects
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode
+  def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode()
 
   @doc """
   Encodes a record into a JSON object
@@ -220,12 +228,11 @@ defimpl JSON.Encoder, for: Record do
 end
 
 defimpl JSON.Encoder, for: Map do
-
   @doc """
   Encodes maps into object
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode
+  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode()
 
   @doc """
   Returns an atom that represents the JSON type for the term
@@ -245,8 +252,8 @@ defimpl JSON.Encoder, for: Any do
   @spec encode(term) :: {atom, bitstring}
   def encode(%{} = struct) do
     struct
-    |> Map.to_list
-    |> JSON.Encoder.Helpers.dict_encode
+    |> Map.to_list()
+    |> JSON.Encoder.Helpers.dict_encode()
   end
 
   @doc """
@@ -255,8 +262,8 @@ defimpl JSON.Encoder, for: Any do
   @spec typeof(term) :: atom
   def encode(x) do
     x
-    |> Kernel.inspect
-    |> JSON.Encoder.encode
+    |> Kernel.inspect()
+    |> JSON.Encoder.encode()
   end
 
   @doc """
@@ -269,6 +276,7 @@ end
 
 defmodule JSON.Encoder.Helpers do
   import JSON.Encoder, only: [encode: 1]
+
   @moduledoc """
   Helper functions for writing JSON.Encoder instances.
   """
@@ -285,20 +293,21 @@ defmodule JSON.Encoder.Helpers do
   as an object.
   """
   def dict_encode(coll) do
-     {:ok, "{" <>
-           Enum.map_join(coll,
-             ",",
-             fn {key, object} ->
-               encode_item(key) <> ":" <>  encode_item(object)
-             end)
-           <> "}"
-     }
+    {:ok,
+     "{" <>
+       Enum.map_join(coll, ",", fn {key, object} ->
+         encode_item(key) <> ":" <> encode_item(object)
+       end) <> "}"}
   end
 
   defp encode_item(item) do
     case encode(item) do
-      {:ok, encoded_item} -> encoded_item
-      err -> err #propagate error, will trigger error in map_join
+      {:ok, encoded_item} ->
+        encoded_item
+
+      # propagate error, will trigger error in map_join
+      err ->
+        err
     end
   end
 end

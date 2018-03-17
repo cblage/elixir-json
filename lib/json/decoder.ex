@@ -2,21 +2,21 @@ defmodule JSON.Decoder.Error do
   @moduledoc """
   Thrown when an unknown decoder error happens
   """
-  defexception [message: "Invalid JSON - unknown error"]
+  defexception message: "Invalid JSON - unknown error"
 end
 
 defmodule JSON.Decoder.UnexpectedEndOfBufferError do
   @moduledoc """
   Thrown when the json payload is incomplete
   """
-  defexception [message: "Invalid JSON - unexpected end of buffer"]
+  defexception message: "Invalid JSON - unexpected end of buffer"
 end
 
 defmodule JSON.Decoder.UnexpectedTokenError do
   @moduledoc """
   Thrown when the json payload is invalid
   """
-  defexception [token: nil]
+  defexception token: nil
 
   @doc """
     Invalid JSON - Unexpected token
@@ -60,14 +60,16 @@ defimpl JSON.Decoder, for: BitString do
   """
   def decode(bitstring) do
     bitstring
-    |> BitstringParser.trim
-    |> BitstringParser.parse
+    |> BitstringParser.trim()
+    |> BitstringParser.parse()
     |> case do
-      {:error, error_info} -> {:error, error_info}
-      {:ok, value, rest}   ->
+      {:error, error_info} ->
+        {:error, error_info}
+
+      {:ok, value, rest} ->
         case BitstringParser.trim(rest) do
-          << >> -> {:ok, value}
-          _     -> {:error, {:unexpected_token, rest}}
+          <<>> -> {:ok, value}
+          _ -> {:error, {:unexpected_token, rest}}
         end
     end
   end
@@ -96,14 +98,16 @@ defimpl JSON.Decoder, for: List do
   """
   def decode(charlist) do
     charlist
-    |> CharlistParser.trim
-    |> CharlistParser.parse
+    |> CharlistParser.trim()
+    |> CharlistParser.parse()
     |> case do
-      {:error, error_info} -> {:error, error_info}
+      {:error, error_info} ->
+        {:error, error_info}
+
       {:ok, value, rest} ->
         case CharlistParser.trim(rest) do
           [] -> {:ok, value}
-          _  -> {:error, {:unexpected_token, rest}}
+          _ -> {:error, {:unexpected_token, rest}}
         end
     end
   end
