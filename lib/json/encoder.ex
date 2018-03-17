@@ -22,10 +22,14 @@ defprotocol JSON.Encoder do
   Returns a JSON string representation of the Elixir term
 
   ## Examples
+      iex> JSON.Encoder.encode({1, :two, "three"})
+      {:ok, "[1,\\\"two\\\",\\\"three\\\"]"}
 
       iex> JSON.Encoder.encode([result: "this will be a elixir result"])
       {:ok, "{\\\"result\\\":\\\"this will be a elixir result\\\"}"}
 
+      iex> JSON.Encoder.encode(%{a: 1, b: 2})
+      {:ok, "{\\\"a\\\":1,\\\"b\\\":2}"}
   """
   @spec encode(term) :: {atom, bitstring}
   def encode(term)
@@ -34,49 +38,58 @@ defprotocol JSON.Encoder do
   Returns an atom that reprsents the JSON type for the term
 
   ## Examples
+      iex> JSON.Encoder.typeof(3)
+      :number
+
+      iex> JSON.Encoder.typeof({1, :two, "three"})
+      :array
+
+      iex> JSON.Encoder.typeof([foo: "this will be a elixir result"])
+      :object
 
       iex> JSON.Encoder.typeof([result: "this will be a elixir result"])
       :object
 
+      iex> JSON.Encoder.typeof(["this will be a elixir result"])
+      :array
+
+      iex> JSON.Encoder.typeof([foo: "bar"])
+      :object
   """
   @spec typeof(term) :: atom
   def typeof(term)
 end
 
 defimpl JSON.Encoder, for: Tuple do
-
+  @doc """
+  Encodes an Elixir tuple into a JSON array
+  """
   def encode(term), do: term |> Tuple.to_list |> JSON.Encoder.Helpers.enum_encode
 
   @doc """
   Returns an atom that represents the JSON type for the term
-
-  ## Examples
-
-      iex> JSON.Encoder.typeof(["this will be a elixir result"])
-      :array
-
   """
   @spec typeof(term) :: atom
   def typeof(_), do: :array
 end
 
 defimpl JSON.Encoder, for: HashDict do
+  @doc """
+  Encodes an Elixir HashDict into a JSON object
+  """
   def encode(dict), do: JSON.Encoder.Helpers.dict_encode(dict)
 
   @doc """
-  Returns an atom that represents the JSON type for the term
-
-  ## Examples
-
-      iex> JSON.Encoder.typeof([foo: "this will be a elixir result"])
-      :object
-
+  Returns :object
   """
   @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encoder, for: List do
+  @doc """
+  Encodes an Elixir List into a JSON array
+  """
   def encode([]), do: {:ok, "[]"}
   def encode(list) do
     if Keyword.keyword? list do
@@ -88,14 +101,6 @@ defimpl JSON.Encoder, for: List do
 
   @doc """
   Returns an atom that represents the JSON type for the term
-
-  ## Examples
-
-      iex> JSON.Encoder.typeof(["this will be a elixir result"])
-      :array
-
-      iex> JSON.Encoder.typeof([foo: "bar"])
-      :object
   """
   @spec typeof(term) :: atom
   def typeof([]), do: :array
@@ -109,16 +114,13 @@ defimpl JSON.Encoder, for: List do
 end
 
 defimpl JSON.Encoder, for: [Integer, Float] do
+  @doc """
+  Converts Elixir Integer and Floats into JSON Numbers
+  """
   def encode(number), do: {:ok, "#{number}"} # Elixir converts octal, etc into decimal when putting in strings
 
   @doc """
   Returns an atom that represents the JSON type for the term
-
-  ## Examples
-
-      iex> JSON.Encoder.typeof(3)
-      :number
-
   """
   @spec typeof(term) :: atom
   def typeof(_), do: :number
@@ -178,7 +180,7 @@ defimpl JSON.Encoder, for: BitString do
 end
 
 defimpl JSON.Encoder, for: Record do
-  def encode(record), do: record.to_keywords() |> JSON.Encoder.Helpers.dict_encode()
+  def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode
   def typeof(_), do: :object
 end
 
@@ -186,12 +188,6 @@ defimpl JSON.Encoder, for: Map do
 
   @doc """
   Encodes maps into object
-
-  ## Examples
-
-      iex> JSON.encode(%{a: 1, b: 2})
-      {:ok, "{\"a\":1,\"b\":2}"} =
-
   """
   def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode
 
