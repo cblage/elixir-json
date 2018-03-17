@@ -64,6 +64,7 @@ defimpl JSON.Encoder, for: Tuple do
   @doc """
   Encodes an Elixir tuple into a JSON array
   """
+  @spec encode(term) :: {atom, bitstring}
   def encode(term), do: term |> Tuple.to_list |> JSON.Encoder.Helpers.enum_encode
 
   @doc """
@@ -77,6 +78,7 @@ defimpl JSON.Encoder, for: HashDict do
   @doc """
   Encodes an Elixir HashDict into a JSON object
   """
+  @spec encode(term) :: {atom, bitstring}
   def encode(dict), do: JSON.Encoder.Helpers.dict_encode(dict)
 
   @doc """
@@ -90,6 +92,7 @@ defimpl JSON.Encoder, for: List do
   @doc """
   Encodes an Elixir List into a JSON array
   """
+  @spec encode(term) :: {atom, bitstring}
   def encode([]), do: {:ok, "[]"}
   def encode(list) do
     if Keyword.keyword? list do
@@ -117,6 +120,7 @@ defimpl JSON.Encoder, for: [Integer, Float] do
   @doc """
   Converts Elixir Integer and Floats into JSON Numbers
   """
+  @spec encode(term) :: {atom, bitstring}
   def encode(number), do: {:ok, "#{number}"} # Elixir converts octal, etc into decimal when putting in strings
 
   @doc """
@@ -127,11 +131,19 @@ defimpl JSON.Encoder, for: [Integer, Float] do
 end
 
 defimpl JSON.Encoder, for: Atom do
+  @doc """
+  Converts Elixir Atoms into their JSON equivalents
+  """
+  @spec encode(term) :: {atom, bitstring}
   def encode(nil), do: {:ok, "null"}
   def encode(false), do: {:ok, "false"}
   def encode(true),  do: {:ok, "true"}
   def encode(atom) when is_atom(atom), do: atom |> Atom.to_string |> JSON.Encoder.encode
 
+  @doc """
+  Returns an atom that represents the JSON type for the term
+  """
+  @spec typeof(term) :: atom
   def typeof(boolean) when is_boolean(boolean), do: :boolean
   def typeof(nil), do: :null
   def typeof(atom) when is_atom(atom), do: :string
@@ -141,6 +153,10 @@ defimpl JSON.Encoder, for: BitString do
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
+  @doc """
+  Converts Elixir String into JSON String
+  """
+  @spec encode(term) :: {atom, bitstring}
   def encode(bitstring), do: {:ok, <<?">> <> encode_binary_recursive(bitstring, []) <> <<?">>}
 
   defp encode_binary_recursive(<< head :: utf8, tail :: binary >>, acc) do
@@ -176,11 +192,24 @@ defimpl JSON.Encoder, for: BitString do
   defp zeropad_hexadecimal_unicode_control_character([a]),       do: [?0, ?0, ?0, a]
   defp zeropad_hexadecimal_unicode_control_character(iolist) when is_list(iolist), do: iolist
 
+  @doc """
+  Returns an atom that represents the JSON type for the term
+  """
+  @spec typeof(term) :: atom
   def typeof(_), do: :string
 end
 
 defimpl JSON.Encoder, for: Record do
+  @doc """
+  Encodes elixir records into json objects
+  """
+  @spec encode(term) :: {atom, bitstring}
   def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode
+
+  @doc """
+  Encodes a record into a JSON object
+  """
+  @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
@@ -189,17 +218,13 @@ defimpl JSON.Encoder, for: Map do
   @doc """
   Encodes maps into object
   """
+  @spec encode(term) :: {atom, bitstring}
   def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode
 
   @doc """
   Returns an atom that represents the JSON type for the term
-
-  ## Examples
-
-      iex> JSON.Encoder.typeof([foo: "this will be a elixir result"])
-      :object
-
   """
+  @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
@@ -211,6 +236,7 @@ defimpl JSON.Encoder, for: Any do
   @doc """
   Encodes a map into a JSON object
   """
+  @spec encode(term) :: {atom, bitstring}
   def encode(%{} = struct) do
     struct
     |> Map.to_list
@@ -220,12 +246,17 @@ defimpl JSON.Encoder, for: Any do
   @doc """
   Fallback method
   """
+  @spec typeof(term) :: atom
   def encode(x) do
     x
     |> Kernel.inspect
     |> JSON.Encoder.encode
   end
 
+  @doc """
+  Fallback method
+  """
+  @spec typeof(term) :: atom
   def typeof(struct) when is_map(struct), do: :object
   def typeof(_), do: :string
 end
