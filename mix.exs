@@ -1,9 +1,9 @@
-defmodule ElixirJSON_103.Mixfile do
+defmodule ElixirJSON_104_SNAPSHOT.Mixfile do
   use Mix.Project
 
   def project do
     [app: :json,
-      version: "1.0.3",
+      version: "1.0.4-SNAPSHOT",
       elixir: "~> 1.6",
       deps: deps(Mix.env),
       description: "Native Elixir library for JSON encoding and decoding",
