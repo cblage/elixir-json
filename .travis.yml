@@ -13,6 +13,7 @@ elixir:
   - 1.6
 script:
   - MIX_ENV=test mix test
+  - ./test/check_formatted.sh
 after_script:
   - MIX_ENV=docs mix deps.get
   - MIX_ENV=docs mix inch.report
