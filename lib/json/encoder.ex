@@ -1,6 +1,19 @@
 defmodule JSON.Encoder.Error do
+  @moduledoc """
+  Thrown when an encoder error happens
+  """
   defexception [error_info: nil]
 
+  @doc """
+    Invalid term to Encode
+  """
+  @spec exception(term) :: __MODULE__.t
+  def exception(term)
+
+  @doc """
+    Invalid Term
+  """
+  @spec message(__MODULE__.t) :: String.t
   def message(exception) do
     error_message = "An error occurred while encoding the JSON object"
     if nil != exception.error_info  do
