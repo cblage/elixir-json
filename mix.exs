@@ -1,4 +1,4 @@
-defmodule JSON.Mixfile do
+defmodule ElixirJSON_103.Mixfile do
   use Mix.Project
 
   def project do
@@ -16,10 +16,9 @@ defmodule JSON.Mixfile do
 
   def deps(:prod) do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev},
-      {:earmark, ">= 0.0.0", only: :dev},
-      {:inch_ex, only: :docs},
-      {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false}
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
+      {:credo, github: "cblage/credo", branch: "master", only: [:dev, :test], runtime: false}
    ]
   end
 

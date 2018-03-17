@@ -1,42 +1,52 @@
     <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="ExDoc v0.12.0">
-    <title>JSON.Parser.Bitstring.String – json v1.0.2</title>
-    <link rel="stylesheet" href="dist/app-88251e7c81.css" />
+    <meta name="generator" content="ExDoc v0.18.3">
+    <title>JSON.Parser.Bitstring.String – json v1.0.3</title>
+    <link rel="stylesheet" href="dist/app-480ffdc169.css" />
     
-      <link rel="canonical" href="https://hexdocs.pm/json/JSON.Parser.Bitstring.String.html" />
+    <script src="dist/sidebar_items-1c90ffce76.js"></script>
     
-    <script src="dist/sidebar_items.js"></script>
+    
+    
+    
   </head>
   <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
 
     <div class="main">
-<button class="sidebar-toggle">
-  <i class="icon-menu"></i>
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<button class="sidebar-button night-mode-toggle">
+  <span class="icon-theme" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Theme</span>
 </button>
 <section class="sidebar">
 
   
-  <a href="api-reference.html" class="sidebar-projectLink">
+  <a href="https://hex.pm/packages/json" class="sidebar-projectLink">
     <div class="sidebar-projectDetails">
       <h1 class="sidebar-projectName">
         json
       </h1>
       <h2 class="sidebar-projectVersion">
-        v1.0.2
+        v1.0.3
       </h2>
     </div>
     
   </a>
 
-  <div class="sidebar-search">
-    <i class="icon-search"></i>
-    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" />
-  </div>
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
+  </form>
 
   <ul class="sidebar-listNav">
     <li><a id="extras-list" href="#full-list">Pages</a></li>
@@ -50,12 +60,9 @@
     
 
     
-      <li><a id="protocols-list" href="#full-list">Protocols</a></li>
-    
   </ul>
-
+  <div class="gradient"></div>
   <ul id="full-list" class="sidebar-fullList"></ul>
-  <div class="sidebar-noResults"></div>
 </section>
 
 <section class="content">
@@ -64,23 +71,29 @@
 
 
       <h1>
-        <small class="visible-xs">json v1.0.2</small>
+        <small class="visible-xs">json v1.0.3</small>
         JSON.Parser.Bitstring.String
         
-        
           <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/bitstring/string.ex#L1" title="View Source" class="view-source" rel="help">
-            <i class="icon-code"></i>
+            <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
           </a>
         
       </h1>
 
+      
+        <section id="moduledoc">
+          <p>Implements a JSON String Parser for Bitstring values</p>
+
+        </section>
       
 
       
         <section id="summary" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#summary">
-              <i class="icon-link"></i>
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
             </a>
             Summary
           </h1>
@@ -106,8 +119,6 @@
 
           
 
-          
-
         </section>
       
 
@@ -117,27 +128,36 @@
         <section id="functions" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#functions">
-              <i class="icon-link"></i>
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
             </a>
             Functions
           </h1>
           <div class="detail" id="parse/1">
+  
+  
   <div class="detail-header">
     <a href="#parse/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
     </a>
     <span class="signature">parse(json)</span>
     
-      <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/bitstring/string.ex#L39" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
+      <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/bitstring/string.ex#L46" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
      </a>
     
     
+    
   </div>
-  
   <section class="docstring">
     <p>parses a valid JSON string, returns its elixir representation</p>
-<h2>Examples</h2>
+<h2 id="parse/1-examples" class="section-heading">
+  <a href="#parse/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
 <pre><code class="iex elixir">iex&gt; JSON.Parser.Bitstring.String.parse &quot;&quot;
 {:error, :unexpected_end_of_buffer}
 
@@ -175,26 +195,27 @@ iex&gt; JSON.Parser.Bitstring.String.parse &quot;\&quot;Éloise woot\&quot; Élo
       
 
       
-
-      
           <footer class="footer">
         <p>
           <span class="line">
             Built using
-            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.12.0),
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.18.3),
           </span>
           <span class="line">
             designed by
             <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
             </span>
         </p>
-        <button class="night-mode-toggle" />
       </footer>
     </div>
   </div>
 </section>
 </div>
-  <script src="dist/app-21f1a20b9e.js"></script>
+  <script src="dist/app-9bd040e5e5.js"></script>
+  
+  
+  
+  
   </body>
 </html>
 

@@ -1,42 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="ExDoc v0.12.0">
-    <title>API Reference – json v1.0.2</title>
-    <link rel="stylesheet" href="dist/app-88251e7c81.css" />
+    <meta name="generator" content="ExDoc v0.18.3">
+    <title>API Reference – json v1.0.3</title>
+    <link rel="stylesheet" href="dist/app-480ffdc169.css" />
     
-      <link rel="canonical" href="https://hexdocs.pm/json/api-reference.html" />
+    <script src="dist/sidebar_items-1c90ffce76.js"></script>
     
-    <script src="dist/sidebar_items.js"></script>
+    
+    
+    
   </head>
   <body data-type="extras">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
 
 <div class="main">
-<button class="sidebar-toggle">
-  <i class="icon-menu"></i>
+<button class="sidebar-button sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<button class="sidebar-button night-mode-toggle">
+  <span class="icon-theme" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Theme</span>
 </button>
 <section class="sidebar">
 
   
-  <a href="api-reference.html" class="sidebar-projectLink">
+  <a href="https://hex.pm/packages/json" class="sidebar-projectLink">
     <div class="sidebar-projectDetails">
       <h1 class="sidebar-projectName">
         json
       </h1>
       <h2 class="sidebar-projectVersion">
-        v1.0.2
+        v1.0.3
       </h2>
     </div>
     
   </a>
 
-  <div class="sidebar-search">
-    <i class="icon-search"></i>
-    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" />
-  </div>
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button">
+      <span class="icon-search" aria-hidden="true"></span>
+    </button>
+    <input name="q" type="text" id="search-list" class="search-input" placeholder="Search" aria-label="Search" autocomplete="off" />
+  </form>
 
   <ul class="sidebar-listNav">
     <li><a id="extras-list" href="#full-list">Pages</a></li>
@@ -50,133 +60,37 @@
     
 
     
-      <li><a id="protocols-list" href="#full-list">Protocols</a></li>
-    
   </ul>
-
+  <div class="gradient"></div>
   <ul id="full-list" class="sidebar-fullList"></ul>
-  <div class="sidebar-noResults"></div>
 </section>
 
 <section class="content">
   <div class="content-outer">
     <div id="content" class="content-inner">
 
-  <h1>
-    <small class="visible-xs">json v1.0.2</small>
-    API Reference
-  </h1>
 
-  <ul class="summary-links">
-    
-      <li><a href="#modules">Modules</a></li>
-    
-    
-      <li><a href="#exceptions">Exceptions</a></li>
-    
-    
-      <li><a href="#protocols">Protocols</a></li>
-    
-  </ul>
+<h1>
+  <small class="visible-xs">json v1.0.3</small>
+  API Reference
+</h1>
 
-  
-    <section id="modules" class="details-list">
-      <h1 class="section-heading">Modules</h1>
-      <div class="summary">
-        <div class="summary-row">
+
+  <section class="details-list">
+    <h2 id="modules" class="section-heading">
+  <a href="#modules" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Modules
+</h2>
+
+    <div class="summary">
+      <div class="summary-row">
   <div class="summary-signature"><a href="JSON.html">JSON</a></div>
   
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Encoder.Helpers.html">JSON.Encoder.Helpers</a></div>
-  
-    <div class="summary-synopsis"><p>Helper functions for writing JSON.Encoder instances</p>
+    <div class="summary-synopsis"><p>Provides a RFC 7159, ECMA 404, and JSONTestSuite compliant JSON Encoder / Decoder</p>
 </div>
   
 </div>
 <div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Bitstring.html">JSON.Parser.Bitstring</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Array.html">JSON.Parser.Bitstring.Array</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Number.html">JSON.Parser.Bitstring.Number</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Object.html">JSON.Parser.Bitstring.Object</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Bitstring.String.html">JSON.Parser.Bitstring.String</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Unicode.html">JSON.Parser.Bitstring.Unicode</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Charlist.html">JSON.Parser.Charlist</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Charlist.Array.html">JSON.Parser.Charlist.Array</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Charlist.Number.html">JSON.Parser.Charlist.Number</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Charlist.Object.html">JSON.Parser.Charlist.Object</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Charlist.String.html">JSON.Parser.Charlist.String</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Parser.Charlist.Unicode.html">JSON.Parser.Charlist.Unicode</a></div>
-  
-</div>
-
-      </div>
-    </section>
-  
-
-  
-    <section id="exceptions" class="details-list">
-      <h1 class="section-heading">Exceptions</h1>
-      <div class="summary">
-        <div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Decoder.Error.html">JSON.Decoder.Error</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Decoder.UnexpectedEndOfBufferError.html">JSON.Decoder.UnexpectedEndOfBufferError</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Decoder.UnexpectedTokenError.html">JSON.Decoder.UnexpectedTokenError</a></div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature"><a href="JSON.Encoder.Error.html">JSON.Encoder.Error</a></div>
-  
-</div>
-
-      </div>
-    </section>
-  
-
-  
-    <section id="protocols" class="details-list">
-      <h1 class="section-heading">Protocols</h1>
-      <div class="summary">
-        <div class="summary-row">
   <div class="summary-signature"><a href="JSON.Decoder.html">JSON.Decoder</a></div>
   
     <div class="summary-synopsis"><p>Defines the protocol required for converting raw JSON into Elixir terms</p>
@@ -190,28 +104,163 @@
 </div>
   
 </div>
-
-      </div>
-    </section>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Encoder.Helpers.html">JSON.Encoder.Helpers</a></div>
   
+    <div class="summary-synopsis"><p>Helper functions for writing JSON.Encoder instances</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Bitstring.html">JSON.Parser.Bitstring</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Parser for Bitstring values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Array.html">JSON.Parser.Bitstring.Array</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Array Parser for Bitstring values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Number.html">JSON.Parser.Bitstring.Number</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Numeber Parser for Bitstring values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Object.html">JSON.Parser.Bitstring.Object</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Object Parser for Bitstring values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Bitstring.String.html">JSON.Parser.Bitstring.String</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON String Parser for Bitstring values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Bitstring.Unicode.html">JSON.Parser.Bitstring.Unicode</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Unicode Parser for Bitstring values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Charlist.html">JSON.Parser.Charlist</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Parser for Charlist values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Charlist.Array.html">JSON.Parser.Charlist.Array</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Array Parser for Charlist values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Charlist.Number.html">JSON.Parser.Charlist.Number</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Number Parser for Charlist values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Charlist.Object.html">JSON.Parser.Charlist.Object</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Object Parser for Charlist values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Charlist.String.html">JSON.Parser.Charlist.String</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON String Parser for Charlist values</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Parser.Charlist.Unicode.html">JSON.Parser.Charlist.Unicode</a></div>
+  
+    <div class="summary-synopsis"><p>Implements a JSON Unicode Parser for Charlist values</p>
+</div>
+  
+</div>
+
+    </div>
+  </section>
+
+
+
+  <section class="details-list">
+    <h2 id="exceptions" class="section-heading">
+  <a href="#exceptions" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Exceptions
+</h2>
+
+    <div class="summary">
+      <div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Decoder.Error.html">JSON.Decoder.Error</a></div>
+  
+    <div class="summary-synopsis"><p>Thrown when an unknown decoder error happens</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Decoder.UnexpectedEndOfBufferError.html">JSON.Decoder.UnexpectedEndOfBufferError</a></div>
+  
+    <div class="summary-synopsis"><p>Thrown when the json payload is incomplete</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Decoder.UnexpectedTokenError.html">JSON.Decoder.UnexpectedTokenError</a></div>
+  
+    <div class="summary-synopsis"><p>Thrown when the json payload is invalid</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="JSON.Encoder.Error.html">JSON.Encoder.Error</a></div>
+  
+</div>
+
+    </div>
+  </section>
+
+
+
+
       <footer class="footer">
         <p>
           <span class="line">
             Built using
-            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.12.0),
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.18.3),
           </span>
           <span class="line">
             designed by
             <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
             </span>
         </p>
-        <button class="night-mode-toggle" />
       </footer>
     </div>
   </div>
 </section>
 </div>
-  <script src="dist/app-21f1a20b9e.js"></script>
+  <script src="dist/app-9bd040e5e5.js"></script>
+  
+  
+  
+  
   </body>
 </html>
 
