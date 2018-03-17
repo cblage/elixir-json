@@ -54,11 +54,12 @@ defmodule JSON.Parser.Charlist.Array do
     do
       {:error, error_info} -> {:error, error_info}
       {:ok, value, after_value} ->
-        case trim(after_value) do
+        trimmed_after_value = trim(after_value)
+        case trimmed_after_value do
           [?, | after_comma] ->
             parse_array_contents([value | acc], trim(after_comma))
           _ ->
-            parse_array_contents([value | acc], after_value)
+            parse_array_contents([value | acc], trimmed_after_value)
         end
     end
   end

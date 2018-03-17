@@ -151,8 +151,8 @@ defmodule JSONDecodeTest do
                               Enum.into([{"result", "this is awesome"}], Map.new)
 
     decodes "empty array", '  [ ] ', []
-    decodes "simple array", '[1, 2, "three", 4]', [1, 2, "three", 4]
-    decodes "nested array", ' [null, [false, "five"], [3, true]] ', [nil, [false, "five"], [3, true]]
+    decodes "simple array", ' [1, 2, "three", 4] ', [1, 2, "three", 4]
+    decodes "nested array", '      [null, [false, "five"], [3, true]]       ', [nil, [false, "five"], [3, true]]
 
     decodes "complex object",
             '{
@@ -163,8 +163,8 @@ defmodule JSONDecodeTest do
               "children": [
                 {"name": "Penny"},
                 {"name": "Elga"}
-             ]
-            }',
+              ]
+             }',
              Enum.into([
               {"name", "Jenny"},
               {"active", true},

@@ -3,8 +3,8 @@ defmodule JSON do
   Provides a RFC 7159, ECMA 404, and JSONTestSuite compliant JSON Encoder / Decoder
   """
 
-  import JSON.Encoder, only: [encode: 1]
-  import JSON.Decoder, only: [decode: 1]
+  alias JSON.Encoder, as: Encoder
+  alias JSON.Decoder, as: Decoder
 
   @vsn "1.0.2"
 
@@ -19,7 +19,7 @@ defmodule JSON do
   """
   @spec encode(term) :: {atom, bitstring}
   def encode(term) do
-    encode(term)
+    Encoder.encode(term)
   end
 
   @doc """
@@ -33,7 +33,7 @@ defmodule JSON do
   """
   @spec encode!(term) :: bitstring
   def encode!(term) do
-    case encode(term) do
+    case Encoder.encode(term) do
       {:ok, value}         -> value
       {:error, error_info} -> raise JSON.Encoder.Error, error_info: error_info
       _                    -> raise JSON.Encoder.Error
@@ -51,7 +51,7 @@ defmodule JSON do
   @spec decode(bitstring) :: {atom, term}
   @spec decode(charlist) :: {atom, term}
   def decode(bitstring_or_char_list) do
-    decode(bitstring_or_char_list)
+    Decoder.decode(bitstring_or_char_list)
   end
 
   @doc """
@@ -65,7 +65,7 @@ defmodule JSON do
   @spec decode!(bitstring) :: term
   @spec decode!(charlist) :: term
   def decode!(bitstring_or_char_list) do
-    case decode(bitstring_or_char_list) do
+    case Decoder.decode(bitstring_or_char_list) do
       {:ok, value} -> value
       {:error, {:unexpected_token, tok}} ->
         raise JSON.Decoder.UnexpectedTokenError, token: tok

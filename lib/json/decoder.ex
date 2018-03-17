@@ -77,7 +77,7 @@ defimpl JSON.Decoder, for: List do
 
   @doc """
   decodes json in BitString format
-  
+
   ## Examples
 
       iex> JSON.Decoder.decode ""

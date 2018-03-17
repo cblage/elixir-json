@@ -98,10 +98,10 @@ defmodule JSON.Parser.Charlist do
   def trim(charlist) when is_list(charlist) do
     case charlist do
       #32 = ascii space, clearer than using "? ", I think
-      [32  | rest] -> trim rest
-      [?\t | rest] -> trim rest
-      [?\r | rest] -> trim rest
-      [?\n | rest] -> trim rest
+      [32  | rest] -> trim(rest)
+      [?\t | rest] -> trim(rest)
+      [?\r | rest] -> trim(rest)
+      [?\n | rest] -> trim(rest)
       _ -> charlist
     end
   end

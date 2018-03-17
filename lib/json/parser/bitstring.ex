@@ -4,10 +4,10 @@ defmodule JSON.Parser.Bitstring do
   """
 
   alias JSON.Parser.Bitstring, as: BitstringParser
-  alias BitstringParser.Array, as: ArrayBitstringParser
-  alias BitstringParser.Number, as: NumberBitstringParser
-  alias BitstringParser.Object, as: ObjectBitstringParser
-  alias BitstringParser.String, as: StringBitstringParser
+  alias BitstringParser.Array, as: ArrayParser
+  alias BitstringParser.Number, as: NumberParser
+  alias BitstringParser.Object, as: ObjectParser
+  alias BitstringParser.String, as: StringParser
 
   @doc """
   parses a valid JSON value, returns its elixir representation
@@ -65,15 +65,15 @@ defmodule JSON.Parser.Bitstring do
       iex> JSON.Parser.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-  def parse(<< ?[, _ :: binary >> = bin), do: ArrayBitstringParser.parse(bin)
-  def parse(<< ?{, _ :: binary >> = bin), do: ObjectBitstringParser.parse(bin)
-  def parse(<< ?", _ :: binary >> = bin), do: BitstringParser.String.parse(bin)
+  def parse(<< ?[, _ :: binary >> = bin), do: ArrayParser.parse(bin)
+  def parse(<< ?{, _ :: binary >> = bin), do: ObjectParser.parse(bin)
+  def parse(<< ?", _ :: binary >> = bin), do: StringParser.parse(bin)
 
   def parse(<< ?- , number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    NumberBitstringParser.parse(bin)
+    NumberParser.parse(bin)
   end
   def parse(<< number :: utf8, _ :: binary >> = bin) when number in ?0..?9 do
-    NumberBitstringParser.parse(bin)
+    NumberParser.parse(bin)
   end
 
   def parse(<< ?n, ?u, ?l, ?l, rest :: binary >>), do: {:ok, nil,   rest}
