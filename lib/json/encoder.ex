@@ -12,12 +12,12 @@ defmodule JSON.Encoder.Error do
 end
 
 defprotocol JSON.Encoder do
-
   @fallback_to_any true
 
   @moduledoc """
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.
   """
+
   @doc """
   Returns a JSON string representation of the Elixir term
 
@@ -46,19 +46,38 @@ end
 defimpl JSON.Encoder, for: Tuple do
 
   def encode(term), do: term |> Tuple.to_list |> JSON.Encoder.Helpers.enum_encode
+
+  @doc """
+  Returns an atom that represents the JSON type for the term
+
+  ## Examples
+
+      iex> JSON.Encoder.typeof(["this will be a elixir result"])
+      :array
+
+  """
+  @spec typeof(term) :: atom
   def typeof(_), do: :array
 end
 
 defimpl JSON.Encoder, for: HashDict do
-
   def encode(dict), do: JSON.Encoder.Helpers.dict_encode(dict)
+
+  @doc """
+  Returns an atom that represents the JSON type for the term
+
+  ## Examples
+
+      iex> JSON.Encoder.typeof([foo: "this will be a elixir result"])
+      :object
+
+  """
+  @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encoder, for: List do
-
   def encode([]), do: {:ok, "[]"}
-
   def encode(list) do
     if Keyword.keyword? list do
       JSON.Encoder.Helpers.dict_encode(list)
@@ -67,8 +86,19 @@ defimpl JSON.Encoder, for: List do
     end
   end
 
-  def typeof([]), do: :array
+  @doc """
+  Returns an atom that represents the JSON type for the term
 
+  ## Examples
+
+      iex> JSON.Encoder.typeof(["this will be a elixir result"])
+      :array
+
+      iex> JSON.Encoder.typeof([foo: "bar"])
+      :object
+  """
+  @spec typeof(term) :: atom
+  def typeof([]), do: :array
   def typeof(list) do
     if Keyword.keyword? list do
       :object
@@ -79,7 +109,18 @@ defimpl JSON.Encoder, for: List do
 end
 
 defimpl JSON.Encoder, for: [Integer, Float] do
-  def encode(number), do: {:ok, "#{number}"} # Elixir convers octal, etc into decimal when putting in strings
+  def encode(number), do: {:ok, "#{number}"} # Elixir converts octal, etc into decimal when putting in strings
+
+  @doc """
+  Returns an atom that represents the JSON type for the term
+
+  ## Examples
+
+      iex> JSON.Encoder.typeof(3)
+      :number
+
+  """
+  @spec typeof(term) :: atom
   def typeof(_), do: :number
 end
 
@@ -137,27 +178,52 @@ defimpl JSON.Encoder, for: BitString do
 end
 
 defimpl JSON.Encoder, for: Record do
-
   def encode(record), do: record.to_keywords() |> JSON.Encoder.Helpers.dict_encode()
   def typeof(_), do: :object
 end
 
-# Encodes maps into object
-# > {:ok, "{\"a\":1,\"b\":2}"} = JSON.encode(%{a: 1, b: 2})
 defimpl JSON.Encoder, for: Map do
 
-  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode()
+  @doc """
+  Encodes maps into object
+
+  ## Examples
+
+      iex> JSON.encode(%{a: 1, b: 2})
+      {:ok, "{\"a\":1,\"b\":2}"} =
+
+  """
+  def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode
+
+  @doc """
+  Returns an atom that represents the JSON type for the term
+
+  ## Examples
+
+      iex> JSON.Encoder.typeof([foo: "this will be a elixir result"])
+      :object
+
+  """
   def typeof(_), do: :object
 end
 
 defimpl JSON.Encoder, for: Any do
+  @moduledoc """
+  Falllback module for encoding any other values
+  """
 
+  @doc """
+  Encodes a map into a JSON object
+  """
   def encode(%{} = struct) do
     struct
-    |> Map.to_list()
-    |> JSON.Encoder.Helpers.dict_encode()
+    |> Map.to_list
+    |> JSON.Encoder.Helpers.dict_encode
   end
 
+  @doc """
+  Fallback method
+  """
   def encode(x) do
     x
     |> Kernel.inspect

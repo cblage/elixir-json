@@ -1,7 +1,6 @@
 Code.require_file "test_helper.exs", __DIR__
 
 defmodule JSONDecodeTest do
-
   defmodule DSL do
     def prefix(bitstring) when is_bitstring(bitstring), do: "bitstring containing "
     def prefix(bitstring) when is_list(bitstring), do: "charlist containing "

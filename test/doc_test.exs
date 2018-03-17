@@ -1,7 +1,10 @@
 Code.require_file "test_helper.exs", __DIR__
-
-defmodule ParseTest do
+defmodule DocTest do
   use ExUnit.Case
+
+  doctest JSON
+
+  doctest JSON.Encoder
 
   doctest JSON.Parser.Bitstring
   doctest JSON.Parser.Bitstring.String
