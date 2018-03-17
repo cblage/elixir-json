@@ -3,18 +3,6 @@ defmodule JSON.Decoder.Error do
   Thrown when an unknown decoder error happens
   """
   defexception [message: "Invalid JSON - unknown error"]
-
-  @doc """
-    Invalid JSON
-  """
-  @spec message(__MODULE__.t) :: String.t
-  def message(exception)
-
-  @doc """
-    Invalid JSON
-  """
-  @spec exception(term) :: __MODULE__.t
-  def exception(term)
 end
 
 defmodule JSON.Decoder.UnexpectedEndOfBufferError do
@@ -22,18 +10,6 @@ defmodule JSON.Decoder.UnexpectedEndOfBufferError do
   Thrown when the json payload is incomplete
   """
   defexception [message: "Invalid JSON - unexpected end of buffer"]
-
-  @doc """
-    Invalid JSON - unexpected end of buffer
-  """
-  @spec message(__MODULE__.t) :: String.t
-  def message(exception)
-
-  @doc """
-    Invalid JSON - unexpected end of buffer
-  """
-  @spec exception(term) :: __MODULE__.t
-  def exception(term)
 end
 
 defmodule JSON.Decoder.UnexpectedTokenError do
@@ -45,14 +21,7 @@ defmodule JSON.Decoder.UnexpectedTokenError do
   @doc """
     Invalid JSON - Unexpected token
   """
-  @spec message(__MODULE__.t) :: String.t
   def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
-
-  @doc """
-    Invalid JSON - unexpected token
-  """
-  @spec exception(term) :: __MODULE__.t
-  def exception(term)
 end
 
 defprotocol JSON.Decoder do
