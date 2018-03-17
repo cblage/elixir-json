@@ -12,7 +12,11 @@ defmodule JSONDecodeTest do
           decode_result = JSON.decode(unquote(input))
           case decode_result do
             {:ok, actual} -> assert unquote(output) == actual
-            decode_result -> flunk "Expected {:ok, " <> inspect(unquote(output)) <> "}}, got {" <> inspect(decode_result) <> "}}"
+            decode_result -> flunk "Expected {:ok, " <>
+                                   inspect(unquote(output)) <>
+                                   "}}, got {" <>
+                                   inspect(decode_result) <>
+                                   "}}"
           end
         end
       end
@@ -24,7 +28,11 @@ defmodule JSONDecodeTest do
           decode_result = JSON.decode(unquote(input))
           case decode_result do
             {:error, actual} -> assert unquote(error_info) == actual
-            decode_result -> flunk "Expected {:error," <> inspect(unquote(error_info)) <> "}}, got {" <> inspect(decode_result) <> "}}"
+            decode_result -> flunk "Expected {:error," <>
+                                   inspect(unquote(error_info))
+                                   <> "}}, got {" <>
+                                      inspect(decode_result) <>
+                                      "}}"
           end
         end
       end
@@ -126,7 +134,8 @@ defmodule JSONDecodeTest do
 
     decodes "string with unicode escape", '"star -> \\u272d <- star"', "star -> ✭ <- star"
 
-    decodes "emoji", '"I \\u2665 emoji! So do you \\ud83c\\uddfa\\ud83c\\uddf8!"', "I ♥ emoji! So do you 🇺🇸!"
+    decodes "emoji", '"I \\u2665 emoji! So do you \\ud83c\\uddfa\\ud83c\\uddf8!"',
+            "I ♥ emoji! So do you 🇺🇸!"
 
     decodes "positive integer", '1337', 1337
     decodes "positive float", '13.37', 13.37
@@ -166,7 +175,6 @@ defmodule JSONDecodeTest do
                 Enum.into([{"name", "Elga"}], Map.new)
              ]}
            ], Map.new)
-
 
     cannot_decode "bad literal", 'nul', {:unexpected_token, 'nul'}
 

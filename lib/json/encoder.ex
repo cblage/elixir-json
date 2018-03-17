@@ -18,8 +18,6 @@ defprotocol JSON.Encoder do
   @moduledoc """
   Defines the protocol required for converting Elixir types into JSON and inferring their json types.
   """
-
-
   @doc """
   Returns a JSON string representation of the Elixir term
 
@@ -80,8 +78,7 @@ defimpl JSON.Encoder, for: List do
   end
 end
 
-# TODO: get rid of "Number" when we want to phase out 10.3 support.
-defimpl JSON.Encoder, for: [Number, Integer, Float] do
+defimpl JSON.Encoder, for: [Integer, Float] do
   def encode(number), do: {:ok, "#{number}"} # Elixir convers octal, etc into decimal when putting in strings
   def typeof(_), do: :number
 end
@@ -98,8 +95,6 @@ defimpl JSON.Encoder, for: Atom do
 end
 
 defimpl JSON.Encoder, for: BitString do
-
-
   #32 = ascii space, cleaner than using "? ", I think
   @acii_space 32
 
@@ -109,8 +104,8 @@ defimpl JSON.Encoder, for: BitString do
     encode_binary_recursive(tail, encode_binary_character(head, acc))
   end
 
+  #stop cond
   defp encode_binary_recursive(<<>>, acc), do: acc |> Enum.reverse |> to_string
-
 
   defp encode_binary_character(?",   acc),  do: [?", ?\\  | acc]
   defp encode_binary_character(?\b,  acc),  do: [?b, ?\\  | acc]
@@ -127,7 +122,10 @@ defimpl JSON.Encoder, for: BitString do
   defp encode_binary_character(char, acc) when is_number(char), do: [char | acc]
 
   defp encode_hexadecimal_unicode_control_character(char, acc) when is_number(char) do
-    [char |> Integer.to_charlist(16) |> zeropad_hexadecimal_unicode_control_character |> Enum.reverse | acc]
+    [char
+      |> Integer.to_charlist(16)
+      |> zeropad_hexadecimal_unicode_control_character
+      |> Enum.reverse | acc]
   end
 
   defp zeropad_hexadecimal_unicode_control_character([a, b, c]), do: [?0,  a,  b, c]
@@ -162,8 +160,8 @@ defimpl JSON.Encoder, for: Any do
 
   def encode(x) do
     x
-    |> Kernel.inspect()
-    |> JSON.Encoder.encode()
+    |> Kernel.inspect
+    |> JSON.Encoder.encode
   end
 
   def typeof(struct) when is_map(struct), do: :object
@@ -171,7 +169,7 @@ defimpl JSON.Encoder, for: Any do
 end
 
 defmodule JSON.Encoder.Helpers do
-
+  import JSON.Encoder, only: [encode: 1]
   @moduledoc """
   Helper functions for writing JSON.Encoder instances.
   """
@@ -188,11 +186,18 @@ defmodule JSON.Encoder.Helpers do
   as an object.
   """
   def dict_encode(coll) do
-     {:ok, "{" <> Enum.map_join(coll, ",", fn {key, object} -> encode_item(key) <> ":" <>  encode_item(object) end) <> "}"}
+     {:ok, "{" <>
+           Enum.map_join(coll,
+             ",",
+             fn {key, object} ->
+               encode_item(key) <> ":" <>  encode_item(object)
+             end)
+           <> "}"
+     }
   end
 
   defp encode_item(item) do
-    case JSON.Encoder.encode(item) do
+    case encode(item) do
       {:ok, encoded_item} -> encoded_item
       err -> err #propagate error, will trigger error in map_join
     end

@@ -3,6 +3,10 @@ defmodule JSON.Parser.Charlist do
   Implements a JSON Parser for Charlist values
   """
 
+  alias JSON.Parser.Charlist.Array, as: ArrayParser
+  alias JSON.Parser.Charlist.Object, as: ObjectParser
+  alias JSON.Parser.Charlist.String, as: StringParser
+  alias JSON.Parser.Charlist.Number, as: NumberParser
 
   @doc """
   parses a valid JSON value, returns its elixir representation
@@ -57,26 +61,15 @@ defmodule JSON.Parser.Charlist do
       iex> JSON.Parser.Charlist.parse '{"result": "this will be a elixir result"} lalal'
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), ' lalal'}
   """
-  def parse([?[| _] = charlist) do
-    JSON.Parser.Charlist.Array.parse(charlist)
-  end
-
-  def parse([?{| _] = charlist) do
-    JSON.Parser.Charlist.Object.parse(charlist)
-  end
-
-  def parse([?" | _] = charlist) do
-    JSON.Parser.Charlist.String.parse(charlist)
-  end
-
+  def parse([?[| _] = charlist), do: ArrayParser.parse(charlist)
+  def parse([?{| _] = charlist), do: ObjectParser.parse(charlist)
+  def parse([?" | _] = charlist), do: StringParser.parse(charlist)
   def parse([?- , number | _] = charlist) when number in ?0..?9 do
-    JSON.Parser.Charlist.Number.parse(charlist)
+    NumberParser.parse(charlist)
   end
-
   def parse([number | _] = charlist) when number in ?0..?9 do
-    JSON.Parser.Charlist.Number.parse(charlist)
+    NumberParser.parse(charlist)
   end
-
 
   def parse([?n, ?u, ?l, ?l  | rest]),    do: {:ok, nil,   rest}
   def parse([?t, ?r, ?u, ?e  | rest]),    do: {:ok, true,  rest}
@@ -84,7 +77,6 @@ defmodule JSON.Parser.Charlist do
 
   def parse([]),  do:  {:error, :unexpected_end_of_buffer}
   def parse(json), do:  {:error, {:unexpected_token, json}}
-
 
   @doc """
   parses valid JSON whitespace if it exists, returns the rest of the buffer

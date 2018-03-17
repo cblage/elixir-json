@@ -3,6 +3,8 @@ defmodule JSON.Parser.Bitstring.String do
   Implements a JSON String Parser for Bitstring values
   """
 
+  alias JSON.Parser.Bitstring.Unicode, as: UnicodeParser
+
   use Bitwise
   @doc """
   parses a valid JSON string, returns its elixir representation
@@ -43,7 +45,6 @@ defmodule JSON.Parser.Bitstring.String do
   def parse(<< >>), do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
-
   #stop conditions
   defp parse_string_contents(<< >>, _), do: {:error, :unexpected_end_of_buffer}
 
@@ -67,12 +68,13 @@ defmodule JSON.Parser.Bitstring.String do
   defp parse_string_contents(<< ?\\, ?/,  json :: binary >>, acc), do: parse_string_contents(json, [?/  | acc])
 
   defp parse_string_contents(<< ?\\, ?u , _ :: binary >> = bin, acc) do
-    case JSON.Parser.Bitstring.Unicode.parse(bin) do
+    case UnicodeParser.parse(bin) do
       {:error, error_info} -> {:error, error_info}
       {:ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
           << _ ::utf8 >> ->
-            parse_string_contents(after_codepoint, [decoded_unicode_codepoint | acc])
+            parse_string_contents(after_codepoint,
+              [decoded_unicode_codepoint | acc])
           _ ->
             {:error, {:unexpected_token, bin}}
         end

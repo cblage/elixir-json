@@ -3,6 +3,9 @@ defmodule JSON.Parser.Charlist.Object do
   Implements a JSON Object Parser for Charlist values
   """
 
+  import JSON.Parser.Charlist, only: [trim: 1]
+  alias JSON.Parser.Charlist, as: CharlistParser
+
   @doc """
   parses a valid JSON object value, returns its elixir Map representation
 
@@ -25,7 +28,7 @@ defmodule JSON.Parser.Charlist.Object do
   """
   def parse([?{| rest]) do
     rest
-      |> JSON.Parser.Charlist.trim
+      |> trim
       |> parse_object_contents
   end
 
@@ -36,27 +39,27 @@ defmodule JSON.Parser.Charlist.Object do
     case JSON.Parser.Charlist.String.parse(json) do
       {:error, error_info} -> {:error, error_info}
       {:ok, key, after_key} ->
-        case JSON.Parser.Charlist.trim(after_key) do
+        case trim(after_key) do
           [?: | after_colon] ->
-            {:ok, key, JSON.Parser.Charlist.trim(after_colon)}
+            {:ok, key, trim(after_colon)}
           [] ->
             {:error, :unexpected_end_of_buffer}
           _ ->
-            {:error, {:unexpected_token, JSON.Parser.Charlist.trim(after_key)}}
+            {:error, {:unexpected_token, trim(after_key)}}
         end
     end
   end
 
   defp parse_object_value(acc, key, after_key) do
-    case JSON.Parser.Charlist.parse(after_key) do
+    case CharlistParser.parse(after_key) do
       {:error, error_info} -> {:error, error_info}
       {:ok, value, after_value} ->
-        acc  = Map.put(acc, key, value)
-        after_value = JSON.Parser.Charlist.trim(after_value)
+        acc = Map.put(acc, key, value)
+        after_value = trim(after_value)
         case after_value do
           [?, | after_comma] ->
             parse_object_contents(acc,
-              JSON.Parser.Charlist.trim(after_comma))
+              trim(after_comma))
           _ ->
             parse_object_contents(acc, after_value)
         end

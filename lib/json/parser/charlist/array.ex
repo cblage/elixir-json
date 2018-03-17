@@ -3,6 +3,9 @@ defmodule JSON.Parser.Charlist.Array do
   Implements a JSON Array Parser for Charlist values
   """
 
+  alias JSON.Parser.Charlist, as: CharlistParser
+  import CharlistParser, only: [trim: 1]
+
   @doc """
   parses a valid JSON array value, returns its elixir list representation
 
@@ -27,15 +30,13 @@ defmodule JSON.Parser.Charlist.Array do
       {:ok, ["foo", 1, 2, 1.5], ' lala'}
   """
   def parse([?[| rest]) do
-    rest |> JSON.Parser.Charlist.trim |> parse_array_contents
+    rest |> trim |> parse_array_contents
   end
 
   def parse([]),  do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
-
   # Array Parsing
-
   defp parse_array_contents(json) when is_list(json) do
     parse_array_contents([], json)
   end
@@ -48,19 +49,17 @@ defmodule JSON.Parser.Charlist.Array do
 
   defp parse_array_contents(acc, json) do
     case json
-          |> JSON.Parser.Charlist.trim
-          |> JSON.Parser.Charlist.parse
+          |> trim
+          |> CharlistParser.parse
     do
       {:error, error_info} -> {:error, error_info}
       {:ok, value, after_value} ->
-        after_value = JSON.Parser.Charlist.trim(after_value)
-        case after_value  do
+        case trim(after_value) do
           [?, | after_comma] ->
-            parse_array_contents([value | acc], JSON.Parser.Charlist.trim(after_comma))
+            parse_array_contents([value | acc], trim(after_comma))
           _ ->
             parse_array_contents([value | acc], after_value)
         end
     end
   end
 end
-

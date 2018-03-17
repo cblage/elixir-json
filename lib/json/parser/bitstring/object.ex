@@ -3,6 +3,8 @@ defmodule JSON.Parser.Bitstring.Object do
   Implements a JSON Object Parser for Bitstring values
   """
 
+  import JSON.Parser.Bitstring, only: [trim: 1]
+  alias JSON.Parser.Bitstring, as: BitstringParser
 
   @doc """
   parses a valid JSON object value, returns its elixir representation
@@ -29,7 +31,7 @@ defmodule JSON.Parser.Bitstring.Object do
   """
   def parse(<< ?{, rest :: binary >>) do
     rest
-      |> JSON.Parser.Bitstring.trim
+      |> trim
       |> parse_object_contents
   end
 
@@ -41,26 +43,26 @@ defmodule JSON.Parser.Bitstring.Object do
     case JSON.Parser.Bitstring.String.parse(json) do
       {:error, error_info} -> {:error, error_info}
       {:ok, key, after_key} ->
-        case JSON.Parser.Bitstring.trim(after_key) do
+        case trim(after_key) do
           << ?:,  after_colon :: binary >> ->
-            {:ok, key, JSON.Parser.Bitstring.trim(after_colon)}
+            {:ok, key, trim(after_colon)}
           << >> ->
             {:error, :unexpected_end_of_buffer}
           _ ->
-            {:error, {:unexpected_token, JSON.Parser.Bitstring.trim(after_key)}}
+            {:error, {:unexpected_token, trim(after_key)}}
         end
     end
   end
 
   defp parse_object_value(acc, key, after_key) do
-    case JSON.Parser.Bitstring.parse(after_key) do
+    case BitstringParser.parse(after_key) do
       {:error, error_info} -> {:error, error_info}
       {:ok, value, after_value} ->
         acc = Map.put(acc, key, value)
-        after_value = JSON.Parser.Bitstring.trim(after_value)
+        after_value = trim(after_value)
         case after_value do
           << ?,, after_comma :: binary >> ->
-            parse_object_contents acc, JSON.Parser.Bitstring.trim(after_comma)
+            parse_object_contents acc, trim(after_comma)
           _  ->
             parse_object_contents acc, after_value
         end

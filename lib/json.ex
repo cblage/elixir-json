@@ -3,6 +3,9 @@ defmodule JSON do
   Provides a RFC 7159, ECMA 404, and JSONTestSuite compliant JSON Encoder / Decoder
   """
 
+  import JSON.Encoder, only: [encode: 1]
+  import JSON.Decoder, only: [decode: 1]
+
   @vsn "1.0.2"
 
   @doc """
@@ -16,7 +19,7 @@ defmodule JSON do
   """
   @spec encode(term) :: {atom, bitstring}
   def encode(term) do
-    JSON.Encoder.encode(term)
+    encode(term)
   end
 
   @doc """
@@ -37,7 +40,6 @@ defmodule JSON do
     end
   end
 
-
   @doc """
   Converts a valid JSON string into an Elixir term
 
@@ -49,7 +51,7 @@ defmodule JSON do
   @spec decode(bitstring) :: {atom, term}
   @spec decode(charlist) :: {atom, term}
   def decode(bitstring_or_char_list) do
-    JSON.Decoder.decode(bitstring_or_char_list)
+    decode(bitstring_or_char_list)
   end
 
   @doc """
@@ -65,8 +67,10 @@ defmodule JSON do
   def decode!(bitstring_or_char_list) do
     case decode(bitstring_or_char_list) do
       {:ok, value} -> value
-      {:error, {:unexpected_token, tok}} -> raise JSON.Decoder.UnexpectedTokenError, token: tok
-      {:error, :unexpected_end_of_buffer} -> raise JSON.Decoder.UnexpectedEndOfBufferError
+      {:error, {:unexpected_token, tok}} ->
+        raise JSON.Decoder.UnexpectedTokenError, token: tok
+      {:error, :unexpected_end_of_buffer} ->
+        raise JSON.Decoder.UnexpectedEndOfBufferError
       _ -> raise JSON.Decoder.Error
     end
   end

@@ -84,7 +84,6 @@ defmodule JSON.Parser.Charlist.Number do
 
   defp parse_fractional(json, acc , _), do: {acc, json}
 
-
   #exponent
   defp apply_exponent({:error, error_info}), do: {:error, error_info}
 

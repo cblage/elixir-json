@@ -3,7 +3,6 @@ defmodule JSON.Parser.Bitstring.Number do
   Implements a JSON Numeber Parser for Bitstring values
   """
 
-
   @doc """
   parses a valid JSON numerical value, returns its elixir numerical representation
 
@@ -43,7 +42,6 @@ defmodule JSON.Parser.Bitstring.Number do
     end
   end
 
-
   def parse(binary) do
     case binary do
       << number :: utf8 ,  _ :: binary >> when number in ?0..?9 ->
@@ -53,9 +51,10 @@ defmodule JSON.Parser.Bitstring.Number do
     end
   end
 
-
+  # error condition
   defp add_fractional({:error, error_info}), do: {:error, error_info}
 
+  # stop condition
   defp add_fractional({:ok, acc, bin})  do
     case bin do
       << ?., after_dot :: binary >>  ->
@@ -77,21 +76,19 @@ defmodule JSON.Parser.Bitstring.Number do
 
   defp parse_fractional(json, acc , _) when is_binary(json), do: {acc, json}
 
-
+  # error condition
   defp apply_exponent({:error, error_info}), do: {:error, error_info}
 
+  # stop condition
   defp apply_exponent({:ok, acc, << exponent :: utf8, rest :: binary >>}) when exponent in 'eE' do
     case to_integer(rest) do
       {:ok, power, rest} -> {:ok, acc * :math.pow(10, power), rest}
       {:error, error_info} -> {:error, error_info}
     end
   end
-
   defp apply_exponent({:ok, acc, json}), do: {:ok, acc, json}
 
-
   defp to_integer(<< >>), do: {:error,  :unexpected_end_of_buffer}
-
   defp to_integer(binary) do
     case Integer.parse(binary) do
       :error -> {:error, {:unexpected_token, binary}}

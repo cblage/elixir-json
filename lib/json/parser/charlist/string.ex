@@ -3,7 +3,9 @@ defmodule JSON.Parser.Charlist.String do
   Implements a JSON String Parser for Charlist values
   """
 
+  alias JSON.Parser.Charlist.Unicode, as: UnicodeParser
   use Bitwise
+
   @doc """
   parses a valid JSON string, returns its elixir representation
 
@@ -38,7 +40,6 @@ defmodule JSON.Parser.Charlist.String do
   def parse([]),  do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
-
   #stop conditions
   defp parse_string_contents([], _), do: {:error, :unexpected_end_of_buffer}
 
@@ -62,19 +63,18 @@ defmodule JSON.Parser.Charlist.String do
   defp parse_string_contents([?\\, ?/  | json], acc), do: parse_string_contents(json, [?/  | acc])
 
   defp parse_string_contents([?\\, ?u  | _] = char, acc) do
-    case JSON.Parser.Charlist.Unicode.parse(char) do
-      {:error, error_info} ->
-        {:error, error_info}
+    case UnicodeParser.parse(char) do
+      {:error, error_info} -> {:error, error_info}
       {:ok, decoded_unicode_codepoint, after_codepoint} ->
         case decoded_unicode_codepoint do
           << _ ::utf8 >> ->
-            parse_string_contents(after_codepoint, [decoded_unicode_codepoint | acc])
+            parse_string_contents(after_codepoint,
+              [decoded_unicode_codepoint | acc])
           _ ->
             {:error, {:unexpected_token, char}}
         end
     end
   end
-
 
   # omnomnom, eat the next character
   defp parse_string_contents([char | json], acc) do
