@@ -11,5 +11,5 @@ elixir:
 script:
   - MIX_ENV=test mix test
 after_script:
-  - MIX_ENV=docs mix deps.get
+  - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report

@@ -17,17 +17,18 @@ defmodule ElixirJSON_104_SNAPSHOT.Mixfile do
   def application, do: []
 
   def deps(:prod), do: []
-  def deps(:dev), do: [ex_doc()]
-  def deps(:test), do: [ex_doc()]
+  def deps(:dev), do: [ex_doc(), inch_ex()]
+  def deps(:test), do: [ex_doc(), inch_ex()]
 
   def deps(:docs) do
     [
-      {:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
+      inch_ex(),
       {:credo, github: "cblage/credo", branch: "master", only: [:dev, :test], runtime: false},
       ex_doc()
     ]
   end
 
+  defp inch_ex, do: {:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false}
   defp ex_doc, do: {:ex_doc, "~> 0.16", only: :dev, runtime: false}
 
   def package do
