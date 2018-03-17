@@ -5,7 +5,7 @@ defmodule ElixirJSON_104_SNAPSHOT.Mixfile do
     [
       app: :json,
       version: "1.0.4-SNAPSHOT",
-      elixir: "~> 1.6",
+      elixir: "~> 1.0",
       deps: deps(Mix.env()),
       description: "Native Elixir library for JSON encoding and decoding",
       package: package(),
