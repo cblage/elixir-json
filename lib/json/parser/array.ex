@@ -77,7 +77,7 @@ defmodule JSON.Parser.Array do
             rest ->
               Logger.debug("#{__MODULE__}.parse_array_contents(acc, json) continuing parsing of #{inspect rest}")
               parse_array_contents([value | acc], rest)
-          end
+         end
     end
   end
 end

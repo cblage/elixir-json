@@ -52,7 +52,7 @@ defmodule JSON.Decoder.DefaultImplementations do
                  Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) returning {:ok. #{inspect value}}")
                  {:ok, value}
                rest ->
-                 Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}")
+                 Logger.error("#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}")
                  {:error, {:unexpected_token, rest}}
              end
          end

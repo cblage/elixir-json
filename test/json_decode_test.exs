@@ -231,7 +231,6 @@ defmodule JSONDecodeTest do
       %{"foo" => [1,2,3]}
     )
 
-
     decodes(
       "complex object",
       '{
