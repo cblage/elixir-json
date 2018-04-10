@@ -5,10 +5,12 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.18.3">
-    <title>JSON.Parser.Charlist.Object – json v1.0.4-SNAPSHOT</title>
+    <title>JSON.Parser.Object – json v1.0.4-SNAPSHOT</title>
     <link rel="stylesheet" href="dist/app-480ffdc169.css" />
     
-    <script src="dist/sidebar_items-1c90ffce76.js"></script>
+      <link rel="canonical" href="https://hexdocs.pm/json/JSON.Parser.Object.html" />
+    
+    <script src="dist/sidebar_items-f947740837.js"></script>
     
     
     
@@ -72,9 +74,9 @@
 
       <h1>
         <small class="visible-xs">json v1.0.4-SNAPSHOT</small>
-        JSON.Parser.Charlist.Object
+        JSON.Parser.Object
         
-          <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/charlist/object.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/object.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -83,7 +85,7 @@
 
       
         <section id="moduledoc">
-          <p>Implements a JSON Object Parser for Charlist values</p>
+          <p>Implements a JSON Object Parser for Bitstring values</p>
 
         </section>
       
@@ -109,7 +111,7 @@
     <a href="#parse/1">parse(json)</a>
   </div>
   
-    <div class="summary-synopsis"><p>parses a valid JSON object value, returns its elixir Map representation</p>
+    <div class="summary-synopsis"><p>parses a valid JSON object value, returns its elixir representation</p>
 </div>
   
 </div>
@@ -143,7 +145,7 @@
     </a>
     <span class="signature">parse(json)</span>
     
-      <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/charlist/object.ex#L36" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/cblage/elixir-json/blob/master/lib/json/parser/object.ex#L39" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -152,26 +154,29 @@
     
   </div>
   <section class="docstring">
-    <p>parses a valid JSON object value, returns its elixir Map representation</p>
+    <p>parses a valid JSON object value, returns its elixir representation</p>
 <h2 id="parse/1-examples" class="section-heading">
   <a href="#parse/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   Examples
 </h2>
 
-<pre><code class="iex elixir">iex&gt; JSON.Parser.Charlist.Object.parse &#39;&#39;
+<pre><code class="iex elixir">iex&gt; JSON.Parser.Object.parse &quot;&quot;
 {:error, :unexpected_end_of_buffer}
 
-iex&gt; JSON.Parser.Charlist.Object.parse &#39;face0ff&#39;
-{:error, {:unexpected_token, &#39;face0ff&#39;}}
+iex&gt; JSON.Parser.Object.parse &quot;face0ff&quot;
+{:error, {:unexpected_token, &quot;face0ff&quot;}}
 
-iex&gt; JSON.Parser.Charlist.Object.parse &#39;[] &#39;
-{:error, {:unexpected_token, &#39;[] &#39;}}
+iex&gt; JSON.Parser.Object.parse &quot;[] &quot;
+{:error, {:unexpected_token, &quot;[] &quot;}}
 
-iex&gt; JSON.Parser.Charlist.Object.parse &#39;[]&#39;
-{:error, {:unexpected_token, &#39;[]&#39;}}
+iex&gt; JSON.Parser.Object.parse &quot;[]&quot;
+{:error, {:unexpected_token, &quot;[]&quot;}}
 
-iex&gt; JSON.Parser.Charlist.Object.parse &#39;{&quot;result&quot;: &quot;this will be a elixir result&quot;} lalal&#39;
-{:ok, Enum.into([{&quot;result&quot;, &quot;this will be a elixir result&quot;}], Map.new), &#39; lalal&#39;}</code></pre>
+iex&gt; JSON.Parser.Object.parse &quot;[\&quot;foo\&quot;, 1, 2, 1.5] lala&quot;
+{:error, {:unexpected_token, &quot;[\&quot;foo\&quot;, 1, 2, 1.5] lala&quot;}}
+
+iex&gt; JSON.Parser.Object.parse &quot;{\&quot;result\&quot;: \&quot;this will be a elixir result\&quot;} lalal&quot;
+{:ok, Enum.into([{&quot;result&quot;, &quot;this will be a elixir result&quot;}], Map.new), &quot; lalal&quot;}</code></pre>
 
   </section>
 </div>

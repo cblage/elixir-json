@@ -19,18 +19,18 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
 
   def deps(_) do
     [
-      {:async, "~> 1.0", app: false, override: true},
+      #{:async, "~> 1.0", app: false, override: true},
       #{:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
-      {:inch_ex, ">=0.0.0"},
-      {:parallel_stream, "~> 1.0"},
-      {:stream_data, "~> 0.4.2"},
+      #{:inch_ex, ">=0.0.0"},
+      #{:parallel_stream, "~> 1.0"},
+      #{:stream_data, "~> 0.4.2"},
       #{:swarm, "~> 3.3"},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:distillery, "~> 1.5", runtime: false},
+      #{:distillery, "~> 1.5", runtime: false},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       #{:credo, github: "cblage/credo", branch: "master", only: [:dev, :test], runtime: false},
-      {:credo, ">=0.0.0"},
+      {:credo, ">=0.0.0", only: [:dev, :test]},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
