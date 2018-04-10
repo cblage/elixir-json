@@ -82,7 +82,7 @@ defmodule JSON.Parser do
     Logger.debug("#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
     StringParser.parse(bin)
   end
-  
+
   def parse(<<?-, number::utf8, _::binary>> = bin) when number in ?0..?9 do
     Logger.debug("#{__MODULE__}.parse(bin) starting negative NumberParser.parse(bin)...")
     NumberParser.parse(bin)
