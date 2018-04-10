@@ -4,7 +4,7 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
   def project do
     [
       app: :json,
-      version: "2.0.0-SNAPSHOT",
+      version: "2.0.1-SNAPSHOT",
       elixir: "~> 1.6",
       deps: deps(Mix.env()),
       description: "Native Elixir library for JSON encoding and decoding",
