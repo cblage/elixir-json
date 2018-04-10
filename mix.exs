@@ -1,4 +1,4 @@
-defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
+defmodule ElixirJSON_110_SNAPSHOT.Mixfile do
   use Mix.Project
 
   @version "1.1.0"
@@ -29,12 +29,8 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
 
   def deps(_) do
     [
-      {:async, "~> 1.0", app: false, override: true},
       #{:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
       {:inch_ex, ">=0.0.0", only: [:dev, :test]},
-      {:parallel_stream, "~> 1.0"},
-      {:stream_data, "~> 0.4.2"},
-      #{:swarm, "~> 3.3"},
       {:decimal, "~> 1.0", optional: true},
       {:benchee, "~> 0.8", only: :bench, override: true},
       {:benchee_html, "~> 0.1", only: :bench, override: true},
@@ -44,10 +40,8 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
       {:jsone, "~> 1.4", only: :bench, override: true},
       {:jason, "~> 1.0", only: :bench, override: true},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      #{:distillery, "~> 1.5", runtime: false},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
-      #{:credo, github: "cblage/credo", branch: "master", only: [:dev, :test], runtime: false},
       {:credo, ">=0.0.0", only: [:dev, :test]},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
