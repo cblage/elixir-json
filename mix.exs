@@ -42,7 +42,6 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
       {:exjsx, "~> 4.0", only: [:bench, :test], override: true},
       {:tiny, "~> 1.0", only: :bench, override: true},
       {:jsone, "~> 1.4", only: :bench, override: true},
-      {:jiffy, "~> 0.14", only: :bench, override: true},
       {:jason, "~> 1.0", only: :bench, override: true},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       #{:distillery, "~> 1.5", runtime: false},
