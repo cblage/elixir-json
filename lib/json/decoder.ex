@@ -103,7 +103,7 @@ defimpl JSON.Decoder, for: List do
       Decoder.decode() |>
       case do
         {:error, {:unexpected_token, rest}} -> {:error, {:unexpected_token, rest |> to_charlist()}}
-        ok -> ok
+        other -> other
       end
   end
 end
