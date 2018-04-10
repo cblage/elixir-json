@@ -20,9 +20,8 @@ defmodule JSON do
 
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(term) do
-    Encoder.encode(term)
-  end
+  def encode(term), do: Encoder.encode(term)
+
 
   @doc """
   Returns a JSON string representation of the Elixir term, raises errors when something bad happens
