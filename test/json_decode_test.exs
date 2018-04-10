@@ -204,6 +204,7 @@ defmodule JSONDecodeTest do
       [3, true]
     ])
 
+
     decodes(
       "complex object",
       '{
