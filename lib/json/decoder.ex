@@ -1,32 +1,4 @@
-defmodule JSON.Decoder.Error do
-  @moduledoc """
-  Thrown when an unknown decoder error happens
-  """
-  defexception message: "Invalid JSON - unknown error"
-end
-
-defmodule JSON.Decoder.UnexpectedEndOfBufferError do
-  @moduledoc """
-  Thrown when the json payload is incomplete
-  """
-  defexception message: "Invalid JSON - unexpected end of buffer"
-end
-
-defmodule JSON.Decoder.UnexpectedTokenError do
-  @moduledoc """
-  Thrown when the json payload is invalid
-  """
-  defexception token: nil
-
-  @doc """
-    Invalid JSON - Unexpected token
-  """
-  def message(exception), do: "Invalid JSON - unexpected token >>#{exception.token}<<"
-end
-
 defprotocol JSON.Decoder do
-  @dialyzer {:nowarn_function, __protocol__: 1}
-
   @moduledoc """
   Defines the protocol required for converting raw JSON into Elixir terms
   """
@@ -38,7 +10,9 @@ defprotocol JSON.Decoder do
   def decode(bitstring_or_char_list)
 end
 
-defmodule JSON.Encoder.DefaultImplementations do
+defmodule JSON.Decoder.DefaultImplementations do
+  require Logger
+
   defimpl JSON.Decoder, for: BitString do
     @moduledoc """
     JSON Decoder implementation for BitString values
@@ -62,17 +36,24 @@ defmodule JSON.Encoder.DefaultImplementations do
 
     """
     def decode(bitstring) do
+      Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) starting...")
       bitstring
-      |> Parser.trim()
+      |> String.trim()
       |> Parser.parse()
       |> case do
            {:error, error_info} ->
-             {:error, error_info}
-
+              Logger.error("#{__MODULE__}.decode(#{inspect bitstring}} failed with errror: #{inspect error_info}")
+              {:error, error_info}
            {:ok, value, rest} ->
-             case Parser.trim(rest) do
-               <<>> -> {:ok, value}
-               _ -> {:error, {:unexpected_token, rest}}
+             Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) trimming remainder of JSON payload #{inspect rest}...")
+             case rest |> String.trim() do
+               <<>> ->
+                 Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) successfully trimmed remainder JSON payload!")
+                 Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) returning {:ok. #{inspect value}}")
+                 {:ok, value}
+               rest ->
+                 Logger.error("#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}")
+                 {:error, {:unexpected_token, rest}}
              end
          end
     end
@@ -105,8 +86,27 @@ defmodule JSON.Encoder.DefaultImplementations do
         to_string() |>
         Decoder.decode() |>
         case do
-          {:error, {:unexpected_token, rest}} -> {:error, {:unexpected_token, rest |> to_charlist()}}
-          other -> other
+          {:ok, value} -> {:ok, value}
+          {:error, error_info} when is_binary(error_info)  ->
+            Logger.error("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect error_info}")
+            {:error, error_info |> to_charlist()}
+          {:error, {:unexpected_token, bin}} when is_binary(bin)  ->
+            Logger.error("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect bin}")
+            {:error, {:unexpected_token, bin |> to_charlist()}}
+          e = {:error, error_info} ->
+            Logger.error("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect e}")
+            {:error, error_info}
+          {:ok, value, rest} ->
+            Logger.debug("#{__MODULE__}.decode(#{inspect charlist}) trimming remainder of JSON payload #{inspect rest}...")
+            case rest |> String.trim() do
+              <<>> ->
+                Logger.debug("#{__MODULE__}.decode(#{inspect charlist}) successfully trimmed remainder JSON payload!")
+                Logger.debug("#{__MODULE__}.decode(#{inspect charlist}) returning {:ok. #{inspect value}}")
+                {:ok, value}
+              rest ->
+                Logger.error("#{__MODULE__}.decode(#{inspect charlist}} failed consume entire buffer: #{rest}")
+                {:error, {:unexpected_token, rest |> to_charlist()}}
+            end
         end
     end
   end
