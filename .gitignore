@@ -36,3 +36,5 @@ erl_crash.dump
 /bench/snapshots
 
 *.log
+
+.elixir_ls
