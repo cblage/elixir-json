@@ -25,20 +25,11 @@ defmodule ElixirJSON_120_SNAPSHOT.Mixfile do
     [applications: applications(Mix.env)]
   end
 
-  defp applications(:dev) do
-    if System.get_env("MIX_REMIX") != nil do
-      applications(:all) ++ [:remix]
-    else
-      applications(:all)
-    end
-  end
+  defp applications(:dev), do:  [] ++ applications(:default)
   defp applications(_all), do: [:logger]
 
   def deps(_) do
     [
-      #{:remix, "~> 0.0.1", only: :dev},
-      #{:async, "~> 1.0", app: false, override: true},
-      #{:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
       {:inch_ex, ">=0.0.0", only: [:dev, :test]},
       {:decimal, "~> 1.0", optional: true},
       {:benchee, "~> 0.8", only: :bench, override: true},
