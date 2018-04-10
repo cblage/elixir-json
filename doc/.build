@@ -4,13 +4,15 @@ fonts/icomoon.eot
 fonts/icomoon.svg
 fonts/icomoon.ttf
 fonts/icomoon.woff
-dist/sidebar_items-f947740837.js
+dist/sidebar_items-5aa1ba4306.js
 api-reference.html
+readme.html
 search.html
 404.html
 JSON.html
 JSON.Decoder.html
 JSON.Encoder.html
+JSON.Encoder.DefaultImplementations.html
 JSON.Encoder.Helpers.html
 JSON.Parser.html
 JSON.Parser.Array.html
