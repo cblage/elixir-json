@@ -12,7 +12,7 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "https://hex.pm/packages/json",
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test],    ]
+      preferred_cli_env: [coveralls: :test], ]
   end
 
   def application, do: []
