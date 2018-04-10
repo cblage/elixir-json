@@ -71,7 +71,7 @@ defmodule JSON.Parser do
   def parse(<<?[, _::binary>> = bin), do: ArrayParser.parse(bin)
   def parse(<<?{, _::binary>> = bin), do: ObjectParser.parse(bin)
   def parse(<<?", _::binary>> = bin), do: StringParser.parse(bin)
-
+  
   def parse(<<?-, number::utf8, _::binary>> = bin) when number in ?0..?9 do
     NumberParser.parse(bin)
   end
@@ -87,20 +87,5 @@ defmodule JSON.Parser do
   def parse(<<>>), do: {:error, :unexpected_end_of_buffer}
   def parse(json), do: {:error, {:unexpected_token, json}}
 
-
-  def parse(<<?-, number::utf8, _::binary>> = bin) when number in ?0..?9 do
-    NumberParser.parse(bin)
-  end
-
-  def parse(<<number::utf8, _::binary>> = bin) when number in ?0..?9 do
-    NumberParser.parse(bin)
-  end
-
-  def parse(<<?n, ?u, ?l, ?l, rest::binary>>), do: {:ok, nil, rest}
-  def parse(<<?t, ?r, ?u, ?e, rest::binary>>), do: {:ok, true, rest}
-  def parse(<<?f, ?a, ?l, ?s, ?e, rest::binary>>), do: {:ok, false, rest}
-
-  def parse(<<>>), do: {:error, :unexpected_end_of_buffer}
-  def parse(json), do: {:error, {:unexpected_token, json}}
 
 end
