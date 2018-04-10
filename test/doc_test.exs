@@ -7,15 +7,9 @@ defmodule DocTest do
 
   doctest JSON.Encoder
 
-  doctest JSON.Parser.Bitstring
-  doctest JSON.Parser.Bitstring.String
-  doctest JSON.Parser.Bitstring.Number
-  doctest JSON.Parser.Bitstring.Array
-  doctest JSON.Parser.Bitstring.Object
-
-  doctest JSON.Parser.Charlist
-  doctest JSON.Parser.Charlist.String
-  doctest JSON.Parser.Charlist.Number
-  doctest JSON.Parser.Charlist.Array
-  doctest JSON.Parser.Charlist.Object
+  doctest JSON.Parser
+  doctest JSON.Parser.String
+  doctest JSON.Parser.Number
+  doctest JSON.Parser.Array
+  doctest JSON.Parser.Object
 end

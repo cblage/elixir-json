@@ -1,32 +1,32 @@
-defmodule JSON.Parser.Bitstring.Object do
+defmodule JSON.Parser.Object do
   @moduledoc """
   Implements a JSON Object Parser for Bitstring values
   """
 
-  import JSON.Parser.Bitstring, only: [trim: 1]
-  alias JSON.Parser.Bitstring, as: BitstringParser
+  import JSON.Parser, only: [trim: 1]
+  alias JSON.Parser, as: Parser
 
   @doc """
   parses a valid JSON object value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parser.Bitstring.Object.parse ""
+      iex> JSON.Parser.Object.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parser.Bitstring.Object.parse "face0ff"
+      iex> JSON.Parser.Object.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"}}
 
-      iex> JSON.Parser.Bitstring.Object.parse "[] "
+      iex> JSON.Parser.Object.parse "[] "
       {:error, {:unexpected_token, "[] "}}
 
-      iex> JSON.Parser.Bitstring.Object.parse "[]"
+      iex> JSON.Parser.Object.parse "[]"
       {:error, {:unexpected_token, "[]"}}
 
-      iex> JSON.Parser.Bitstring.Object.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parser.Object.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:error, {:unexpected_token, "[\\\"foo\\\", 1, 2, 1.5] lala"}}
 
-      iex> JSON.Parser.Bitstring.Object.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+      iex> JSON.Parser.Object.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
   def parse(<<?{, rest::binary>>) do
@@ -40,7 +40,7 @@ defmodule JSON.Parser.Bitstring.Object do
 
   # Object Parsing
   defp parse_object_key(json) do
-    case JSON.Parser.Bitstring.String.parse(json) do
+    case JSON.Parser.String.parse(json) do
       {:error, error_info} ->
         {:error, error_info}
 
@@ -59,7 +59,7 @@ defmodule JSON.Parser.Bitstring.Object do
   end
 
   defp parse_object_value(acc, key, after_key) do
-    case BitstringParser.parse(after_key) do
+    case Parser.parse(after_key) do
       {:error, error_info} ->
         {:error, error_info}
 

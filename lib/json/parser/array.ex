@@ -1,32 +1,32 @@
-defmodule JSON.Parser.Bitstring.Array do
+defmodule JSON.Parser.Array do
   @moduledoc """
   Implements a JSON Array Parser for Bitstring values
   """
 
-  alias JSON.Parser.Bitstring, as: BitstringParser
-  import BitstringParser, only: [trim: 1]
+  alias JSON.Parser, as: Parser
+  import Parser, only: [trim: 1]
 
   @doc """
   parses a valid JSON array value, returns its elixir list representation
 
   ## Examples
 
-      iex> JSON.Parser.Bitstring.Array.parse ""
+      iex> JSON.Parser.Array.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parser.Bitstring.Array.parse "[1, 2 "
+      iex> JSON.Parser.Array.parse "[1, 2 "
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parser.Bitstring.Array.parse "face0ff"
+      iex> JSON.Parser.Array.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"}}
 
-      iex> JSON.Parser.Bitstring.Array.parse "[] lala"
+      iex> JSON.Parser.Array.parse "[] lala"
       {:ok, [], " lala"}
 
-      iex> JSON.Parser.Bitstring.Array.parse "[]"
+      iex> JSON.Parser.Array.parse "[]"
       {:ok, [], ""}
 
-      iex> JSON.Parser.Bitstring.Array.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parser.Array.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:ok, ["foo", 1, 2, 1.5], " lala"}
   """
   def parse(<<?[, rest::binary>>) do
@@ -46,7 +46,7 @@ defmodule JSON.Parser.Bitstring.Array do
   defp parse_array_contents(_, <<>>), do: {:error, :unexpected_end_of_buffer}
 
   defp parse_array_contents(acc, json) do
-    case json |> trim |> BitstringParser.parse() do
+    case json |> trim |> Parser.parse() do
       {:error, error_info} ->
         {:error, error_info}
 

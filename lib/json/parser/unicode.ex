@@ -1,4 +1,4 @@
-defmodule JSON.Parser.Bitstring.Unicode do
+defmodule JSON.Parser.Unicode do
   @moduledoc """
   Implements a JSON Unicode Parser for Bitstring values
   """
@@ -11,13 +11,13 @@ defmodule JSON.Parser.Bitstring.Unicode do
 
   ## Examples
 
-      iex> JSON.Parser.Bitstring.parse ""
+      iex> JSON.Parser.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parser.Bitstring.parse "face0ff"
+      iex> JSON.Parser.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"}}
 
-      iex> JSON.Parser.Bitstring.parse "-hello"
+      iex> JSON.Parser.parse "-hello"
       {:error, {:unexpected_token, "-hello"}}
 
   """

@@ -1,9 +1,9 @@
-defmodule JSON.Parser.Bitstring.String do
+defmodule JSON.Parser.String do
   @moduledoc """
   Implements a JSON String Parser for Bitstring values
   """
 
-  alias JSON.Parser.Bitstring.Unicode, as: UnicodeParser
+  alias JSON.Parser.Unicode, as: UnicodeParser
 
   use Bitwise
 
@@ -12,34 +12,34 @@ defmodule JSON.Parser.Bitstring.String do
 
   ## Examples
 
-      iex> JSON.Parser.Bitstring.String.parse ""
+      iex> JSON.Parser.String.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parser.Bitstring.String.parse "face0ff"
+      iex> JSON.Parser.String.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"}}
 
-      iex> JSON.Parser.Bitstring.String.parse "-hello"
+      iex> JSON.Parser.String.parse "-hello"
       {:error, {:unexpected_token, "-hello"}}
 
-      iex> JSON.Parser.Bitstring.String.parse "129245"
+      iex> JSON.Parser.String.parse "129245"
       {:error, {:unexpected_token, "129245"}}
 
-      iex> JSON.Parser.Bitstring.String.parse "\\\"7.something\\\""
+      iex> JSON.Parser.String.parse "\\\"7.something\\\""
       {:ok, "7.something", ""}
 
-      iex> JSON.Parser.Bitstring.String.parse "\\\"-88.22suffix\\\" foo bar"
+      iex> JSON.Parser.String.parse "\\\"-88.22suffix\\\" foo bar"
       {:ok, "-88.22suffix", " foo bar"}
 
-      iex> JSON.Parser.Bitstring.String.parse "\\\"star -> \\\\u272d <- star\\\""
+      iex> JSON.Parser.String.parse "\\\"star -> \\\\u272d <- star\\\""
       {:ok, "star -> ✭ <- star", ""}
 
-      iex> JSON.Parser.Bitstring.String.parse "\\\"\\\\u00df ist wunderbar\\\""
+      iex> JSON.Parser.String.parse "\\\"\\\\u00df ist wunderbar\\\""
       {:ok, "ß ist wunderbar", ""}
 
-      iex> JSON.Parser.Bitstring.String.parse "\\\"Rafaëlla\\\" foo bar"
+      iex> JSON.Parser.String.parse "\\\"Rafaëlla\\\" foo bar"
       {:ok, "Rafaëlla", " foo bar"}
 
-      iex> JSON.Parser.Bitstring.String.parse "\\\"Éloise woot\\\" Éloise"
+      iex> JSON.Parser.String.parse "\\\"Éloise woot\\\" Éloise"
       {:ok, "Éloise woot", " Éloise"}
   """
   def parse(<<?"::utf8, json::binary>>), do: parse_string_contents(json, [])

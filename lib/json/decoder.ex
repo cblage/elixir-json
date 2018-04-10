@@ -41,7 +41,7 @@ defimpl JSON.Decoder, for: BitString do
   JSON Decoder implementation for BitString values
   """
 
-  alias JSON.Parser.Bitstring, as: BitstringParser
+  alias JSON.Parser, as: Parser
 
   @doc """
   decodes json in BitString format
@@ -60,14 +60,14 @@ defimpl JSON.Decoder, for: BitString do
   """
   def decode(bitstring) do
     bitstring
-    |> BitstringParser.trim()
-    |> BitstringParser.parse()
+    |> Parser.trim()
+    |> Parser.parse()
     |> case do
       {:error, error_info} ->
         {:error, error_info}
 
       {:ok, value, rest} ->
-        case BitstringParser.trim(rest) do
+        case Parser.trim(rest) do
           <<>> -> {:ok, value}
           _ -> {:error, {:unexpected_token, rest}}
         end
@@ -79,7 +79,8 @@ defimpl JSON.Decoder, for: List do
   @moduledoc """
   JSON Decoder implementation for Charlist values
   """
-  alias JSON.Parser.Charlist, as: CharlistParser
+
+  alias JSON.Decoder, as: Decoder
 
   @doc """
   decodes json in BitString format
@@ -97,18 +98,12 @@ defimpl JSON.Decoder, for: List do
 
   """
   def decode(charlist) do
-    charlist
-    |> CharlistParser.trim()
-    |> CharlistParser.parse()
-    |> case do
-      {:error, error_info} ->
-        {:error, error_info}
-
-      {:ok, value, rest} ->
-        case CharlistParser.trim(rest) do
-          [] -> {:ok, value}
-          _ -> {:error, {:unexpected_token, rest}}
-        end
-    end
+    charlist |>
+      to_string() |>
+      Decoder.decode() |>
+      case do
+        {:error, {:unexpected_token, rest}} -> {:error, {:unexpected_token, rest |> to_charlist()}}
+        ok -> ok
+      end
   end
 end

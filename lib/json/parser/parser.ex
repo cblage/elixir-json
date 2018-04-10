@@ -1,68 +1,68 @@
-defmodule JSON.Parser.Bitstring do
+defmodule JSON.Parser do
   @moduledoc """
   Implements a JSON Parser for Bitstring values
   """
 
-  alias JSON.Parser.Bitstring, as: BitstringParser
-  alias BitstringParser.Array, as: ArrayParser
-  alias BitstringParser.Number, as: NumberParser
-  alias BitstringParser.Object, as: ObjectParser
-  alias BitstringParser.String, as: StringParser
+  alias JSON.Parser, as: Parser
+  alias Parser.Array, as: ArrayParser
+  alias Parser.Number, as: NumberParser
+  alias Parser.Object, as: ObjectParser
+  alias Parser.String, as: StringParser
 
   @doc """
   parses a valid JSON value, returns its elixir representation
 
   ## Examples
 
-      iex> JSON.Parser.Bitstring.parse ""
+      iex> JSON.Parser.parse ""
       {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Parser.Bitstring.parse "face0ff"
+      iex> JSON.Parser.parse "face0ff"
       {:error, {:unexpected_token, "face0ff"}}
 
-      iex> JSON.Parser.Bitstring.parse "-hello"
+      iex> JSON.Parser.parse "-hello"
       {:error, {:unexpected_token, "-hello"}}
 
-      iex> JSON.Parser.Bitstring.parse "129245"
+      iex> JSON.Parser.parse "129245"
       {:ok, 129245, ""}
 
-      iex> JSON.Parser.Bitstring.parse "7.something"
+      iex> JSON.Parser.parse "7.something"
       {:ok, 7, ".something"}
 
-      iex> JSON.Parser.Bitstring.parse "-88.22suffix"
+      iex> JSON.Parser.parse "-88.22suffix"
       {:ok, -88.22, "suffix"}
 
-      iex> JSON.Parser.Bitstring.parse "-12e4and then some"
+      iex> JSON.Parser.parse "-12e4and then some"
       {:ok, -1.2e+5, "and then some"}
 
-      iex> JSON.Parser.Bitstring.parse "7842490016E-12-and more"
+      iex> JSON.Parser.parse "7842490016E-12-and more"
       {:ok, 7.842490016e-3, "-and more"}
 
-      iex> JSON.Parser.Bitstring.parse "null"
+      iex> JSON.Parser.parse "null"
       {:ok, nil, ""}
 
-      iex> JSON.Parser.Bitstring.parse "false"
+      iex> JSON.Parser.parse "false"
       {:ok, false, ""}
 
-      iex> JSON.Parser.Bitstring.parse "true"
+      iex> JSON.Parser.parse "true"
       {:ok, true, ""}
 
-      iex> JSON.Parser.Bitstring.parse "\\\"7.something\\\""
+      iex> JSON.Parser.parse "\\\"7.something\\\""
       {:ok, "7.something", ""}
 
-      iex> JSON.Parser.Bitstring.parse "\\\"-88.22suffix\\\" foo bar"
+      iex> JSON.Parser.parse "\\\"-88.22suffix\\\" foo bar"
       {:ok, "-88.22suffix", " foo bar"}
 
-      iex> JSON.Parser.Bitstring.parse "\\\"star -> \\\\u272d <- star\\\""
+      iex> JSON.Parser.parse "\\\"star -> \\\\u272d <- star\\\""
       {:ok, "star -> ✭ <- star", ""}
 
-      iex> JSON.Parser.Bitstring.parse "[]"
+      iex> JSON.Parser.parse "[]"
       {:ok, [], ""}
 
-      iex> JSON.Parser.Bitstring.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
+      iex> JSON.Parser.parse "[\\\"foo\\\", 1, 2, 1.5] lala"
       {:ok, ["foo", 1, 2, 1.5], " lala"}
 
-      iex> JSON.Parser.Bitstring.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
+      iex> JSON.Parser.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
   def parse(<<?[, _::binary>> = bin), do: ArrayParser.parse(bin)
@@ -89,16 +89,16 @@ defmodule JSON.Parser.Bitstring do
 
   ## Examples
 
-      iex> JSON.Parser.Bitstring.trim ""
+      iex> JSON.Parser.trim ""
       ""
 
-      iex> JSON.Parser.Bitstring.trim "xkcd"
+      iex> JSON.Parser.trim "xkcd"
       "xkcd"
 
-      iex> JSON.Parser.Bitstring.trim "  \\t\\r lalala "
+      iex> JSON.Parser.trim "  \\t\\r lalala "
       "lalala "
 
-      iex> JSON.Parser.Bitstring.trim " \\n\\t\\n fooo \\u00dflalalal "
+      iex> JSON.Parser.trim " \\n\\t\\n fooo \\u00dflalalal "
       "fooo \\u00dflalalal "
   """
   def trim(bitstring) when is_binary(bitstring) do
