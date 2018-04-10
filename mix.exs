@@ -4,15 +4,17 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
   def project do
     [
       app: :json,
-      version: "1.0.4-SNAPSHOT",
-      elixir: "~> 1.3",
+      version: "2.0.0-SNAPSHOT",
+      elixir: "~> 1.6",
       deps: deps(Mix.env()),
       description: "Native Elixir library for JSON encoding and decoding",
       package: package(),
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "https://hex.pm/packages/json",
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test], ]
+      preferred_cli_env: [coveralls: :test],
+      dialyzer: [ flags: ["-Wunmatched_returns", :error_handling, :underspecs]]
+    ]
   end
 
   def application, do: []

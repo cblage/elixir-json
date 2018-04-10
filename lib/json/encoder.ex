@@ -249,7 +249,7 @@ defimpl JSON.Encoder, for: Any do
   @doc """
   Encodes a map into a JSON object
   """
-  @spec encode(term) :: {atom, bitstring}
+  @spec encode(map|term) :: {atom, bitstring}
   def encode(%{} = struct) do
     struct
     |> Map.to_list()
@@ -259,7 +259,6 @@ defimpl JSON.Encoder, for: Any do
   @doc """
   Fallback method
   """
-  @spec typeof(term) :: atom
   def encode(x) do
     x
     |> Kernel.inspect()

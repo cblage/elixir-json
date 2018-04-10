@@ -51,13 +51,8 @@ defmodule JSON.Parser.String do
 
   # found the closing ", lets reverse the acc and encode it as a string!
   defp parse_string_contents(<<?"::utf8, json::binary>>, acc) do
-    case acc |> Enum.reverse() |> List.to_string() do
-      encoded when is_binary(encoded) ->
-        {:ok, encoded, json}
-
-      _ ->
-        {:error, {:unexpected_token, json}}
-    end
+    encoded = acc |> Enum.reverse() |> List.to_string()
+    {:ok, encoded, json}
   end
 
   # parsing

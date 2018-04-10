@@ -99,9 +99,8 @@ defmodule JSON.Parser.Number do
 
   defp to_integer(binary) do
     case Integer.parse(binary) do
+      {result, rest} when is_integer(result) and is_binary(rest) -> {:ok, result, rest}
       :error -> {:error, {:unexpected_token, binary}}
-      {:error, _} -> {:error, {:unexpected_token, binary}}
-      {result, rest} -> {:ok, result, rest}
     end
   end
 end
