@@ -1,10 +1,12 @@
 defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
   use Mix.Project
 
+  @version "2.0.2-SNAPSHOT"
+
   def project do
     [
       app: :json,
-      version: "2.0.1-SNAPSHOT",
+      version: @version,
       elixir: "~> 1.6",
       deps: deps(Mix.env()),
       description: "Native Elixir library for JSON encoding and decoding",
@@ -12,21 +14,36 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "https://hex.pm/packages/json",
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test],
-      dialyzer: [ flags: ["-Wunmatched_returns", :error_handling, :underspecs]]
+      dialyzer: dialyzer(),
+      docs: docs(),
+      aliases: aliases(),
+      preferred_cli_env: ["bench.encode": :bench, "bench.decode": :bench, docs: :docs, coveralls: :test],
     ]
   end
 
-  def application, do: []
+  def application() do
+    [
+      extra_applications: []
+    ]
+  end
 
   def deps(_) do
     [
-      #{:async, "~> 1.0", app: false, override: true},
+      {:async, "~> 1.0", app: false, override: true},
       #{:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
-      #{:inch_ex, ">=0.0.0"},
-      #{:parallel_stream, "~> 1.0"},
-      #{:stream_data, "~> 0.4.2"},
+      {:inch_ex, ">=0.0.0", only: [:dev, :test]},
+      {:parallel_stream, "~> 1.0"},
+      {:stream_data, "~> 0.4.2"},
       #{:swarm, "~> 3.3"},
+      {:decimal, "~> 1.0", optional: true},
+      {:benchee, "~> 0.8", only: :bench, override: true},
+      {:benchee_html, "~> 0.1", only: :bench, override: true},
+      {:poison, "~> 3.0", only: [:bench, :dev, :test], override: true},
+      {:exjsx, "~> 4.0", only: [:bench, :test], override: true},
+      {:tiny, "~> 1.0", only: :bench, override: true},
+      {:jsone, "~> 1.4", only: :bench, override: true},
+      {:jiffy, "~> 0.14", only: :bench, override: true},
+      {:jason, "~> 1.0", only: :bench, override: true},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       #{:distillery, "~> 1.5", runtime: false},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
@@ -37,6 +54,31 @@ defmodule ElixirJSON_200_SNAPSHOT.Mixfile do
     ]
   end
 
+  defp aliases() do
+    [
+      "bench.encode": ["run bench/encode.exs"],
+      "bench.decode": ["run bench/decode.exs"]
+    ]
+  end
+
+  defp dialyzer() do
+    [
+      ignore_warnings: "dialyzer.ignore"
+    ]
+  end
+
+  defp docs() do
+    [
+      main: "readme",
+      name: "JSON",
+      source_ref: "v#{@version}",
+      canonical: "http://hexdocs.pm/json",
+      source_url: "https://github.com/cblage/elixir-json",
+      extras: [
+        "README.md"
+      ]
+    ]
+  end
 
   def package do
     [
