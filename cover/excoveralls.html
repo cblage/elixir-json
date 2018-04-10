@@ -367,7 +367,7 @@ function find(y) {
           </li>
         
           <li>
-            <span class='cov high'>80</span>
+            <span class='cov medium'>50</span>
             <a href='#lib/json/decoder.ex'>
               
               
@@ -378,7 +378,7 @@ function find(y) {
           </li>
         
           <li>
-            <span class='cov medium'>58.3</span>
+            <span class='cov medium'>56.0</span>
             <a href='#lib/json/encoder.ex'>
               
               
@@ -444,7 +444,7 @@ function find(y) {
           </li>
         
           <li>
-            <span class='cov high'>87.5</span>
+            <span class='cov high'>88.9</span>
             <a href='#lib/json/parser/bitstring/unicode.ex'>
               
               
@@ -499,7 +499,7 @@ function find(y) {
           </li>
         
           <li>
-            <span class='cov high'>100</span>
+            <span class='cov medium'>57.1</span>
             <a href='#lib/json/parser/charlist/string.ex'>
               
               
@@ -510,7 +510,7 @@ function find(y) {
           </li>
         
           <li>
-            <span class='cov high'>87.5</span>
+            <span class='cov high'>88.9</span>
             <a href='#lib/json/parser/charlist/unicode.ex'>
               
               
@@ -523,10 +523,10 @@ function find(y) {
       </div>
 
       <div id='stats' class='high'>
-        <div class='percentage'>90</div>
-        <div class='sloc'>180</div>
-        <div class='hits'>5290</div>
-        <div class='misses'>18</div>
+        <div class='percentage'>85.5</div>
+        <div class='sloc'>193</div>
+        <div class='hits'>5321</div>
+        <div class='misses'>28</div>
       </div>
       <div id='files'>
         
@@ -1209,11 +1209,11 @@ function find(y) {
         
           <div class='file'>
             <h2 id='lib/json/decoder.ex'>lib/json/decoder.ex</h1>
-            <div id='stats' class='high'>
-              <div class='percentage'>80</div>
-              <div class='sloc'>5</div>
+            <div id='stats' class='medium'>
+              <div class='percentage'>50</div>
+              <div class='sloc'>8</div>
               <div class='hits'>122</div>
-              <div class='misses'>1</div>
+              <div class='misses'>4</div>
             </div>
             <table id='source'>
               <thead>
@@ -1257,12 +1257,12 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>4</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defexception message: &quot;Invalid JSON - unknown error&quot;</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>
@@ -1313,12 +1313,12 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>11</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defexception message: &quot;Invalid JSON - unexpected end of buffer&quot;</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>
@@ -1369,12 +1369,12 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>18</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defexception token: nil</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>
@@ -2143,10 +2143,10 @@ function find(y) {
           <div class='file'>
             <h2 id='lib/json/encoder.ex'>lib/json/encoder.ex</h1>
             <div id='stats' class='medium'>
-              <div class='percentage'>58.3</div>
-              <div class='sloc'>24</div>
+              <div class='percentage'>56.0</div>
+              <div class='sloc'>25</div>
               <div class='hits'>840</div>
-              <div class='misses'>10</div>
+              <div class='misses'>11</div>
             </div>
             <table id='source'>
               <thead>
@@ -2190,12 +2190,12 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>4</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defexception error_info: nil</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>
@@ -8709,9 +8709,9 @@ function find(y) {
           <div class='file'>
             <h2 id='lib/json/parser/bitstring/unicode.ex'>lib/json/parser/bitstring/unicode.ex</h1>
             <div id='stats' class='high'>
-              <div class='percentage'>87.5</div>
-              <div class='sloc'>8</div>
-              <div class='hits'>63</div>
+              <div class='percentage'>88.9</div>
+              <div class='sloc'>9</div>
+              <div class='hits'>78</div>
               <div class='misses'>1</div>
             </div>
             <table id='source'>
@@ -8908,12 +8908,12 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='hit'>
                         <td class='line'>23</td>
-                        <td class='hits'></td>
+                        <td class='hits'>15</td>
                         <td class='source'>  def parse(&lt;&lt;?\\, ?u, json::binary&gt;&gt;), do: parse_escaped_unicode_codepoint(json, 0, 0)</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>
@@ -12405,11 +12405,11 @@ function find(y) {
         
           <div class='file'>
             <h2 id='lib/json/parser/charlist/string.ex'>lib/json/parser/charlist/string.ex</h1>
-            <div id='stats' class='high'>
-              <div class='percentage'>100</div>
-              <div class='sloc'>7</div>
-              <div class='hits'>513</div>
-              <div class='misses'>0</div>
+            <div id='stats' class='medium'>
+              <div class='percentage'>57.1</div>
+              <div class='sloc'>14</div>
+              <div class='hits'>515</div>
+              <div class='misses'>6</div>
             </div>
             <table id='source'>
               <thead>
@@ -12877,60 +12877,60 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>57</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?f | json], acc), do: parse_string_contents(json, [?\f | acc])</td>
                       </tr>
-                  
+                    
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>58</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?n | json], acc), do: parse_string_contents(json, [?\n | acc])</td>
                       </tr>
-                  
+                    
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>59</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?r | json], acc), do: parse_string_contents(json, [?\r | acc])</td>
                       </tr>
-                  
+                    
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>60</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?t | json], acc), do: parse_string_contents(json, [?\t | acc])</td>
                       </tr>
-                  
+                    
                 
                   
-                      <tr>
+                      <tr class='hit'>
                         <td class='line'>61</td>
-                        <td class='hits'></td>
+                        <td class='hits'>2</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?&quot; | json], acc), do: parse_string_contents(json, [?&quot; | acc])</td>
                       </tr>
-                  
+                    
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>62</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?\\ | json], acc), do: parse_string_contents(json, [?\\ | acc])</td>
                       </tr>
-                  
+                    
                 
                   
-                      <tr>
+                      <tr class='miss'>
                         <td class='line'>63</td>
-                        <td class='hits'></td>
+                        <td class='hits'>0</td>
                         <td class='source'>  defp parse_string_contents([?\\, ?/ | json], acc), do: parse_string_contents(json, [?/ | acc])</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>
@@ -13115,9 +13115,9 @@ function find(y) {
           <div class='file'>
             <h2 id='lib/json/parser/charlist/unicode.ex'>lib/json/parser/charlist/unicode.ex</h1>
             <div id='stats' class='high'>
-              <div class='percentage'>87.5</div>
-              <div class='sloc'>8</div>
-              <div class='hits'>58</div>
+              <div class='percentage'>88.9</div>
+              <div class='sloc'>9</div>
+              <div class='hits'>72</div>
               <div class='misses'>1</div>
             </div>
             <table id='source'>
@@ -13306,12 +13306,12 @@ function find(y) {
                   
                 
                   
-                      <tr>
+                      <tr class='hit'>
                         <td class='line'>22</td>
-                        <td class='hits'></td>
+                        <td class='hits'>14</td>
                         <td class='source'>  def parse([?\\, ?u | json]), do: parse_escaped_unicode_codepoint(json, 0, 0)</td>
                       </tr>
-                  
+                    
                 
                   
                       <tr>

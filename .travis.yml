@@ -13,3 +13,6 @@ script:
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
+after_success:
+  - MIX_ENV=test mix coveralls
+  - MIX_ENV=test mix coveralls.post --token  ilbBz5SvaqJqUBZx9KcIcuM8C1D3BCsB8  --branch "master" --name "TravisCI"
