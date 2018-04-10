@@ -69,19 +69,15 @@ defmodule JSON.Parser do
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
   def parse(bin) when is_binary(bin) do
-    Stream.chunk_while(bin , [], 
-      fn i, [] ->
-        {:cont, [i]}
-      i, chunk ->
-        if rem(i, 2) == 0 do
-          {:cont, Enum.reverse(chunk), [i]}
-        else
-          {:cont, [i | chunk]}
-        end
+    Logger.debug("#{__MODULE__}.parse(#{inspect bin})")
+    Logger.debug("#{__MODULE__}.parse(#{inspect bin}) starting Stream.chunk_while, [],...")
+    Stream.chunk_while(bin , %Parser.Record.Chunk{},
+      fn (_,_) ->
+        :halt
       end, 
-      fn
-        [] -> {:cont, []}
-        chunk -> {:cont, Enum.reverse(chunk), []}
+      fn arg ->
+        Logger.debug("#{__MODULE__}.finish_chunk(#{inspect arg})")
+       :halt
       end)
   end
 

@@ -44,38 +44,85 @@ defmodule JSON.Decoder.DefaultImplementations do
       |> Parser.parse()
       |> case do
         {:error, error_info} ->
-          log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with error: #{inspect(error_info)}"
-          end)
+          # TODO use new logging
+          Logger.debug(
+            "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with errror: #{
+              inspect(error_info)
+            }"
+          )
 
           {:error, error_info}
 
         {:ok, value, rest} ->
-          log(:debug, fn ->
+          Logger.debug(
             "#{__MODULE__}.decode(#{inspect(bitstring)}) trimming remainder of JSON payload #{
               inspect(rest)
             }..."
-          end)
+          )
 
-          case rest |> String.trim() do
+          rest
+          |> String.trim()
+          |> case do
             <<>> ->
-              log(:debug, fn ->
+              Logger.debug(
                 "#{__MODULE__}.decode(#{inspect(bitstring)}) successfully trimmed remainder JSON payload!"
-              end)
+              )
 
-              log(:debug, fn ->
+              Logger.debug(
                 "#{__MODULE__}.decode(#{inspect(bitstring)}) returning {:ok. #{inspect(value)}}"
-              end)
+              )
 
               {:ok, value}
 
             rest ->
-              log(:debug, fn ->
+              Logger.error(
                 "#{__MODULE__}.decode(#{inspect(bitstring)}} failed consume entire buffer: #{rest}"
-              end)
+              )
 
               {:error, {:unexpected_token, rest}}
           end
+
+        stream = %Stream{enum: chunk, funs: funs} ->
+          Logger.debug(
+            "#{__MODULE__}.decode(#{inspect(bitstring)}} received stream #{inspect(stream)}"
+          )
+
+          # run = Stream.run(stream)
+          run =
+            Enum.each(funs, fn func ->
+              Logger.debug(
+                "#{__MODULE__}.decode(#{inspect(bitstring)}} checking = #{inspect(func)}"
+              )
+
+              res = func.(chunk)
+              more_res = res.(:foo, :bar)
+
+              Logger.debug(
+                "#{__MODULE__}.decode(#{inspect(bitstring)}} checking = #{inspect(func)} = MORE_Res #{
+                  inspect(more_res)
+                }"
+              )
+
+              Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}} calling decode(#{chunk})")
+              decode(chunk)
+            end)
+
+          Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}} run result = #{inspect(run)}")
+
+          err = {:error, :stream_not_implemented}
+          Logger.error("#{__MODULE__}.decode(#{inspect(bitstring)}) returning #{inspect(err)}")
+          err
+
+        other ->
+          Logger.error(
+            "#{__MODULE__}.decode(#{inspect(bitstring)}) received unexpected result from parse: #{
+              inspect(other)
+            }"
+          )
+
+          err = {:error, {:unexpected_token, other}}
+          Logger.error("#{__MODULE__}.decode(#{inspect(bitstring)}) returning #{inspect(err)}")
+          err
       end
     end
   end
