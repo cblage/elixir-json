@@ -38,7 +38,7 @@ defprotocol JSON.Encoder do
       iex> JSON.Encoder.encode(%{a: 1, b: 2})
       {:ok, "{\\\"a\\\":1,\\\"b\\\":2}"}
   """
-  @spec encode(term) :: {atom, bitstring}
+  @spec encode(tuple|HashDict.t|list|integer|float|map|list|atom|term) :: {atom, bitstring}
   def encode(term)
 
   @doc """
@@ -71,13 +71,11 @@ defimpl JSON.Encoder, for: Tuple do
   @doc """
   Encodes an Elixir tuple into a JSON array
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode(term), do: term |> Tuple.to_list() |> JSON.Encoder.Helpers.enum_encode()
 
   @doc """
   Returns an atom that represents the JSON type for the term
   """
-  @spec typeof(term) :: atom
   def typeof(_), do: :array
 end
 
@@ -85,13 +83,11 @@ defimpl JSON.Encoder, for: HashDict do
   @doc """
   Encodes an Elixir HashDict into a JSON object
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode(dict), do: JSON.Encoder.Helpers.dict_encode(dict)
 
   @doc """
   Returns :object
   """
-  @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
@@ -99,7 +95,6 @@ defimpl JSON.Encoder, for: List do
   @doc """
   Encodes an Elixir List into a JSON array
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode([]), do: {:ok, "[]"}
 
   def encode(list) do
@@ -113,7 +108,6 @@ defimpl JSON.Encoder, for: List do
   @doc """
   Returns an atom that represents the JSON type for the term
   """
-  @spec typeof(term) :: atom
   def typeof([]), do: :array
 
   def typeof(list) do
@@ -129,14 +123,12 @@ defimpl JSON.Encoder, for: [Integer, Float] do
   @doc """
   Converts Elixir Integer and Floats into JSON Numbers
   """
-  @spec encode(term) :: {atom, bitstring}
   # Elixir converts octal, etc into decimal when putting in strings
   def encode(number), do: {:ok, "#{number}"}
 
   @doc """
   Returns an atom that represents the JSON type for the term
   """
-  @spec typeof(term) :: atom
   def typeof(_), do: :number
 end
 
@@ -144,7 +136,6 @@ defimpl JSON.Encoder, for: Atom do
   @doc """
   Converts Elixir Atoms into their JSON equivalents
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode(nil), do: {:ok, "null"}
   def encode(false), do: {:ok, "false"}
   def encode(true), do: {:ok, "true"}
@@ -153,7 +144,6 @@ defimpl JSON.Encoder, for: Atom do
   @doc """
   Returns an atom that represents the JSON type for the term
   """
-  @spec typeof(term) :: atom
   def typeof(boolean) when is_boolean(boolean), do: :boolean
   def typeof(nil), do: :null
   def typeof(atom) when is_atom(atom), do: :string
@@ -166,7 +156,6 @@ defimpl JSON.Encoder, for: BitString do
   @doc """
   Converts Elixir String into JSON String
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode(bitstring), do: {:ok, <<?">> <> encode_binary_recursive(bitstring, []) <> <<?">>}
 
   defp encode_binary_recursive(<<head::utf8, tail::binary>>, acc) do
@@ -209,7 +198,6 @@ defimpl JSON.Encoder, for: BitString do
   @doc """
   Returns an atom that represents the JSON type for the term
   """
-  @spec typeof(term) :: atom
   def typeof(_), do: :string
 end
 
@@ -217,13 +205,11 @@ defimpl JSON.Encoder, for: Record do
   @doc """
   Encodes elixir records into json objects
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode(record), do: record.to_keywords |> JSON.Encoder.Helpers.dict_encode()
 
   @doc """
   Encodes a record into a JSON object
   """
-  @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
@@ -231,13 +217,11 @@ defimpl JSON.Encoder, for: Map do
   @doc """
   Encodes maps into object
   """
-  @spec encode(term) :: {atom, bitstring}
   def encode(map), do: map |> JSON.Encoder.Helpers.dict_encode()
 
   @doc """
   Returns an atom that represents the JSON type for the term
   """
-  @spec typeof(term) :: atom
   def typeof(_), do: :object
 end
 
@@ -249,7 +233,6 @@ defimpl JSON.Encoder, for: Any do
   @doc """
   Encodes a map into a JSON object
   """
-  @spec encode(map|term) :: {atom, bitstring}
   def encode(%{} = struct) do
     struct
     |> Map.to_list()
@@ -268,7 +251,6 @@ defimpl JSON.Encoder, for: Any do
   @doc """
   Fallback method
   """
-  @spec typeof(term) :: atom
   def typeof(struct) when is_map(struct), do: :object
   def typeof(_), do: :string
 end
