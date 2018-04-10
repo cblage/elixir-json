@@ -25,6 +25,8 @@ defmodule JSON.Decoder.UnexpectedTokenError do
 end
 
 defprotocol JSON.Decoder do
+  @dialyzer {:nowarn_function, __protocol__: 1}
+
   @moduledoc """
   Defines the protocol required for converting raw JSON into Elixir terms
   """
@@ -36,74 +38,77 @@ defprotocol JSON.Decoder do
   def decode(bitstring_or_char_list)
 end
 
-defimpl JSON.Decoder, for: BitString do
-  @moduledoc """
-  JSON Decoder implementation for BitString values
-  """
+defmodule JSON.Encoder.DefaultImplementations do
+  defimpl JSON.Decoder, for: BitString do
+    @moduledoc """
+    JSON Decoder implementation for BitString values
+    """
 
-  alias JSON.Parser, as: Parser
+    alias JSON.Parser, as: Parser
 
-  @doc """
-  decodes json in BitString format
+    @doc """
+    decodes json in BitString format
 
-  ## Examples
+    ## Examples
 
-      iex> JSON.Decoder.decode ""
-      {:error, :unexpected_end_of_buffer}
+        iex> JSON.Decoder.decode ""
+        {:error, :unexpected_end_of_buffer}
 
-      iex> JSON.Decoder.decode "face0ff"
-      {:error, {:unexpected_token, "face0ff"}}
+        iex> JSON.Decoder.decode "face0ff"
+        {:error, {:unexpected_token, "face0ff"}}
 
-      iex> JSON.Decoder.decode "-hello"
-      {:error, {:unexpected_token, "-hello"}}
+        iex> JSON.Decoder.decode "-hello"
+        {:error, {:unexpected_token, "-hello"}}
 
-  """
-  def decode(bitstring) do
-    bitstring
-    |> Parser.trim()
-    |> Parser.parse()
-    |> case do
-      {:error, error_info} ->
-        {:error, error_info}
+    """
+    def decode(bitstring) do
+      bitstring
+      |> Parser.trim()
+      |> Parser.parse()
+      |> case do
+           {:error, error_info} ->
+             {:error, error_info}
 
-      {:ok, value, rest} ->
-        case Parser.trim(rest) do
-          <<>> -> {:ok, value}
-          _ -> {:error, {:unexpected_token, rest}}
+           {:ok, value, rest} ->
+             case Parser.trim(rest) do
+               <<>> -> {:ok, value}
+               _ -> {:error, {:unexpected_token, rest}}
+             end
+         end
+    end
+  end
+
+  defimpl JSON.Decoder, for: List do
+    @moduledoc """
+    JSON Decoder implementation for Charlist values
+    """
+
+    alias JSON.Decoder, as: Decoder
+
+    @doc """
+    decodes json in BitString format
+
+    ## Examples
+
+        iex> JSON.Decoder.decode ""
+        {:error, :unexpected_end_of_buffer}
+
+        iex> JSON.Decoder.decode "face0ff"
+        {:error, {:unexpected_token, "face0ff"}}
+
+        iex> JSON.Decoder.decode "-hello"
+        {:error, {:unexpected_token, "-hello"}}
+
+    """
+    def decode(charlist) do
+      charlist |>
+        to_string() |>
+        Decoder.decode() |>
+        case do
+          {:error, {:unexpected_token, rest}} -> {:error, {:unexpected_token, rest |> to_charlist()}}
+          other -> other
         end
     end
   end
 end
 
-defimpl JSON.Decoder, for: List do
-  @moduledoc """
-  JSON Decoder implementation for Charlist values
-  """
-
-  alias JSON.Decoder, as: Decoder
-
-  @doc """
-  decodes json in BitString format
-
-  ## Examples
-
-      iex> JSON.Decoder.decode ""
-      {:error, :unexpected_end_of_buffer}
-
-      iex> JSON.Decoder.decode "face0ff"
-      {:error, {:unexpected_token, "face0ff"}}
-
-      iex> JSON.Decoder.decode "-hello"
-      {:error, {:unexpected_token, "-hello"}}
-
-  """
-  def decode(charlist) do
-    charlist |>
-      to_string() |>
-      Decoder.decode() |>
-      case do
-        {:error, {:unexpected_token, rest}} -> {:error, {:unexpected_token, rest |> to_charlist()}}
-        other -> other
-      end
-  end
-end
