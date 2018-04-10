@@ -95,6 +95,8 @@ defmodule JSON do
             inspect(e)
           }"
         end)
+
+        e
     end
   end
 end

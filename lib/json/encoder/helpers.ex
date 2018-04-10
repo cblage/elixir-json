@@ -16,6 +16,7 @@ defmodule JSON.Encoder.Helpers do
   Given an enumerable that yields tuples of `{key, value}` encode the enumerable
   as an object.
   """
+
   def dict_encode(coll) do
     {:ok,
      "{" <>
@@ -25,7 +26,9 @@ defmodule JSON.Encoder.Helpers do
   end
 
   defp encode_item(item) do
-    case Encoder.encode(item) do
+    item
+    |> Encoder.encode()
+    |> case do
       {:ok, encoded_item} -> encoded_item
       # propagate error, will trigger error in map_join
       err -> err
