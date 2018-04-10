@@ -1,5 +1,6 @@
 # Elixir JSON
 
+[![Coverage Status](https://coveralls.io/repos/github/cblage/elixir-json/badge.svg?branch=master)](https://coveralls.io/github/cblage/elixir-json?branch=master)
 [![Hex.pm](https://img.shields.io/hexpm/v/json.svg?style=flat-square)](https://hex.pm/packages/json)
 [![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json) 
 [![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) 
