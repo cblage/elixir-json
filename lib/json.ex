@@ -96,7 +96,7 @@ defmodule JSON do
           }"
         end)
 
-        e
+        raise JSON.Decoder.Error
     end
   end
 end
