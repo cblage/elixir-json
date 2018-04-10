@@ -25,6 +25,7 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
     [applications: applications(Mix.env)]
   end
 
+  defp applications(:dev), do:  [] ++ applications(:default)
   defp applications(_all), do: [:logger]
 
   def deps(_) do
