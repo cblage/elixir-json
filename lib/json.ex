@@ -55,7 +55,7 @@ defmodule JSON do
     bitstring_or_char_list |>
       Decoder.decode() |>
       case  do
-       res = {:ok, value} ->
+       res = {:ok, _} ->
          Logger.debug("#{__MODULE__}.decode(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect res}")
          res
        e = {:error, {:unexpected_token, tok}} ->

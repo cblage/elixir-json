@@ -5,12 +5,12 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.18.3">
-    <title>JSON.Encoder – json v1.1.0</title>
+    <title>JSON.Encoder – json v2.1.0-SNAPSHOT</title>
     <link rel="stylesheet" href="dist/app-480ffdc169.css" />
     
       <link rel="canonical" href="https://hexdocs.pm/json/JSON.Encoder.html" />
     
-    <script src="dist/sidebar_items-5aa1ba4306.js"></script>
+    <script src="dist/sidebar_items-266cb79179.js"></script>
     
     
     
@@ -37,7 +37,7 @@
         json
       </h1>
       <h2 class="sidebar-projectVersion">
-        v1.1.0
+        v2.1.0-SNAPSHOT
       </h2>
     </div>
     
@@ -73,10 +73,10 @@
 
 
       <h1>
-        <small class="visible-xs">json v1.1.0</small>
+        <small class="visible-xs">json v2.1.0-SNAPSHOT</small>
         JSON.Encoder <small>protocol</small>
         
-          <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/encoder.ex#L21" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/cblage/elixir-json/blob/v2.1.0-SNAPSHOT/lib/json/encoder.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -166,7 +166,7 @@
     </a>
     <span class="signature">t()</span>
     
-      <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/encoder.ex#L21" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/cblage/elixir-json/blob/v2.1.0-SNAPSHOT/lib/json/encoder.ex#L1" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -208,7 +208,7 @@
     </a>
     <span class="signature">encode(term)</span>
     
-      <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/encoder.ex#L42" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/cblage/elixir-json/blob/v2.1.0-SNAPSHOT/lib/json/encoder.ex#L22" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -217,7 +217,17 @@
     
       <div class="specs">
         
-          <pre>encode(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>()) :: {<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">bitstring</a>()}</pre>
+          <pre>encode(
+  <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">tuple</a>()
+  | <a href="https://hexdocs.pm/elixir/HashDict.html#t:t/0">HashDict.t</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">integer</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">float</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">map</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>()
+  | <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">term</a>()
+) :: {<a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">bitstring</a>()}</pre>
         
       </div>
     
@@ -250,7 +260,7 @@ iex&gt; JSON.Encoder.encode(%{a: 1, b: 2})
     </a>
     <span class="signature">typeof(term)</span>
     
-      <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/encoder.ex#L67" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/cblage/elixir-json/blob/v2.1.0-SNAPSHOT/lib/json/encoder.ex#L47" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>

@@ -5,12 +5,12 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.18.3">
-    <title>JSON.Parser – json v1.1.0</title>
+    <title>JSON.Parser – json v2.1.0-SNAPSHOT</title>
     <link rel="stylesheet" href="dist/app-480ffdc169.css" />
     
       <link rel="canonical" href="https://hexdocs.pm/json/JSON.Parser.html" />
     
-    <script src="dist/sidebar_items-5aa1ba4306.js"></script>
+    <script src="dist/sidebar_items-266cb79179.js"></script>
     
     
     
@@ -37,7 +37,7 @@
         json
       </h1>
       <h2 class="sidebar-projectVersion">
-        v1.1.0
+        v2.1.0-SNAPSHOT
       </h2>
     </div>
     
@@ -73,10 +73,10 @@
 
 
       <h1>
-        <small class="visible-xs">json v1.1.0</small>
+        <small class="visible-xs">json v2.1.0-SNAPSHOT</small>
         JSON.Parser
         
-          <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/parser/parser.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/cblage/elixir-json/blob/v2.1.0-SNAPSHOT/lib/json/parser.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -115,15 +115,6 @@
 </div>
   
 </div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#trim/1">trim(bitstring)</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>parses valid JSON whitespace if it exists, returns the rest of the buffer</p>
-</div>
-  
-</div>
 
   </div>
 
@@ -154,7 +145,7 @@
     </a>
     <span class="signature">parse(bin)</span>
     
-      <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/parser/parser.ex#L85" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/cblage/elixir-json/blob/v2.1.0-SNAPSHOT/lib/json/parser.ex#L116" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -219,45 +210,6 @@ iex&gt; JSON.Parser.parse &quot;[\&quot;foo\&quot;, 1, 2, 1.5] lala&quot;
 
 iex&gt; JSON.Parser.parse &quot;{\&quot;result\&quot;: \&quot;this will be a elixir result\&quot;} lalal&quot;
 {:ok, Enum.into([{&quot;result&quot;, &quot;this will be a elixir result&quot;}], Map.new), &quot; lalal&quot;}</code></pre>
-
-  </section>
-</div>
-<div class="detail" id="trim/1">
-  
-  
-  <div class="detail-header">
-    <a href="#trim/1" class="detail-link" title="Link to this function">
-      <span class="icon-link" aria-hidden="true"></span>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <span class="signature">trim(bitstring)</span>
-    
-      <a href="https://github.com/cblage/elixir-json/blob/v1.1.0/lib/json/parser/parser.ex#L104" class="view-source" rel="help" title="View Source">
-       <span class="icon-code" aria-hidden="true"></span>
-       <span class="sr-only">View Source</span>
-     </a>
-    
-    
-    
-  </div>
-  <section class="docstring">
-    <p>parses valid JSON whitespace if it exists, returns the rest of the buffer</p>
-<h2 id="trim/1-examples" class="section-heading">
-  <a href="#trim/1-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
-  Examples
-</h2>
-
-<pre><code class="iex elixir">iex&gt; JSON.Parser.trim &quot;&quot;
-&quot;&quot;
-
-iex&gt; JSON.Parser.trim &quot;xkcd&quot;
-&quot;xkcd&quot;
-
-iex&gt; JSON.Parser.trim &quot;  \t\r lalala &quot;
-&quot;lalala &quot;
-
-iex&gt; JSON.Parser.trim &quot; \n\t\n fooo \u00dflalalal &quot;
-&quot;fooo \u00dflalalal &quot;</code></pre>
 
   </section>
 </div>
