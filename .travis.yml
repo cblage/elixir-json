@@ -6,6 +6,7 @@ notifications:
 elixir:
   - 1.6
 script:
+  - mix dialyzer
   - MIX_ENV=test mix test
 after_script:
   - mix deps.get --only docs
