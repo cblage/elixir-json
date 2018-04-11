@@ -44,7 +44,6 @@ defmodule JSON.Decoder.DefaultImplementations do
       |> Parser.parse()
       |> case do
         {:error, error_info} ->
-          # TODO use new logging
           Logger.debug(
             "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with errror: #{
               inspect(error_info)
@@ -95,7 +94,14 @@ defmodule JSON.Decoder.DefaultImplementations do
               )
 
               res = func.(chunk)
-              more_res = res.(:foo, :bar)
+
+              Logger.debug(
+                "#{__MODULE__}.decode(#{inspect(bitstring)}} got res from func(chunk)=#{
+                  inspect(res)
+                }"
+              )
+
+              more_res = res.("test", "bar")
 
               Logger.debug(
                 "#{__MODULE__}.decode(#{inspect(bitstring)}} checking = #{inspect(func)} = MORE_Res #{
@@ -158,23 +164,23 @@ defmodule JSON.Decoder.DefaultImplementations do
           {:ok, value}
 
         {:error, error_info} when is_binary(error_info) ->
-          log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with error: #{inspect(error_info)}"
-          end)
+          Logger.error(
+            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(error_info)}"
+          )
 
           {:error, error_info |> to_charlist()}
 
         {:error, {:unexpected_token, bin}} when is_binary(bin) ->
-          log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with error: #{inspect(bin)}"
-          end)
+          Logger.error(
+            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(bin)}"
+          )
 
           {:error, {:unexpected_token, bin |> to_charlist()}}
 
         e = {:error, error_info} ->
-          log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with error: #{inspect(e)}"
-          end)
+          Logger.error(
+            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(e)}"
+          )
 
           {:error, error_info}
       end

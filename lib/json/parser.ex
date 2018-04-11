@@ -68,18 +68,19 @@ defmodule JSON.Parser do
       iex> JSON.Parser.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-  def parse(bin) when is_binary(bin) do
-    Logger.debug("#{__MODULE__}.parse(#{inspect bin})")
-    Logger.debug("#{__MODULE__}.parse(#{inspect bin}) starting Stream.chunk_while, [],...")
-    Stream.chunk_while(bin , %Parser.Record.Chunk{},
-      fn (_,_) ->
-        :halt
-      end, 
-      fn arg ->
-        Logger.debug("#{__MODULE__}.finish_chunk(#{inspect arg})")
-       :halt
-      end)
-  end
+  #def parse(bin) when is_binary(bin) do
+  #  Logger.debug("#{__MODULE__}.parse(#{inspect bin})")
+  #  Logger.debug("#{__MODULE__}.parse(#{inspect bin}) starting Stream.chunk_while, [],...")
+  #  bin |> Stream.chunk_while(%Parser.Record.Chunk{},
+  #    fn (foo, bar) ->
+  #      Logger.debug("#{__MODULE__}.process_chunk(#{inspect foo}, #{inspect bar})")
+  #      :halt
+  #    end,
+  #    fn arg ->
+  #      Logger.debug("#{__MODULE__}.finish_chunk(#{inspect arg})")
+  #     :halt
+  #    end)
+  #end
 
   def parse(<<?[, _::binary>> = bin) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)..." end)
