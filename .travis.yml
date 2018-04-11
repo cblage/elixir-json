@@ -24,6 +24,7 @@ after_script:
   - MIX_ENV=test mix coveralls --verbose
   - MIX_ENV=test mix coveralls.json --verbose
   - MIX_ENV=test mix coveralls.travis
+  - MIX_ENV=test mix coveralls.post --token  ilbBz5SvaqJqUBZx9KcIcuM8C1D3BCsB8  --branch $TRAVIS_BRANCH --name "TravisCI"
   - ./cc-test-reporter after-build -r "$CC_TEST_REPORTER_ID" -t excoveralls --exit-code $TRAVIS_TEST_RESULT
 after_success:
   - mix credo --strict
