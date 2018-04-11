@@ -65,9 +65,7 @@ defmodule JSON.Parser.Object do
       {:ok, value, after_value} ->
         acc = Map.put(acc, key, value)
 
-        after_value
-        |> String.trim()
-        |> case do
+        case String.trim(after_value) do
           <<?,, after_comma::binary>> ->
             parse_object_contents(acc, String.trim(after_comma))
 

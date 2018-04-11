@@ -45,7 +45,7 @@ defmodule JSON.Parser.Array do
   end
 
   def parse(json) do
-    log(:debug, fn -> "#{__MODULE__}.parse(<<>>) unexpected token: #{inspect(json)}" end)
+    log(:debug, fn -> "#{__MODULE__}.parse(json) unexpected token: #{inspect(json)}" end)
     {:error, {:unexpected_token, json}}
   end
 
@@ -101,6 +101,35 @@ defmodule JSON.Parser.Array do
         after_value
         |> String.trim()
         |> case do
+          <<?,, after_comma::binary>> ->
+            trimmed = String.trim(after_comma)
+
+            log(:debug, fn ->
+              "#{__MODULE__}.parse_array_contents(acc, json) found a comma, continuing parsing of #{
+                inspect(trimmed)
+              }"
+            end)
+
+            parse_array_contents([value | acc], trimmed)
+
+          rest ->
+            log(:debug, fn ->
+              "#{__MODULE__}.parse_array_contents(acc, json) continuing parsing of #{
+                inspect(rest)
+              }"
+            end)
+
+            parse_array_contents([value | acc], rest)
+        end
+
+        log(:debug, fn ->
+          "#{__MODULE__}.parse_array_contents(acc, json) sucessfully parsed value `#{
+            inspect(value)
+          }`, with
+        after_value=#{inspect(after_value)}"
+        end)
+
+        case String.trim(after_value) do
           <<?,, after_comma::binary>> ->
             trimmed = String.trim(after_comma)
 

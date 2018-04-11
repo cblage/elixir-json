@@ -68,8 +68,6 @@ defmodule JSON.Parser do
       iex> JSON.Parser.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-
-
   def parse(<<?[, _::binary>> = bin) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)..." end)
     ArrayParser.parse(bin)
