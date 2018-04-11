@@ -116,18 +116,18 @@ defmodule JSON.Decoder.DefaultImplementations do
           Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}} run result = #{inspect(run)}")
 
           err = {:error, :stream_not_implemented}
-          Logger.error("#{__MODULE__}.decode(#{inspect(bitstring)}) returning #{inspect(err)}")
+          Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}) returning #{inspect(err)}")
           err
 
         other ->
-          Logger.error(
+          Logger.debug(
             "#{__MODULE__}.decode(#{inspect(bitstring)}) received unexpected result from parse: #{
               inspect(other)
             }"
           )
 
           err = {:error, {:unexpected_token, other}}
-          Logger.error("#{__MODULE__}.decode(#{inspect(bitstring)}) returning #{inspect(err)}")
+          Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}) returning #{inspect(err)}")
           err
       end
     end
@@ -164,21 +164,21 @@ defmodule JSON.Decoder.DefaultImplementations do
           {:ok, value}
 
         {:error, error_info} when is_binary(error_info) ->
-          Logger.error(
+          Logger.debug(
             "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(error_info)}"
           )
 
           {:error, error_info |> to_charlist()}
 
         {:error, {:unexpected_token, bin}} when is_binary(bin) ->
-          Logger.error(
+          Logger.debug(
             "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(bin)}"
           )
 
           {:error, {:unexpected_token, bin |> to_charlist()}}
 
         e = {:error, error_info} ->
-          Logger.error(
+          Logger.debug(
             "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(e)}"
           )
 
