@@ -29,7 +29,7 @@ defmodule ElixirJSON_210_SNAPSHOT.Mixfile do
   def application do
     [applications: applications(Mix.env())]
   end
-  
+
   defp applications(_all), do: [:logger]
 
   def deps(_) do
