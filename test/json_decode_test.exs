@@ -98,6 +98,20 @@ defmodule JSONDecodeTest do
       [3, true]
     ])
 
+    decodes("simple object with string keys" , "{\"foo\" : 123}", %{"foo" => 123})
+
+    decodes("simple object containing array" , "{\"foo\" : [1,2,3]}", %{"foo" => [1,2,3]})
+    decodes("simple object containing big array" ,
+      "{
+           \"foo\" : [
+                       1,
+                       2,
+                       3
+                     ]
+      }",
+      %{"foo" => [1,2,3]}
+    )
+
     decodes(
       "complex object",
       "{
@@ -108,8 +122,8 @@ defmodule JSONDecodeTest do
               \"children\": [
                 {\"name\": \"Søren\"},
                 {\"name\": \"Éloise\"}
-             ]
-            }",
+              ]
+      }",
       Enum.into(
         [
           {"name", "Rafaëlla"},
@@ -125,6 +139,8 @@ defmodule JSONDecodeTest do
         Map.new()
       )
     )
+
+    cannot_decode("simple object with char keys" , "{'foo' : 123}'", {:unexpected_token, "'foo' : 123}'"})
 
     cannot_decode("bad literal", "nul", {:unexpected_token, "nul"})
 
@@ -150,11 +166,7 @@ defmodule JSONDecodeTest do
       :unexpected_end_of_buffer
     )
 
-    cannot_decode(
-      "object with missing colon",
-      "{\"foo\" \"bar\"}",
-      {:unexpected_token, "\"bar\"}"}
-    )
+    cannot_decode("object with missing colon", "{\"foo\" \"bar\"}", {:unexpected_token, "\"bar\"}"})
   end
 
   defmodule CharlistCases do
@@ -204,6 +216,22 @@ defmodule JSONDecodeTest do
       [3, true]
     ])
 
+    decodes("simple object string keys" , '{"foo" : 123}', %{"foo" => 123})
+
+    decodes("simple object containing array" , '{"foo" : [1,2,3]}', %{"foo" => [1,2,3]})
+
+    decodes("simple object containing big array" ,
+      '{
+           "foo" : [
+                       1,
+                       2,
+                       3
+                     ]
+      }',
+      %{"foo" => [1,2,3]}
+    )
+
+
     decodes(
       "complex object",
       '{
@@ -231,6 +259,8 @@ defmodule JSONDecodeTest do
         Map.new()
       )
     )
+
+    cannot_decode("simple object with char keys" , '{\'foo\' : 123}', {:unexpected_token, '\'foo\' : 123}'})
 
     cannot_decode("bad literal", 'nul', {:unexpected_token, 'nul'})
 

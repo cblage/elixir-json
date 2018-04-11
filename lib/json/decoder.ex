@@ -96,17 +96,6 @@ defmodule JSON.Decoder.DefaultImplementations do
           e = {:error, error_info} ->
             Logger.error("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect e}")
             {:error, error_info}
-          {:ok, value, rest} ->
-            Logger.debug("#{__MODULE__}.decode(#{inspect charlist}) trimming remainder of JSON payload #{inspect rest}...")
-            case rest |> String.trim() do
-              <<>> ->
-                Logger.debug("#{__MODULE__}.decode(#{inspect charlist}) successfully trimmed remainder JSON payload!")
-                Logger.debug("#{__MODULE__}.decode(#{inspect charlist}) returning {:ok. #{inspect value}}")
-                {:ok, value}
-              rest ->
-                Logger.error("#{__MODULE__}.decode(#{inspect charlist}} failed consume entire buffer: #{rest}")
-                {:error, {:unexpected_token, rest |> to_charlist()}}
-            end
         end
     end
   end

@@ -3,6 +3,8 @@ defmodule JSON.Parser.Array do
   Implements a JSON Array Parser for Bitstring values
   """
 
+  require Logger
+
   @doc """
   parses a valid JSON array value, returns its elixir list representation
 
@@ -27,33 +29,54 @@ defmodule JSON.Parser.Array do
       {:ok, ["foo", 1, 2, 1.5], " lala"}
   """
   def parse(<<?[, rest::binary>>) do
+    Logger.debug("#{__MODULE__}.parse(#{inspect rest}) trimming string and the calling parse_array_contents()")
     rest |> String.trim() |> parse_array_contents()
   end
 
-  def parse(<<>>), do: {:error, :unexpected_end_of_buffer}
-  def parse(json), do: {:error, {:unexpected_token, json}}
+  def parse(<<>>) do
+    Logger.error("#{__MODULE__}.parse(<<>>) unexpected end of buffer.")
+    {:error, :unexpected_end_of_buffer}
+  end
+  def parse(json) do
+    Logger.error("#{__MODULE__}.parse(<<>) unexpected token: #{inspect json}")
+    {:error, {:unexpected_token, json}}
+  end
 
   # begin parse array
-  defp parse_array_contents(json) when is_binary(json), do: parse_array_contents([], json)
+  defp parse_array_contents(json) when is_binary(json) do
+    Logger.debug("#{__MODULE__}.parse_array_contents(#{inspect json}) beginning to parse array contents...")
+    parse_array_contents([], json)
+  end
 
   # stop condition
-  defp parse_array_contents(acc, <<?], rest::binary>>), do: {:ok, Enum.reverse(acc), rest}
+  defp parse_array_contents(acc, <<?], rest::binary>>) do
+    Logger.debug("#{__MODULE__}.parse_array_contents(#{inspect acc}, #{inspect rest}) finished parsing array contents.")
+    {:ok, Enum.reverse(acc), rest}
+  end
 
   # error condition
-  defp parse_array_contents(_, <<>>), do: {:error, :unexpected_end_of_buffer}
+  defp parse_array_contents(_, <<>>) do
+    Logger.error("#{__MODULE__}.parse_array_contents(acc, <<>>) unexpected end of buffer.")
+    {:error, :unexpected_end_of_buffer}
+  end
 
   defp parse_array_contents(acc, json) do
     case json |> String.trim()|> JSON.Parser.parse() do
       {:error, error_info} ->
+        Logger.error("#{__MODULE__}.parse_array_contents(#{inspect acc}, #{inspect json}) generated an error: #{inspect error_info}")
         {:error, error_info}
       {:ok, value, after_value} ->
-        after_value |>
-          String.trim() |>
-          case  do
+        Logger.debug("#{__MODULE__}.parse_array_contents(acc, json) sucessfully parsed value `#{inspect value}`, with
+        after_value=#{inspect after_value}")
+        after_value |> String.trim() |>
+          case do
             <<?,, after_comma::binary>> ->
-              parse_array_contents([value | acc], String.trim(after_comma))
-            _ ->
-              parse_array_contents([value | acc], after_value)
+              trimmed = String.trim(after_comma)
+              Logger.debug("#{__MODULE__}.parse_array_contents(acc, json) found a comma, continuing parsing of #{inspect trimmed}")
+              parse_array_contents([value | acc], trimmed)
+            rest ->
+              Logger.debug("#{__MODULE__}.parse_array_contents(acc, json) continuing parsing of #{inspect rest}")
+              parse_array_contents([value | acc], rest)
           end
     end
   end
