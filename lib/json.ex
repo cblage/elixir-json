@@ -52,7 +52,40 @@ defmodule JSON do
   """
   @spec decode(bitstring) :: {atom, term}
   @spec decode(charlist) :: {atom, term}
-  defdelegate decode(bitstring_or_char_list), to: Decoder
+
+  # defdelegate decode(bitstring_or_char_list), to: Decoder
+
+  # TODO: use new logging
+  def decode(bitstring_or_char_list) do
+    case bitstring_or_char_list |> Decoder.decode() do
+      res = {:ok, _} ->
+        Logger.debug(
+          "#{__MODULE__}.decode(#{inspect(bitstring_or_char_list)}} was sucesfull: #{inspect(res)}"
+        )
+
+        res
+
+      e = {:error, {:unexpected_token, tok}} ->
+        Logger.debug(
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} unexpected token #{tok}"
+        )
+
+        e
+
+      e = {:error, :unexpected_end_of_buffer} ->
+        Logger.debug("#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} end of buffer")
+        e
+
+      e ->
+        Logger.debug(
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} an unknown problem occurred #{
+            inspect(e)
+          }"
+        )
+
+        e
+    end
+  end
 
   @doc """
   Converts a valid JSON string into an Elixir term, raises errors when something bad happens
