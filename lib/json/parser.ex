@@ -117,6 +117,4 @@ defmodule JSON.Parser do
     Logger.debug("#{__MODULE__}.parse(json) unexpected token: #{inspect json}")
     {:error, {:unexpected_token, json}}
   end
-
-
 end

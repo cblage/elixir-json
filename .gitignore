@@ -11,6 +11,10 @@ erl_crash.dump
 *.iml
 .idea
 
+/doc
+
+/docs
+
 # The directory Mix will write compiled artifacts to.
 /_build
 

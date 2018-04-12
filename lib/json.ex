@@ -66,7 +66,6 @@ defmodule JSON do
          e
        e ->
          Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
-         e
      end
   end
 
@@ -93,7 +92,6 @@ defmodule JSON do
         raise JSON.Decoder.UnexpectedEndOfBufferError
       e ->
         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
-        raise JSON.Decoder.Error
     end
   end
 end
