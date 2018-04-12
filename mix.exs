@@ -1,7 +1,7 @@
-defmodule ElixirJSON_110_SNAPSHOT.Mixfile do
+defmodule ElixirJSON_120_SNAPSHOT.Mixfile do
   use Mix.Project
 
-  @version "1.1.0"
+  @version "2.1.0-SNAPSHOT"
 
   def project do
     [
@@ -17,19 +17,19 @@ defmodule ElixirJSON_110_SNAPSHOT.Mixfile do
       dialyzer: dialyzer(),
       docs: docs(),
       aliases: aliases(),
-      preferred_cli_env: ["bench.encode": :bench, "bench.decode": :bench, docs: :docs, coveralls: :test],
+      preferred_cli_env: ["bench.encode": :bench, "bench.decode": :bench, docs: :docs, coveralls: :test, test: :test],
     ]
   end
 
-  def application() do
-    [
-      extra_applications: []
-    ]
+  def application do
+    [applications: applications(Mix.env)]
   end
+
+  defp applications(:dev), do:  [] ++ applications(:default)
+  defp applications(_all), do: [:logger]
 
   def deps(_) do
     [
-      #{:inch_ex, github: "cblage/inch_ex", branch: "master", only: [:dev, :test], runtime: false},
       {:inch_ex, ">=0.0.0", only: [:dev, :test]},
       {:decimal, "~> 1.0", optional: true},
       {:benchee, "~> 0.8", only: :bench, override: true},

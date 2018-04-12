@@ -9,6 +9,8 @@ defmodule JSON.Parser do
   alias Parser.Object, as: ObjectParser
   alias Parser.String, as: StringParser
 
+  require Logger
+
   @doc """
   parses a valid JSON value, returns its elixir representation
 
@@ -65,59 +67,56 @@ defmodule JSON.Parser do
       iex> JSON.Parser.parse "{\\\"result\\\": \\\"this will be a elixir result\\\"} lalal"
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
-  def parse(<<?[, _::binary>> = bin), do: ArrayParser.parse(bin)
-  def parse(<<?{, _::binary>> = bin), do: ObjectParser.parse(bin)
-  def parse(<<?", _::binary>> = bin), do: StringParser.parse(bin)
 
+  def parse(<<?[, _::binary>> = bin) do
+    Logger.debug("#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
+    ArrayParser.parse(bin)
+  end
+
+  def parse(<<?{, _::binary>> = bin) do
+    Logger.debug("#{__MODULE__}.parse(bin) starting ObjectParser.parse(bin)...")
+    ObjectParser.parse(bin)
+  end
+
+  def parse(<<?", _::binary>> = bin) do
+    Logger.debug("#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
+    StringParser.parse(bin)
+  end
+  
   def parse(<<?-, number::utf8, _::binary>> = bin) when number in ?0..?9 do
+    Logger.debug("#{__MODULE__}.parse(bin) starting negative NumberParser.parse(bin)...")
     NumberParser.parse(bin)
   end
 
   def parse(<<number::utf8, _::binary>> = bin) when number in ?0..?9 do
+    Logger.debug("#{__MODULE__}.parse(bin) starting NumberParser.parse(bin)...")
     NumberParser.parse(bin)
   end
 
-  def parse(<<?n, ?u, ?l, ?l, rest::binary>>), do: {:ok, nil, rest}
-  def parse(<<?t, ?r, ?u, ?e, rest::binary>>), do: {:ok, true, rest}
-  def parse(<<?f, ?a, ?l, ?s, ?e, rest::binary>>), do: {:ok, false, rest}
-
-  def parse(<<>>), do: {:error, :unexpected_end_of_buffer}
-  def parse(json), do: {:error, {:unexpected_token, json}}
-
-  @doc """
-  parses valid JSON whitespace if it exists, returns the rest of the buffer
-
-  ## Examples
-
-      iex> JSON.Parser.trim ""
-      ""
-
-      iex> JSON.Parser.trim "xkcd"
-      "xkcd"
-
-      iex> JSON.Parser.trim "  \\t\\r lalala "
-      "lalala "
-
-      iex> JSON.Parser.trim " \\n\\t\\n fooo \\u00dflalalal "
-      "fooo \\u00dflalalal "
-  """
-  def trim(bitstring) when is_binary(bitstring) do
-    case bitstring do
-      # 32 = ascii space, clearer than using "? ", I think
-      <<32::utf8, rest::binary>> ->
-        trim(rest)
-
-      <<?\t::utf8, rest::binary>> ->
-        trim(rest)
-
-      <<?\r::utf8, rest::binary>> ->
-        trim(rest)
-
-      <<?\n::utf8, rest::binary>> ->
-        trim(rest)
-
-      _ ->
-        bitstring
-    end
+  def parse(<<?n, ?u, ?l, ?l, rest::binary>>) do
+    Logger.debug("#{__MODULE__}.parse(bin) parsed `null` token.")
+    {:ok, nil, rest}
   end
+
+  def parse(<<?t, ?r, ?u, ?e, rest::binary>>) do
+    Logger.debug("#{__MODULE__}.parse(bin) parsed `true` token.")
+    {:ok, true, rest}
+  end
+
+  def parse(<<?f, ?a, ?l, ?s, ?e, rest::binary>>) do
+    Logger.debug("#{__MODULE__}.parse(bin) parsed `false` token.")
+    {:ok, false, rest}
+  end
+
+  def parse(<<>>) do
+    Logger.error("#{__MODULE__}.parse(<<>>) unexpected end of buffer.")
+    {:error, :unexpected_end_of_buffer}
+  end
+
+  def parse(json) do
+    Logger.error("#{__MODULE__}.parse(json) unexpected token: #{inspect json}")
+    {:error, {:unexpected_token, json}}
+  end
+
+
 end

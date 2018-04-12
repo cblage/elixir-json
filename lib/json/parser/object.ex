@@ -2,10 +2,7 @@ defmodule JSON.Parser.Object do
   @moduledoc """
   Implements a JSON Object Parser for Bitstring values
   """
-
-  import JSON.Parser, only: [trim: 1]
-  alias JSON.Parser, as: Parser
-
+  
   @doc """
   parses a valid JSON object value, returns its elixir representation
 
@@ -31,8 +28,8 @@ defmodule JSON.Parser.Object do
   """
   def parse(<<?{, rest::binary>>) do
     rest
-    |> trim
-    |> parse_object_contents
+    |> String.trim()
+    |> parse_object_contents()
   end
 
   def parse(<<>>), do: {:error, :unexpected_end_of_buffer}
@@ -41,39 +38,32 @@ defmodule JSON.Parser.Object do
   # Object Parsing
   defp parse_object_key(json) do
     case JSON.Parser.String.parse(json) do
-      {:error, error_info} ->
-        {:error, error_info}
-
+      {:error, error_info} -> {:error, error_info}
       {:ok, key, after_key} ->
-        case trim(after_key) do
+        case String.trim(after_key) do
           <<?:, after_colon::binary>> ->
-            {:ok, key, trim(after_colon)}
-
+            {:ok, key, String.trim(after_colon)}
           <<>> ->
             {:error, :unexpected_end_of_buffer}
-
           _ ->
-            {:error, {:unexpected_token, trim(after_key)}}
+            {:error, {:unexpected_token, String.trim(after_key)}}
         end
     end
   end
 
   defp parse_object_value(acc, key, after_key) do
-    case Parser.parse(after_key) do
+    case JSON.Parser.parse(after_key) do
       {:error, error_info} ->
         {:error, error_info}
-
       {:ok, value, after_value} ->
         acc = Map.put(acc, key, value)
-        after_value = trim(after_value)
-
-        case after_value do
-          <<?,, after_comma::binary>> ->
-            parse_object_contents(acc, trim(after_comma))
-
-          _ ->
-            parse_object_contents(acc, after_value)
-        end
+        after_value |> String.trim() |>
+          case do
+            <<?,, after_comma::binary>> ->
+              parse_object_contents(acc, String.trim(after_comma))
+            rest ->
+              parse_object_contents(acc, rest)
+          end
     end
   end
 
@@ -87,7 +77,6 @@ defmodule JSON.Parser.Object do
   end
 
   defp parse_object_contents(acc, <<?}, rest::binary>>), do: {:ok, acc, rest}
-
   defp parse_object_contents(_, <<>>), do: {:error, :unexpected_end_of_buffer}
   defp parse_object_contents(_, json), do: {:error, {:unexpected_token, json}}
 end

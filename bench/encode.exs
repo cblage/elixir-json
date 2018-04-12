@@ -3,8 +3,8 @@ encode_jobs = %{
   "Jason strict"   => &Jason.encode_to_iodata!(&1, maps: :strict),
   "Poison"         => &Poison.encode_to_iodata!/1,
   "JSX"            => &JSX.encode!/1,
-  "Tiny"           => &Tiny.encode!/1,
-  "jsone"          => &:jsone.encode/1,
+  #"Tiny"           => &Tiny.encode!/1,
+  #"jsone"          => &:jsone.encode/1,
   "JSON"           => &JSON.encode!/1,
   "term_to_binary" => &:erlang.term_to_binary/1,
 }
