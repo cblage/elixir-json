@@ -59,13 +59,13 @@ defmodule JSON do
          Logger.debug("#{__MODULE__}.decode(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect res}")
          res
        e = {:error, {:unexpected_token, tok}} ->
-         Logger.error("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
+         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
          e
        e = {:error, :unexpected_end_of_buffer} ->
-         Logger.error("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
+         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
          e
        e ->
-         Logger.error("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
+         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
          e
      end
   end
@@ -86,13 +86,13 @@ defmodule JSON do
         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect value}")
         value
       {:error, {:unexpected_token, tok}} ->
-        Logger.error("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
+        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
         raise JSON.Decoder.UnexpectedTokenError, token: tok
       {:error, :unexpected_end_of_buffer} ->
-        Logger.error("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
+        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
         raise JSON.Decoder.UnexpectedEndOfBufferError
       e ->
-        Logger.error("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
+        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
         raise JSON.Decoder.Error
     end
   end
