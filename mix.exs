@@ -1,7 +1,7 @@
 defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
   use Mix.Project
 
-  @version "1.2.4"
+  @version "1.2.1-SNAPSHOT"
 
   def project do
     [
