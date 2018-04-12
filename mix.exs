@@ -31,7 +31,6 @@ defmodule ElixirJSON_120_SNAPSHOT.Mixfile do
   def deps(_) do
     [
       {:inch_ex, ">=0.0.0", only: [:dev, :test]},
-      {:decimal, "~> 1.0", optional: true},
       {:benchee, "~> 0.8", only: :bench, override: true},
       {:benchee_html, "~> 0.1", only: :bench, override: true},
       {:poison, "~> 3.0", only: [:bench, :dev, :test], override: true},
