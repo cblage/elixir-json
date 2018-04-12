@@ -12,14 +12,14 @@ This library provides a natively implemented JSON encoder and decoder for Elixir
 All contributions are welcome.
 ## Installing
 
-Simply add ```{:json, "~> 1.1"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
+Simply add ```{:json, "~> 1.2"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
 ### Example for a project that already uses [Plug](https://github.com/elixir-plug/plug):
 ```elixir
 defp deps do
   [{:cowboy, "~> 1.0.0"},
    {:plug, "~> 1.0"},
-   {:json, "~> 1.1"}]
+   {:json, "~> 1.2"}]
 end
 ```
 

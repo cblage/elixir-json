@@ -34,11 +34,11 @@ defmodule JSON.Parser.Array do
   end
 
   def parse(<<>>) do
-    Logger.error("#{__MODULE__}.parse(<<>>) unexpected end of buffer.")
+    Logger.debug("#{__MODULE__}.parse(<<>>) unexpected end of buffer.")
     {:error, :unexpected_end_of_buffer}
   end
   def parse(json) do
-    Logger.error("#{__MODULE__}.parse(<<>) unexpected token: #{inspect json}")
+    Logger.debug("#{__MODULE__}.parse(<<>>) unexpected token: #{inspect json}")
     {:error, {:unexpected_token, json}}
   end
 
@@ -56,14 +56,14 @@ defmodule JSON.Parser.Array do
 
   # error condition
   defp parse_array_contents(_, <<>>) do
-    Logger.error("#{__MODULE__}.parse_array_contents(acc, <<>>) unexpected end of buffer.")
+    Logger.debug("#{__MODULE__}.parse_array_contents(acc, <<>>) unexpected end of buffer.")
     {:error, :unexpected_end_of_buffer}
   end
 
   defp parse_array_contents(acc, json) do
     case json |> String.trim()|> JSON.Parser.parse() do
       {:error, error_info} ->
-        Logger.error("#{__MODULE__}.parse_array_contents(#{inspect acc}, #{inspect json}) generated an error: #{inspect error_info}")
+        Logger.debug("#{__MODULE__}.parse_array_contents(#{inspect acc}, #{inspect json}) generated an error: #{inspect error_info}")
         {:error, error_info}
       {:ok, value, after_value} ->
         Logger.debug("#{__MODULE__}.parse_array_contents(acc, json) sucessfully parsed value `#{inspect value}`, with
