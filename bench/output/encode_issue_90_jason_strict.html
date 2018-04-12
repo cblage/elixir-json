@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+  <span class="input-label">
+    Issue 90
+  </span>
+
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.6.3</li>
+    <li>Erlang: 20.3</li>
+    <li>Operating system: Linux</li>
+    <li>Available memory: 31.94 GB</li>
+    <li>CPU Information: Intel(R) Core(TM) i5-4670K CPU @ 3.40GHz</li>
+    <li>Number of Available Cores: 4</li>
+  </ul>
+</article>
+
+
+    <article>
+      <h2>
+        <a name="Jason strict"></a>
+        Jason strict
+        <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#individual">
+          <i
+            class="benchee-help-icon icon-question-circle-o"
+            title="Graphs showing the individual run time distribution for Jason strict.
+Run Times Histogram shows the distribution of occurrences of specific run times in buckets.
+Raw Run Times shows all individual recorded run times in the order they were recorded in."
+          ></i>
+        </a>
+      </h2>
+
+      <section>
+        <h3>Data Table</h3>
+<table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      <th>Iterations per Second</th>
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>median</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        
+          <td class="text-left">Jason strict</td>
+        
+        <td>3.32</td>
+        <td>301.06 ms</td>
+        <td>±18.51%</td>
+        <td>296.00 ms</td>
+        <td>165.65 ms</td>
+        <td>530.30 ms</td>
+        <td>400</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+      </section>
+
+      <section class="benchee-plot-container">
+        <div id="sorted-run-times" class="plot" data-job-name="Jason strict"></div>
+      </section>
+      <section class="benchee-plot-container">
+        <div id="raw-run-times" class="plot" data-job-name="Jason strict"></div>
+      </section>
+    </article>
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 0.12.1 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 0.5.0</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-1.30.1.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var measurements = {"run_times":[293070.0,309748.0,308857.0,339653.0,254796.0,294551.0,262768.0,334350.0,322927.0,299071.0,303093.0,419919.0,295393.0,374873.0,311220.0,385424.0,248878.0,419492.0,270939.0,253329.0,283496.0,312279.0,310335.0,371392.0,234967.0,279654.0,233363.0,314396.0,293407.0,271944.0,221867.0,284851.0,257826.0,298258.0,229897.0,317485.0,191134.0,292504.0,249523.0,285089.0,257124.0,296331.0,288374.0,314491.0,307712.0,316494.0,245869.0,325595.0,282133.0,372618.0,234880.0,341295.0,290423.0,353079.0,258505.0,328331.0,306921.0,286814.0,530301.0,461347.0,256244.0,407222.0,306843.0,395801.0,226146.0,311315.0,318898.0,321023.0,304260.0,243755.0,319532.0,338541.0,306108.0,303798.0,377879.0,293666.0,371921.0,377932.0,272524.0,361692.0,306349.0,332158.0,273357.0,297870.0,341111.0,276299.0,253164.0,288555.0,401957.0,213774.0,319162.0,189790.0,328397.0,249062.0,247709.0,207710.0,233869.0,259896.0,237982.0,249256.0,199616.0,360308.0,328049.0,268226.0,326580.0,343679.0,279479.0,290785.0,426753.0,305115.0,348554.0,366465.0,414746.0,444406.0,312577.0,297095.0,259164.0,253667.0,257872.0,357735.0,379725.0,334997.0,283231.0,318805.0,305591.0,257327.0,240489.0,269084.0,221797.0,324030.0,230973.0,323779.0,256211.0,302530.0,219952.0,255765.0,294479.0,276217.0,243313.0,288044.0,245032.0,294442.0,325028.0,243814.0,496295.0,237595.0,250911.0,424539.0,322210.0,274461.0,304423.0,249339.0,265643.0,2.362e5,271734.0,314210.0,308003.0,456288.0,299518.0,335634.0,305278.0,323521.0,285404.0,370973.0,259291.0,404908.0,319245.0,259875.0,328511.0,280995.0,317517.0,289372.0,392640.0,285518.0,309175.0,323720.0,3.002e5,301384.0,276772.0,320958.0,231441.0,400511.0,270026.0,390037.0,334092.0,359285.0,229833.0,403495.0,261649.0,238934.0,211665.0,242580.0,254880.0,243275.0,239967.0,279843.0,251957.0,200222.0,220519.0,216142.0,165653.0,235624.0,355949.0,311131.0,319987.0,270055.0,384464.0,237778.0,277046.0,343812.0,268877.0,254355.0,353077.0,326495.0,344057.0,323169.0,401737.0,295679.0,434899.0,264833.0,285043.0,307940.0,338989.0,258296.0,227649.0,262378.0,292110.0,248998.0,259624.0,248499.0,279290.0,251003.0,253203.0,224193.0,286603.0,232644.0,280827.0,273626.0,292743.0,280209.0,262907.0,263268.0,269148.0,286578.0,250605.0,388041.0,239488.0,392967.0,291908.0,253811.0,356951.0,226332.0,302543.0,287898.0,270096.0,410354.0,3.08e5,314418.0,280418.0,353473.0,478138.0,352560.0,315271.0,323997.0,294233.0,363863.0,349175.0,300980.0,309489.0,274439.0,301958.0,337419.0,317402.0,325890.0,307065.0,327383.0,260263.0,254457.0,394544.0,311856.0,340733.0,291166.0,336746.0,301446.0,282960.0,303710.0,286423.0,314970.0,354692.0,272745.0,370612.0,243398.0,261060.0,223716.0,339741.0,262725.0,230266.0,218934.0,219557.0,250329.0,251360.0,263777.0,276750.0,311993.0,326128.0,357240.0,403390.0,300776.0,241857.0,333576.0,263750.0,347536.0,366064.0,337678.0,347329.0,389170.0,356033.0,337047.0,384977.0,313738.0,258359.0,264678.0,240664.0,401044.0,213049.0,3.201e5,261037.0,333928.0,259630.0,270713.0,201224.0,269243.0,255308.0,308243.0,236465.0,262820.0,274941.0,227138.0,280023.0,337022.0,275119.0,292814.0,236850.0,287503.0,260174.0,332187.0,253141.0,340603.0,232474.0,321172.0,340720.0,382782.0,351968.0,258179.0,296488.0,267967.0,303559.0,330810.0,327778.0,338320.0,496750.0,285532.0,350559.0,356378.0,305942.0,446157.0,309150.0,325948.0,304485.0,351486.0,303968.0,357882.0,303131.0,312709.0,289623.0,358948.0,290328.0,392184.0,284973.0,363973.0,300512.0,308732.0,344585.0,302475.0,267795.0,289608.0,385301.0,342405.0,401454.0,289021.0,232687.0,197198.0,237691.0,285194.0,225380.0,239912.0,239166.0,326212.0,235877.0,283957.0],"statistics":{"average":301062.635,"ips":3.3215679521306254,"maximum":530301.0,"median":296005.0,"minimum":165653.0,"mode":null,"percentiles":{"50":296005.0,"99":477970.09000000014},"sample_size":400,"std_dev":55712.12689905828,"std_dev_ips":0.6146615147141941,"std_dev_ratio":0.18505161525294656}};
+      var runTimes     = measurements.run_times;
+      var statistics   = measurements.statistics;
+
+      var inputHeadline = " (Issue 90)"
+
+      drawRawRunTimeCharts(runTimes, inputHeadline, statistics);
+      drawRunTimeHistograms(runTimes, inputHeadline);
+    </script>
+  </body>
+</html>

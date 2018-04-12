@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+  <span class="input-label">
+    GovTrack
+  </span>
+
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.6.3</li>
+    <li>Erlang: 20.3</li>
+    <li>Operating system: Linux</li>
+    <li>Available memory: 31.94 GB</li>
+    <li>CPU Information: Intel(R) Core(TM) i5-4670K CPU @ 3.40GHz</li>
+    <li>Number of Available Cores: 4</li>
+  </ul>
+</article>
+
+
+    <article>
+      <h2>
+        <a name="Jason strict"></a>
+        Jason strict
+        <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#individual">
+          <i
+            class="benchee-help-icon icon-question-circle-o"
+            title="Graphs showing the individual run time distribution for Jason strict.
+Run Times Histogram shows the distribution of occurrences of specific run times in buckets.
+Raw Run Times shows all individual recorded run times in the order they were recorded in."
+          ></i>
+        </a>
+      </h2>
+
+      <section>
+        <h3>Data Table</h3>
+<table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      <th>Iterations per Second</th>
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>median</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        
+          <td class="text-left">Jason strict</td>
+        
+        <td>0.98</td>
+        <td>1019.39 ms</td>
+        <td>±31.01%</td>
+        <td>1004.29 ms</td>
+        <td>387.29 ms</td>
+        <td>2021.01 ms</td>
+        <td>119</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+      </section>
+
+      <section class="benchee-plot-container">
+        <div id="sorted-run-times" class="plot" data-job-name="Jason strict"></div>
+      </section>
+      <section class="benchee-plot-container">
+        <div id="raw-run-times" class="plot" data-job-name="Jason strict"></div>
+      </section>
+    </article>
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 0.12.1 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 0.5.0</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-1.30.1.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var measurements = {"run_times":[1149602.0,703719.0,1075302.0,791520.0,1252999.0,398821.0,1031488.0,1.5514e6,712902.0,1284694.0,780478.0,834083.0,1967124.0,753627.0,1187589.0,506119.0,889558.0,1371124.0,948974.0,997576.0,1139815.0,800195.0,1539454.0,998497.0,1264282.0,1592991.0,1584726.0,1151027.0,953080.0,889082.0,840632.0,489986.0,1138516.0,520176.0,1104481.0,1300217.0,489736.0,1135315.0,943516.0,1082235.0,2021007.0,949057.0,1054916.0,897351.0,995795.0,1601012.0,1032734.0,1236578.0,930681.0,1083268.0,1566602.0,421179.0,924989.0,790184.0,834590.0,1631823.0,978971.0,629667.0,387285.0,830910.0,1097211.0,523732.0,1127199.0,1.0168e6,995898.0,1486413.0,1169361.0,1135598.0,868842.0,776198.0,1529604.0,734847.0,1383874.0,1081055.0,1077568.0,1294281.0,1101446.0,1063905.0,880123.0,1475366.0,1115734.0,1040550.0,1213060.0,1041733.0,1205660.0,969389.0,734080.0,776831.0,496477.0,422503.0,585031.0,830814.0,828630.0,777334.0,1021368.0,1222466.0,765026.0,872406.0,749693.0,974494.0,1173569.0,1434513.0,916549.0,1230666.0,1149752.0,1010905.0,884843.0,971347.0,1257223.0,807634.0,1298558.0,1119567.0,584979.0,760017.0,1004289.0,1322004.0,1583763.0,805679.0,583143.0],"statistics":{"average":1019385.3529411765,"ips":0.9809832926427233,"maximum":2021007.0,"median":1004289.0,"minimum":387285.0,"mode":null,"percentiles":{"50":1004289.0,"99":2010230.4},"sample_size":119,"std_dev":316116.4419774201,"std_dev_ips":0.30420777306126995,"std_dev_ratio":0.310104948109512}};
+      var runTimes     = measurements.run_times;
+      var statistics   = measurements.statistics;
+
+      var inputHeadline = " (GovTrack)"
+
+      drawRawRunTimeCharts(runTimes, inputHeadline, statistics);
+      drawRunTimeHistograms(runTimes, inputHeadline);
+    </script>
+  </body>
+</html>

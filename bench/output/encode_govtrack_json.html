@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+  <span class="input-label">
+    GovTrack
+  </span>
+
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.6.3</li>
+    <li>Erlang: 20.3</li>
+    <li>Operating system: Linux</li>
+    <li>Available memory: 31.94 GB</li>
+    <li>CPU Information: Intel(R) Core(TM) i5-4670K CPU @ 3.40GHz</li>
+    <li>Number of Available Cores: 4</li>
+  </ul>
+</article>
+
+
+    <article>
+      <h2>
+        <a name="JSON"></a>
+        JSON
+        <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#individual">
+          <i
+            class="benchee-help-icon icon-question-circle-o"
+            title="Graphs showing the individual run time distribution for JSON.
+Run Times Histogram shows the distribution of occurrences of specific run times in buckets.
+Raw Run Times shows all individual recorded run times in the order they were recorded in."
+          ></i>
+        </a>
+      </h2>
+
+      <section>
+        <h3>Data Table</h3>
+<table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      <th>Iterations per Second</th>
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>median</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        
+          <td class="text-left">JSON</td>
+        
+        <td>1.05</td>
+        <td>952.76 ms</td>
+        <td>±14.84%</td>
+        <td>925.32 ms</td>
+        <td>696.76 ms</td>
+        <td>1456.55 ms</td>
+        <td>128</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+      </section>
+
+      <section class="benchee-plot-container">
+        <div id="sorted-run-times" class="plot" data-job-name="JSON"></div>
+      </section>
+      <section class="benchee-plot-container">
+        <div id="raw-run-times" class="plot" data-job-name="JSON"></div>
+      </section>
+    </article>
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 0.12.1 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 0.5.0</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-1.30.1.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var measurements = {"run_times":[957554.0,936929.0,1111568.0,1005708.0,1003349.0,973875.0,885708.0,957244.0,979521.0,920838.0,1153878.0,1098661.0,772919.0,714763.0,887273.0,849376.0,952564.0,934212.0,904274.0,918217.0,817578.0,1154646.0,1427625.0,969875.0,1125479.0,1027908.0,801285.0,808504.0,883707.0,995094.0,1038153.0,701588.0,962766.0,974365.0,1015208.0,1004515.0,1044513.0,993680.0,905082.0,893380.0,968194.0,929790.0,1274771.0,1035832.0,783235.0,767966.0,861765.0,847149.0,921499.0,893151.0,927935.0,896107.0,799420.0,1116612.0,1456553.0,906941.0,1002677.0,970720.0,826742.0,828413.0,824623.0,974840.0,1040596.0,784589.0,923144.0,1070926.0,1069499.0,1043362.0,996158.0,907548.0,869442.0,915962.0,975607.0,950210.0,1351415.0,877976.0,765460.0,732198.0,893974.0,895530.0,882085.0,921823.0,911647.0,875786.0,830480.0,1105817.0,1334539.0,868054.0,1206419.0,954287.0,795394.0,840295.0,868738.0,1009928.0,1112264.0,696762.0,964595.0,958244.0,1107825.0,1019321.0,999871.0,965686.0,892289.0,910549.0,926801.0,931760.0,834163.0,1443143.0,811025.0,765195.0,842133.0,856103.0,913133.0,919841.0,859746.0,872141.0,870364.0,1132614.0,1228603.0,923844.0,966890.0,1064414.0,872356.0,816684.0,828781.0,854519.0,1077774.0,967162.0],"statistics":{"average":952764.0625,"ips":1.0495777909339439,"maximum":1456553.0,"median":925322.5,"minimum":696762.0,"mode":null,"percentiles":{"50":925322.5,"99":1452664.0999999999},"sample_size":128,"std_dev":141427.72277091918,"std_dev_ips":0.15579869422574866,"std_dev_ratio":0.1484393968427196}};
+      var runTimes     = measurements.run_times;
+      var statistics   = measurements.statistics;
+
+      var inputHeadline = " (GovTrack)"
+
+      drawRawRunTimeCharts(runTimes, inputHeadline, statistics);
+      drawRunTimeHistograms(runTimes, inputHeadline);
+    </script>
+  </body>
+</html>

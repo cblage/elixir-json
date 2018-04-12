@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+  <span class="input-label">
+    Issue 90
+  </span>
+
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.6.3</li>
+    <li>Erlang: 20.3</li>
+    <li>Operating system: Linux</li>
+    <li>Available memory: 31.94 GB</li>
+    <li>CPU Information: Intel(R) Core(TM) i5-4670K CPU @ 3.40GHz</li>
+    <li>Number of Available Cores: 4</li>
+  </ul>
+</article>
+
+
+    <article>
+      <h2>
+        <a name="JSX"></a>
+        JSX
+        <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#individual">
+          <i
+            class="benchee-help-icon icon-question-circle-o"
+            title="Graphs showing the individual run time distribution for JSX.
+Run Times Histogram shows the distribution of occurrences of specific run times in buckets.
+Raw Run Times shows all individual recorded run times in the order they were recorded in."
+          ></i>
+        </a>
+      </h2>
+
+      <section>
+        <h3>Data Table</h3>
+<table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      <th>Iterations per Second</th>
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>median</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        
+          <td class="text-left">JSX</td>
+        
+        <td>2.49</td>
+        <td>400.84 ms</td>
+        <td>±18.86%</td>
+        <td>393.12 ms</td>
+        <td>257.51 ms</td>
+        <td>725.41 ms</td>
+        <td>301</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+      </section>
+
+      <section class="benchee-plot-container">
+        <div id="sorted-run-times" class="plot" data-job-name="JSX"></div>
+      </section>
+      <section class="benchee-plot-container">
+        <div id="raw-run-times" class="plot" data-job-name="JSX"></div>
+      </section>
+    </article>
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 0.12.1 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 0.5.0</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-1.30.1.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var measurements = {"run_times":[348057.0,560188.0,348968.0,354295.0,450731.0,257512.0,330147.0,315777.0,486836.0,352834.0,434870.0,387316.0,478130.0,276040.0,364934.0,384120.0,390202.0,472605.0,384162.0,414882.0,284883.0,326779.0,393121.0,304739.0,293748.0,268495.0,340745.0,335686.0,300552.0,323587.0,257548.0,445348.0,360375.0,452307.0,422321.0,325095.0,519860.0,538604.0,462350.0,395124.0,443565.0,351081.0,359360.0,389951.0,354210.0,356904.0,380595.0,417329.0,506121.0,323495.0,342138.0,4.314e5,345316.0,324614.0,459481.0,446079.0,372442.0,535206.0,477701.0,523354.0,719780.0,483780.0,483462.0,432497.0,439040.0,465324.0,414245.0,399767.0,431031.0,422053.0,499012.0,429595.0,411634.0,398157.0,347217.0,410559.0,441847.0,346461.0,365493.0,431324.0,457791.0,446477.0,464128.0,376727.0,449733.0,452792.0,431926.0,343381.0,376067.0,392655.0,337973.0,4.12e5,336248.0,412321.0,336184.0,476831.0,298186.0,298069.0,352161.0,275015.0,377984.0,350648.0,285836.0,285960.0,338539.0,317034.0,312082.0,393212.0,366144.0,423883.0,363383.0,555315.0,4.163e5,472221.0,420855.0,391269.0,447169.0,421978.0,437743.0,317747.0,440731.0,403222.0,319790.0,501935.0,411651.0,301741.0,443228.0,321520.0,432130.0,358736.0,330784.0,611103.0,419680.0,486506.0,586683.0,555423.0,516193.0,369004.0,504853.0,458928.0,463738.0,351239.0,372232.0,375710.0,362348.0,491530.0,440921.0,369687.0,410859.0,335076.0,302841.0,502059.0,387681.0,343535.0,394102.0,372344.0,377237.0,545171.0,363367.0,473542.0,313436.0,366194.0,372745.0,489678.0,333948.0,338682.0,445866.0,442838.0,375593.0,465191.0,437648.0,262654.0,344710.0,350475.0,450303.0,359554.0,338384.0,284517.0,333533.0,294884.0,2.639e5,328572.0,445250.0,375661.0,406556.0,384216.0,504275.0,418933.0,345309.0,422896.0,364412.0,455628.0,396172.0,377341.0,398105.0,480850.0,409037.0,347841.0,328991.0,389428.0,364657.0,472033.0,418233.0,425627.0,422777.0,389559.0,524397.0,423595.0,509274.0,725414.0,352787.0,480130.0,478086.0,443693.0,608264.0,385384.0,434385.0,421896.0,410718.0,283618.0,417958.0,392330.0,373941.0,407169.0,342463.0,328668.0,346197.0,318848.0,423736.0,353917.0,299861.0,287759.0,323381.0,355873.0,389555.0,387542.0,328949.0,311284.0,496949.0,421879.0,294037.0,371739.0,402533.0,489727.0,451582.0,331634.0,488266.0,437671.0,391279.0,375464.0,318414.0,377880.0,384178.0,323169.0,321582.0,427661.0,469978.0,329598.0,399340.0,415504.0,484126.0,501306.0,360361.0,438754.0,274276.0,532524.0,402986.0,311584.0,464211.0,393617.0,412628.0,436507.0,348943.0,336482.0,399129.0,585779.0,414255.0,488672.0,319847.0,420783.0,577209.0,492973.0,425817.0,608099.0,429258.0,397753.0,487242.0,369722.0,389355.0,564875.0,367896.0,402020.0,352120.0,416485.0,306992.0,376681.0,351205.0,358599.0,357792.0,418366.0,258730.0],"statistics":{"average":400836.23588039866,"ips":2.4947844293657613,"maximum":725414.0,"median":393121.0,"minimum":257512.0,"mode":null,"percentiles":{"50":393121.0,"99":611046.2200000001},"sample_size":301,"std_dev":75594.97161128603,"std_dev_ips":0.4704992743481792,"std_dev_ratio":0.18859315811418315}};
+      var runTimes     = measurements.run_times;
+      var statistics   = measurements.statistics;
+
+      var inputHeadline = " (Issue 90)"
+
+      drawRawRunTimeCharts(runTimes, inputHeadline, statistics);
+      drawRunTimeHistograms(runTimes, inputHeadline);
+    </script>
+  </body>
+</html>
