@@ -22,6 +22,4 @@ after_success:
   - MIX_ENV=test mix coveralls --verbose
   - MIX_ENV=test mix coveralls.travis
   - mix credo --strict
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-after_success:
-  - mix credo --strict
+  - ./cc-test-reporter after-build -t excoveralls --exit-code $TRAVIS_TEST_RESULT
