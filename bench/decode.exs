@@ -1,7 +1,7 @@
 decode_jobs = %{
   "Jason"  => fn {json, _} -> Jason.decode!(json) end,
   #"Poison" => fn {json, _} -> Poison.decode!(json) end,
-  "JSX"    => fn {json, _} -> JSX.decode!(json, [:strict]) end,
+  #"JSX"    => fn {json, _} -> JSX.decode!(json, [:strict]) end,
   #"Tiny"   => fn {json, _} -> Tiny.decode!(json) end,
   #"jsone"  => fn {json, _} -> :jsone.decode(json) end,
   "JSON"   => fn {json, _} -> JSON.decode!(json) end,
@@ -14,11 +14,11 @@ decode_inputs = [
   #"GovTrack",
   "Blockchain",
   #"Pokedex",
-  "JSON Generator",
-  "JSON Generator (Pretty)",
+  #"JSON Generator",
+  #"JSON Generator (Pretty)",
   "UTF-8 escaped",
   "UTF-8 unescaped",
-  "Issue 90",
+  #"Issue 90",
 ]
 
 read_data = fn (name) ->

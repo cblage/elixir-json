@@ -31,18 +31,18 @@ defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
   def deps(_) do
     [
       {:inch_ex, ">=0.0.0", only: [:dev, :test]},
-      {:benchee, "~> 0.8", only: :bench, override: true},
-      {:benchee_html, "~> 0.1", only: :bench, override: true},
-      {:poison, "~> 3.0", only: [:bench, :dev, :test], override: true},
-      {:exjsx, "~> 4.0", only: [:bench, :test], override: true},
-      {:tiny, "~> 1.0", only: :bench, override: true},
-      {:jsone, "~> 1.4", only: :bench, override: true},
-      {:jason, "~> 1.0", only: :bench, override: true},
-      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.8", only: :test},
-      {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:benchee, "~> 0.8", only: [:bench, :dev, :test, :prod], override: true, optional: true},
+      {:benchee_html, "~> 0.1", only: [:bench, :dev, :test, :prod], override: true, optional: true},
+      {:poison, "~> 3.0", only: [:bench, :dev, :test, :prod], override: true, optional: true},
+      {:exjsx, "~> 4.0", only: [:bench, :test, :dev, :prod], override: true},
+      {:tiny, "~> 1.0", only: [:bench, :dev, :test, :prod], override: true, runtime: false},
+      {:jsone, "~> 1.4", only: [:bench, :dev,:test, :prod], override: true, runtime: false},
+      {:jason, "~> 1.0", only: [:bench, :dev, :test, :prod], override: true, runtime: false},
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false, optional: true},
+      {:mix_test_watch, "~> 0.3", only: :dev, runtime: false, optional: true},
+      {:excoveralls, "~> 0.8", only: :test, optional: true, runtime: false},
+      {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false, optional: true},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true},
     ]
   end
 
