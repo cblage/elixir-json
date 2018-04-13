@@ -1,3 +1,6 @@
+# License
+The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
+
 # Elixir JSON
 
 [![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json)[![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Maintainability](https://api.codeclimate.com/v1/badges/43b6e8c25e036558ccb6/maintainability)](https://codeclimate.com/github/cblage/elixir-json/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/43b6e8c25e036558ccb6/test_coverage)](https://codeclimate.com/github/cblage/elixir-json/test_coverage) 
@@ -10,7 +13,7 @@ This library provides a natively implemented JSON encoder and decoder for Elixir
 
 All contributions are welcome.
 
-##Before you install
+# Before you install
 
 When dealing with smaller `file.json ~ 14KB` payloads, `JSON v1` handles the processing consistently performant, with
  a much smaller deviation, and absolutely no real-world absolute performance differences with `Jason`.
@@ -19,7 +22,7 @@ However, with often unusually large `file.json > 5MB` payloads, and if the proce
 paramount to you (ie, processing them in a real-time manner vs using them in migration scripts or whatever), `JSON v1` 
 currently significantly slower when compared to `Jason`.
 
-### Small payload `bench/data/utf-8-unescaped.json < 30KB` benchmark results for `JSON v1` and `Jason`
+#### Small payload `bench/data/utf-8-unescaped.json < 30KB` benchmark results for `JSON v1` and `Jason`
 
 As you can see below, both libraries handle "regular" small `json` payloads beautifully.
 
@@ -42,7 +45,7 @@ For `JSON.encode` vs `Jason.encode`, the difference is so minimal, it's not wort
  - `encode`: https://bit.ly/2v5W0H0
 
 
-### Large payload `bench/data/issue-90.json ~ 8MB` benchmark results for `JSON v1` and `Jason`
+#### Large payload `bench/data/issue-90.json ~ 8MB` benchmark results for `JSON v1` and `Jason`
 
 However, with often unusually large `file.json > 5MB` payloads, and if the processing speed for those payloads is paramount to you 
 (ie, processing them in a real-time manner vs using them in migration scripts or whatever), then 
@@ -55,29 +58,30 @@ However, with often unusually large `file.json > 5MB` payloads, and if the proce
 | `JSON.encode`  	| 5.51 s	| ±18.10%	  	| 5.24 s 	| 4.32 s 	| 7.36 s 	    |
 | `Jason.encode` 	| 0.186 s 	| ±26.41%   	| 0.173 s	| 0.122 s	| 0.38 s	  	|
 
-#### Full `benchee` reports for `bench/data/issue-90.json ~ 8MB`:
+### Full `benchee` reports for `bench/data/issue-90.json ~ 8MB`:
  - `decode`: https://bit.ly/2HxReEP
  - `encode`: https://bit.ly/2HuR0OM
 
-#### Plan of action
+# Plan of action for `Elixir JSON v2`
 
 I am currently working on a solution for this problem in `JSON v2`.
 You can follow the process here: https://github.com/cblage/elixir-json/pull/52 
 
-## Interim Solution
+# Interim Solution
 
 To processes these large payloads adding the `Jason` lib to your dependencies (without hopefully removing `JSON` 
 for the smaller payloads :sweat_smile:): 
  - `Jason@Hex.pm`: http://hex.pm/packages/jason
  - `Jason@GitHub`: https://github.com/michalmuskala/jason
  
-Then you just use `JSON.decode` and `JSON.encode` for small payloads.
-For bigger payloads you go for `Jason.decode` and `Jason.encode`.
+After installing `Jason`, you then use `JSON.decode` and `JSON.encode` for small your small `30KB range json` payloads due to the reasons mentioned above.
+
+While `Elixir JSON v2` is not ready to processs the bigger `>5MB json` payloads in time-sensitive operations, you go for `Jason.decode` and `Jason.encode`.
 
 Thanks for the comprehension,
 Carlos Brito Lage
 
-### Example 
+## Example 
 
 ```elixir
  [
@@ -90,11 +94,11 @@ Carlos Brito Lage
 
 You can find its documentation here: https://hexdocs.pm/jason/readme.html
 
-##Installing
+#Installing
 
 Simply add ```{:json, "~> 1.2"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
-### Example for a project that already uses [Plug](https://github.com/elixir-plug/plug):
+## Example for a project that already uses [Plug](https://github.com/elixir-plug/plug):
 
 ```elixir
 [
@@ -135,6 +139,3 @@ Decoding a list from a string that contains JSON
   list["key"]
   # "this will be a value"
 ```
-
-# License
-The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
