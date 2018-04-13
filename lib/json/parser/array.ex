@@ -3,6 +3,8 @@ defmodule JSON.Parser.Array do
   Implements a JSON Array Parser for Bitstring values
   """
 
+  alias JSON.Parser, as: Parser
+
   require Logger
 
   @doc """
@@ -61,7 +63,7 @@ defmodule JSON.Parser.Array do
   end
 
   defp parse_array_contents(acc, json) do
-    case json |> String.trim()|> JSON.Parser.parse() do
+    json |> String.trim() |> Parser.parse() |> case do
       {:error, error_info} ->
         Logger.debug("#{__MODULE__}.parse_array_contents(#{inspect acc}, #{inspect json}) generated an error: #{inspect error_info}")
         {:error, error_info}
@@ -77,7 +79,7 @@ defmodule JSON.Parser.Array do
             rest ->
               Logger.debug("#{__MODULE__}.parse_array_contents(acc, json) continuing parsing of #{inspect rest}")
               parse_array_contents([value | acc], rest)
-          end
+         end
     end
   end
 end

@@ -30,3 +30,9 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
+<<<<<<< 26cc7c1a7c0e718707208ab099d9d87efb8925e8
+=======
+# Ignore benchmark output
+#/bench/output
+/bench/snapshots
+>>>>>>> bench
