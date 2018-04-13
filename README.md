@@ -1,6 +1,3 @@
-# License
-The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
-
 # Elixir JSON
 
 <<<<<<< HEAD
@@ -214,7 +211,6 @@ Decoding a list from a string that contains JSON
   list["key"]
   # "this will be a value"
 ```
-<<<<<<< 68e26dea845b31252fc6e3d4a65845afa32cec32
 
 At any time, you can turn on verbose logging for this library only. 
 To do so, head to config file of your application and add below lines:
@@ -231,9 +227,4 @@ Note that, changing only `:logger` level to `:info`, `:warn` or `:error` will si
 
 # License
 The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
-<<<<<<< 893414bdeb0876914edd432568fd819d172c2b20
-=======
 
-=======
->>>>>>> Update README.md
->>>>>>> Update README.md
