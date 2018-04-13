@@ -100,4 +100,3 @@ defmodule JSON.Decoder.DefaultImplementations do
     end
   end
 end
-

@@ -41,15 +41,15 @@ defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
-      {:credo, ">=0.0.0", only: [:dev, :test]},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
+      {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
     ]
   end
 
   defp aliases() do
     [
       "bench.encode": ["run bench/encode.exs"],
-      "bench.decode": ["run bench/decode.exs"]
+      "bench.decode": ["run bench/decode.exs"],
     ]
   end
 
@@ -67,8 +67,8 @@ defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
       canonical: "http://hexdocs.pm/json",
       source_url: "https://github.com/cblage/elixir-json",
       extras: [
-        "README.md"
-      ]
+        "README.md",
+      ],
     ]
   end
 
@@ -76,7 +76,7 @@ defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
     [
       maintainers: ["cblage"],
       licenses: ["BSD 3-Clause"],
-      links: %{"GitHub" => "https://github.com/cblage/elixir-json"}
+      links: %{"GitHub" => "https://github.com/cblage/elixir-json"},
     ]
   end
 end

@@ -86,21 +86,21 @@ defmodule JSONDecodeTest do
     decodes(
       "simple object",
       "{\"result\": \"this is awesome\"}",
-      Enum.into([{"result", "this is awesome"}], Map.new())
+      Enum.into([{"result", "this is awesome"}, ], Map.new())
     )
 
     decodes("empty array", "  [ ] ", [])
-    decodes("simple array", "[1, 2, \"three\", 4]", [1, 2, "three", 4])
+    decodes("simple array", "[1, 2, \"three\", 4]", [1, 2, "three", 4, ])
 
     decodes("nested array", " [null, [false, \"five\"], [3, true]] ", [
       nil,
       [false, "five"],
-      [3, true]
+      [3, true],
     ])
 
     decodes("simple object with string keys" , "{\"foo\" : 123}", %{"foo" => 123})
 
-    decodes("simple object containing array" , "{\"foo\" : [1,2,3]}", %{"foo" => [1,2,3]})
+    decodes("simple object containing array" , "{\"foo\" : [1,2,3]}", %{"foo" => [1, 2, 3, ]})
     decodes("simple object containing big array" ,
       "{
            \"foo\" : [
@@ -109,7 +109,7 @@ defmodule JSONDecodeTest do
                        3
                      ]
       }",
-      %{"foo" => [1,2,3]}
+      %{"foo" => [1, 2, 3, ]}
     )
 
     decodes(
@@ -204,11 +204,11 @@ defmodule JSONDecodeTest do
     decodes(
       "simple object",
       '{"result": "this is awesome"}',
-      Enum.into([{"result", "this is awesome"}], Map.new())
+      Enum.into([{"result", "this is awesome"}, ], Map.new())
     )
 
     decodes("empty array", '  [ ] ', [])
-    decodes("simple array", ' [1, 2, "three", 4] ', [1, 2, "three", 4])
+    decodes("simple array", ' [1, 2, "three", 4] ', [1, 2, "three", 4, ])
 
     decodes("nested array", '      [null, [false, "five"], [3, true]]       ', [
       nil,
@@ -234,7 +234,7 @@ defmodule JSONDecodeTest do
 
     decodes("simple object string keys" , '{"foo" : 123}', %{"foo" => 123})
 
-    decodes("simple object containing array" , '{"foo" : [1,2,3]}', %{"foo" => [1,2,3]})
+    decodes("simple object containing array" , '{"foo" : [1,2,3]}', %{"foo" => [1,2,3,]})
 
     decodes("simple object containing big array" ,
       '{
@@ -244,9 +244,8 @@ defmodule JSONDecodeTest do
                        3
                      ]
       }',
-      %{"foo" => [1,2,3]}
+      %{"foo" => [1,2,3,]}
     )
-
 
     decodes(
       "complex object",
@@ -269,7 +268,7 @@ defmodule JSONDecodeTest do
           {"children",
            [
              Enum.into([{"name", "Penny"}], Map.new()),
-             Enum.into([{"name", "Elga"}], Map.new())
+             Enum.into([{"name", "Elga"}], Map.new()),
            ]}
         ],
         Map.new()

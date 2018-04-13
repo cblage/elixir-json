@@ -1,7 +1,9 @@
 defmodule JSON.Encoder.Helpers do
   @moduledoc """
-  Helper functions for writing JSON.Encoder instances.
+  Helper functions for JSON.Encoder
   """
+
+  alias JSON.Encoder, as: Encoder
 
   @doc """
   Given an enumerable encode the enumerable as an array.
@@ -23,12 +25,10 @@ defmodule JSON.Encoder.Helpers do
   end
 
   defp encode_item(item) do
-    case Elixir.JSON.Encoder.encode(item) do
-      {:ok, encoded_item} ->
-        encoded_item
+    case Encoder.encode(item) do
+      {:ok, encoded_item} -> encoded_item
       # propagate error, will trigger error in map_join
-      err ->
-        err
+      err -> err
     end
   end
 end
