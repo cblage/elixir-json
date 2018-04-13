@@ -18,9 +18,9 @@ script:
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
-after_success:
   - MIX_ENV=test mix coveralls --verbose
   - MIX_ENV=test mix coveralls.json --verbose
   - MIX_ENV=test mix coveralls.travis
+  - ./cc-test-reporter after-build -t excoveralls --exit-code $TRAVIS_TEST_RESULT -r "TravisCI"
+after_success:
   - mix credo --strict
-  - ./cc-test-reporter after-build -t excoveralls --exit-code $TRAVIS_TEST_RESULT
