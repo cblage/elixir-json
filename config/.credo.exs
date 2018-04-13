@@ -7,7 +7,7 @@
         excluded: []
       },
       checks: [
-        {Credo.Check.Warning.LazyLogging, ignore: [:error, :warn, :info, :debug]},
+        {Credo.Check.Warning.LazyLogging, ignore: [:debug]},
         {Credo.Check.Consistency.TabsOrSpaces},
 
         # For some checks, like AliasUsage, you can only customize the priority
