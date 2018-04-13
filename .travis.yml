@@ -13,7 +13,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script:
-  - mix dialyzer
+  - MIX_ENV=dev mix dialyzer
   - MIX_ENV=test mix test
 after_script:
   - mix deps.get --only docs
