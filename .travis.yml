@@ -1,3 +1,6 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=a669f9b84dcb893c8df72d85c56658c03e59c523ef619714d37b6523d35698aa
 language: elixir
 env: MIX_ENV=test
 notifications:
@@ -5,6 +8,10 @@ notifications:
     - carlos@carloslage.net
 elixir:
   - 1.6
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script:
   - mix dialyzer
   - MIX_ENV=test mix test
@@ -14,3 +21,5 @@ after_script:
 after_success:
   - MIX_ENV=test mix coveralls
   - MIX_ENV=test mix coveralls.post --token  ilbBz5SvaqJqUBZx9KcIcuM8C1D3BCsB8  --branch $TRAVIS_BRANCH --name "TravisCI"
+  - mix credo --strict
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
