@@ -12,13 +12,13 @@ decode_inputs = [
   #"GitHub",
   #"Giphy",
   #"GovTrack",
-  "Blockchain",
+  #"Blockchain",
   #"Pokedex",
   #"JSON Generator",
   #"JSON Generator (Pretty)",
-  "UTF-8 escaped",
+  #"UTF-8 escaped",
   "UTF-8 unescaped",
-  #"Issue 90",
+  "Issue 90",
 ]
 
 read_data = fn (name) ->
