@@ -1,6 +1,3 @@
-# License
-The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
-
 # Elixir JSON
 
 [![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=develop)](https://travis-ci.org/cblage/elixir-json) [![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Test Coverage](https://api.codeclimate.com/v1/badges/43b6e8c25e036558ccb6/test_coverage)](https://codeclimate.com/github/cblage/elixir-json/test_coverage) [![Hex.pm](https://img.shields.io/hexpm/v/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json)
@@ -298,13 +295,7 @@ Decoding a list from a string that contains JSON
   list["key"]
   # "this will be a value"
 ```
-<<<<<<< 68e26dea845b31252fc6e3d4a65845afa32cec32
 
 # License
 The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)
-<<<<<<< 893414bdeb0876914edd432568fd819d172c2b20
-=======
 
-=======
->>>>>>> Update README.md
->>>>>>> Update README.md
