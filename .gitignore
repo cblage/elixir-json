@@ -30,13 +30,14 @@ erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
-
 # Ignore benchmark output
 #/bench/output
 /bench/snapshots
 
 *.log
 
+
 .elixir_ls
 
 bench/output/*.html
+
