@@ -24,4 +24,3 @@ after_script:
   - MIX_ENV=test mix coveralls.travis
   - ./cc-test-reporter after-build -r "$CC_TEST_REPORTER_ID" -t excoveralls --exit-code $TRAVIS_TEST_RESULT
   - mix credo --strict
-
