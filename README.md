@@ -1,6 +1,6 @@
 # Elixir JSON
 
-[![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Test Coverage](https://api.codeclimate.com/v1/badges/43b6e8c25e036558ccb6/test_coverage)](https://codeclimate.com/github/cblage/elixir-json/test_coverage) [![Hex.pm](https://img.shields.io/hexpm/v/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json)
+[![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json) [![Test Coverage](https://api.codeclimate.com/v1/badges/43b6e8c25e036558ccb6/test_coverage)](https://codeclimate.com/github/cblage/elixir-json/test_coverage) [![Hex.pm](https://img.shields.io/hexpm/v/json.svg?style=flat-square)](https://hex.pm/packages/json)
                                                                                                                                      
 
 This library provides a natively implemented JSON encoder and decoder for Elixir.
@@ -88,7 +88,7 @@ Carlos Brito Lage
 
 You can find its documentation here: https://hexdocs.pm/jason/readme.html
 
-#Installing
+# Installing
 
 Simply add ```{:json, "~> 1.2"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
