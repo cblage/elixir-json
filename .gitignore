@@ -37,7 +37,6 @@ erl_crash.dump
 
 *.log
 
-
 .elixir_ls
 
 bench/output/*.html
