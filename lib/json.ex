@@ -71,7 +71,9 @@ defmodule JSON do
 
       e = {:error, {:unexpected_token, tok}} ->
         Logger.debug(
-          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} unexpected token #{tok}"
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} unexpected token #{
+            inspect(tok)
+          }"
         )
 
         e
@@ -109,9 +111,11 @@ defmodule JSON do
         value
 
       {:error, {:unexpected_token, tok}} ->
-        log(:debug, fn ->
-          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} unexpected token #{tok}"
-        end)
+        Logger.debug(
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} unexpected token #{
+            inspect(tok)
+          }"
+        )
 
         raise JSON.Decoder.UnexpectedTokenError, token: tok
 

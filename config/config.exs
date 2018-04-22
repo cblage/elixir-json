@@ -3,7 +3,8 @@
 use Mix.Config
 
 config :logger,
-  level: :info,
-  compile_time_purge_level: :debug
+  level: :debug
 
-config :json, log_level: :info
+# compile_time_purge_level: :debug
+
+config :json, log_level: :debug

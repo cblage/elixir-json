@@ -20,6 +20,7 @@ defmodule JSON.Decoder.DefaultImplementations do
     """
 
     alias JSON.Parser, as: Parser
+    alias Parser.Record.Chunk, as: ParserChunk
 
     @doc """
     decodes json in BitString format
@@ -81,38 +82,12 @@ defmodule JSON.Decoder.DefaultImplementations do
               {:error, {:unexpected_token, rest}}
           end
 
-        stream = %Stream{enum: chunk, funs: funs} ->
+        stream = %Stream{} ->
           Logger.debug(
             "#{__MODULE__}.decode(#{inspect(bitstring)}} received stream #{inspect(stream)}"
           )
 
-          # run = Stream.run(stream)
-          run =
-            Enum.each(funs, fn func ->
-              Logger.debug(
-                "#{__MODULE__}.decode(#{inspect(bitstring)}} checking = #{inspect(func)}"
-              )
-
-              res = func.(chunk)
-
-              Logger.debug(
-                "#{__MODULE__}.decode(#{inspect(bitstring)}} got res from func(chunk)=#{
-                  inspect(res)
-                }"
-              )
-
-              more_res = res.("test", "bar")
-
-              Logger.debug(
-                "#{__MODULE__}.decode(#{inspect(bitstring)}} checking = #{inspect(func)} = MORE_Res #{
-                  inspect(more_res)
-                }"
-              )
-
-              Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}} calling decode(#{chunk})")
-              decode(chunk)
-            end)
-
+          run = Enum.to_list(stream)
           Logger.debug("#{__MODULE__}.decode(#{inspect(bitstring)}} run result = #{inspect(run)}")
 
           err = {:error, :stream_not_implemented}
