@@ -3,6 +3,9 @@ plugins:
   credo:
     enabled: true
     channel: "beta"
+    checks:
+      nesting:
+        enabled: false
 exclude_patterns:
   - "bench/"
   - "doc/"
