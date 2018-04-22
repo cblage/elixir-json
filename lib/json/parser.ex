@@ -73,27 +73,26 @@ defmodule JSON.Parser do
   """
   def parse(bin) when is_binary(bin) do
     Logger.debug("#{__MODULE__}.parse(#{inspect bin}) starting Stream.resource...")
-    resource = Stream.resource(
+    Stream.resource(
       fn ->
         chunked = bin |> Stream.chunk_every(@chunk_size)
-        Logger.debug("#{__MODULE__}.parse(bin).init() initalized Stream.chunk_every(#{inspect bin}, #{inspect @chunk_size}) = #{inspect chunked}")
+        Logger.debug("#{__MODULE__}.parse(bin).resource.init() initalized Stream.chunk_every(#{inspect bin}, #{inspect @chunk_size}) = #{inspect chunked}")
         chunked
       end,
       fn chunked_stream ->
+        Logger.debug("#{__MODULE__}.parse(bin).resource.chunk(#{inspect chunked_stream})....")
         chunked_stream |> case do
           stream = %Stream{} ->
-            Logger.debug("#{__MODULE__}.parse(bin).resource() received stream #{inspect stream}")
+            Logger.debug("#{__MODULE__}.parse(bin).resource.chunk(#{inspect chunked_stream}) received stream #{inspect stream}")
             transform = stream |> Stream.transform(nil, fn(c, acc) ->
               Logger.debug("Stream.transform.reducer(#{inspect c}, #{inspect acc})...")
               c |> case do
-               data when is_bitstring(data) -> {[data], acc}
+               data when is_bitstring(data) -> {data, acc}
                 _ -> {:halt, acc}
               end
             end)
             Logger.debug("#{__MODULE__}.parse(bin).resource() transform = #{inspect transform}")
-            err = {:error, :stream_not_implemented}
-            Logger.debug("#{__MODULE__}.parse(bin).resource() returning #{inspect err}")
-            {:halt, err}
+            {:halt, transform}
           other ->
             Logger.debug("#{__MODULE__}.parse(bin).resource() received unexpected result from parse: #{inspect other}")
             err = {:error, {:unexpected_token, other}}
@@ -105,8 +104,6 @@ defmodule JSON.Parser do
         Logger.debug("#{__MODULE__}.parse(#{inspect bin}).finally() res = #{inspect res}")
         res
       end)
-      Logger.debug("#{__MODULE__}.parse(#{inspect bin}) resource = #{inspect resource}")
-      resource
   end
 
   def parse(<<?[, _::binary>> = bin) do
