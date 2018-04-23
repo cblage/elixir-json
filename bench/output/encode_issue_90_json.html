@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>Benchee Report</title>
+  <meta charset="utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <link rel="stylesheet" type="text/css" href="assets/stylesheets/benchee.css">
+    <link rel="stylesheet" type="text/css" href="assets/fontello/css/fontello.css">
+  
+</head>
+
+  <body>
+
+    <div class="header">
+  <h1>benchee report</h1>
+  
+  <span class="input-label">
+    Issue 90
+  </span>
+
+
+  <span class="version-note">
+  <a href="javascript:toggleSystemDataInfo();" title="Click to toggle system info">System info</a>
+</span>
+
+</div>
+
+
+    <article id="system-info" class="benchee-systeminfo" >
+  <h3>System info</h3>
+  <ul class="benchee-systeminfo-list">
+    <li>Elixir: 1.6.3</li>
+    <li>Erlang: 20.3</li>
+    <li>Operating system: Linux</li>
+    <li>Available memory: 31.94 GB</li>
+    <li>CPU Information: Intel(R) Core(TM) i5-4670K CPU @ 3.40GHz</li>
+    <li>Number of Available Cores: 4</li>
+  </ul>
+</article>
+
+
+    <article>
+      <h2>
+        <a name="JSON"></a>
+        JSON
+        <a href="https://github.com/PragTob/benchee_html/wiki/Chart-Types#individual">
+          <i
+            class="benchee-help-icon icon-question-circle-o"
+            title="Graphs showing the individual run time distribution for JSON.
+Run Times Histogram shows the distribution of occurrences of specific run times in buckets.
+Raw Run Times shows all individual recorded run times in the order they were recorded in."
+          ></i>
+        </a>
+      </h2>
+
+      <section>
+        <h3>Data Table</h3>
+<table>
+  <thead>
+    <tr>
+      <th class="text-left">Name</th>
+      <th>Iterations per Second</th>
+      <th>Average</th>
+      <th>Deviation</th>
+      <th>median</th>
+      <th>minimum</th>
+      <th>maximum</th>
+      <th>Sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        
+          <td class="text-left">JSON</td>
+        
+        <td>0.30</td>
+        <td>3.36 s</td>
+        <td>±14.62%</td>
+        <td>3.24 s</td>
+        <td>2.81 s</td>
+        <td>4.76 s</td>
+        <td>36</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+      </section>
+
+      <section class="benchee-plot-container">
+        <div id="sorted-run-times" class="plot" data-job-name="JSON"></div>
+      </section>
+      <section class="benchee-plot-container">
+        <div id="raw-run-times" class="plot" data-job-name="JSON"></div>
+      </section>
+    </article>
+
+    <footer>
+      <a href="https://github.com/PragTob/benchee" target="blank">benchee version: 0.12.1 </a>
+<br/>
+<a href="https://github.com/PragTob/benchee_html" target="blank">benchee_html version: 0.5.0</a>
+
+
+    </footer>
+
+    
+  <script src="assets/javascripts/plotly-1.30.1.min.js"></script>
+  <script src="assets/javascripts/benchee.js"></script>
+
+
+
+    <script>
+      var measurements = {"run_times":[2966476.0,3304727.0,3248247.0,3005655.0,3171556.0,2824391.0,3822275.0,4757272.0,3169883.0,3013542.0,3311893.0,3225561.0,2.924e6,2973354.0,2858852.0,4009886.0,4143575.0,3819915.0,2896323.0,3294720.0,3348429.0,2808244.0,2959823.0,2912360.0,3945964.0,4220409.0,3823538.0,3051065.0,3258453.0,3398409.0,2861935.0,3003522.0,2964809.0,3834551.0,4242551.0,3621351.0],"statistics":{"average":3361042.111111111,"ips":0.29752676906193676,"maximum":4757272.0,"median":3236904.0,"minimum":2808244.0,"mode":null,"percentiles":{"50":3236904.0,"99":4757272.0},"sample_size":36,"std_dev":491408.8063408882,"std_dev_ips":0.04350057797724334,"std_dev_ratio":0.14620727443918746}};
+      var runTimes     = measurements.run_times;
+      var statistics   = measurements.statistics;
+
+      var inputHeadline = " (Issue 90)"
+
+      drawRawRunTimeCharts(runTimes, inputHeadline, statistics);
+      drawRunTimeHistograms(runTimes, inputHeadline);
+    </script>
+  </body>
+</html>
