@@ -1,7 +1,7 @@
-defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
+defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
   use Mix.Project
 
-  @version "1.2.4"
+  @version "1.2.5"
 
   def project do
     [
@@ -30,9 +30,9 @@ defmodule ElixirJSON_121_SNAPSHOT.Mixfile do
 
   def deps(_) do
     [
-      {:inch_ex, ">=0.0.0", only: [:dev, :test]},
-      {:benchee, "~> 0.8", only: [:bench, :dev, :test, :prod], optional: true, optional: true},
-      {:benchee_html, "~> 0.1", only: [:bench, :dev, :test, :prod], optional: true, optional: true},
+      {:inch_ex, ">=0.0.0", only: [:dev, :test], optional: true},
+      {:benchee, "~> 0.8", only: [:bench, :dev, :test, :prod], optional: true},
+      {:benchee_html, "~> 0.1", only: [:bench, :dev, :test, :prod], optional: true},
       {:poison, "~> 3.0", only: [:bench, :dev, :test, :prod], optional: true,},
       {:exjsx, "~> 4.0", only: [:bench, :test, :dev, :prod], optional: true},
       {:tiny, "~> 1.0", only: [:bench, :dev, :test, :prod], optional: true, runtime: false},
