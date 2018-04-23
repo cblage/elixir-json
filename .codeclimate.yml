@@ -3,3 +3,6 @@ plugins:
   credo:
     enabled: true
     channel: "beta"
+exclude_patterns:
+  - "bench/"
+  - "doc/"
