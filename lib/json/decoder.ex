@@ -12,6 +12,7 @@ end
 
 defmodule JSON.Decoder.DefaultImplementations do
   require Logger
+  import Json.Logger
 
   defimpl JSON.Decoder, for: BitString do
     @moduledoc """
@@ -36,23 +37,23 @@ defmodule JSON.Decoder.DefaultImplementations do
 
     """
     def decode(bitstring) do
-      Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) starting...")
+      log(:debug, "#{__MODULE__}.decode(#{inspect bitstring}) starting...")
       bitstring
       |> String.trim()
       |> Parser.parse()
       |> case do
            {:error, error_info} ->
-              Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}} failed with errror: #{inspect error_info}")
+              log(:debug, "#{__MODULE__}.decode(#{inspect bitstring}} failed with errror: #{inspect error_info}")
               {:error, error_info}
            {:ok, value, rest} ->
-             Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) trimming remainder of JSON payload #{inspect rest}...")
+             log(:debug, "#{__MODULE__}.decode(#{inspect bitstring}) trimming remainder of JSON payload #{inspect rest}...")
              case rest |> String.trim() do
                <<>> ->
-                 Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) successfully trimmed remainder JSON payload!")
-                 Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}) returning {:ok. #{inspect value}}")
+                 log(:debug, "#{__MODULE__}.decode(#{inspect bitstring}) successfully trimmed remainder JSON payload!")
+                 log(:debug, "#{__MODULE__}.decode(#{inspect bitstring}) returning {:ok. #{inspect value}}")
                  {:ok, value}
                rest ->
-                 Logger.debug("#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}")
+                 log(:debug, "#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}")
                  {:error, {:unexpected_token, rest}}
              end
          end
@@ -88,13 +89,13 @@ defmodule JSON.Decoder.DefaultImplementations do
         case do
           {:ok, value} -> {:ok, value}
           {:error, error_info} when is_binary(error_info)  ->
-            Logger.debug("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect error_info}")
+            log(:debug, "#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect error_info}")
             {:error, error_info |> to_charlist()}
           {:error, {:unexpected_token, bin}} when is_binary(bin)  ->
-            Logger.debug("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect bin}")
+            log(:debug, "#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect bin}")
             {:error, {:unexpected_token, bin |> to_charlist()}}
           e = {:error, error_info} ->
-            Logger.debug("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect e}")
+            log(:debug, "#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect e}")
             {:error, error_info}
         end
     end

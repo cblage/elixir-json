@@ -4,6 +4,7 @@ defmodule JSON do
   """
 
   require Logger
+  import Json.Logger
 
   alias JSON.Encoder, as: Encoder
   alias JSON.Decoder, as: Decoder
@@ -55,16 +56,16 @@ defmodule JSON do
       Decoder.decode() |>
       case  do
        res = {:ok, _} ->
-         Logger.debug("#{__MODULE__}.decode(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect res}")
+        log(:debug, "#{__MODULE__}.decode(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect res}")
          res
        e = {:error, {:unexpected_token, tok}} ->
-         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
+         log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
          e
        e = {:error, :unexpected_end_of_buffer} ->
-         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
+         log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
          e
        e ->
-         Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
+         log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
      end
   end
 
@@ -81,16 +82,16 @@ defmodule JSON do
   def decode!(bitstring_or_char_list) do
     case Decoder.decode(bitstring_or_char_list) do
       {:ok, value} ->
-        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect value}")
+        log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect value}")
         value
       {:error, {:unexpected_token, tok}} ->
-        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
+        log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}")
         raise JSON.Decoder.UnexpectedTokenError, token: tok
       {:error, :unexpected_end_of_buffer} ->
-        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
+        log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer")
         raise JSON.Decoder.UnexpectedEndOfBufferError
       e ->
-        Logger.debug("#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
+        log(:debug, "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}")
     end
   end
 end
