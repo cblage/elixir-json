@@ -10,6 +10,7 @@ defmodule JSON.Parser do
   alias Parser.String, as: StringParser
 
   require Logger
+  import Json.Logger
 
   @doc """
   parses a valid JSON value, returns its elixir representation
@@ -69,44 +70,44 @@ defmodule JSON.Parser do
   """
 
   def parse(<<?[, _::binary>> = bin) do
-    Logger.debug("#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
+    log(:debug, "#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
     ArrayParser.parse(bin)
   end
   def parse(<<?{, _::binary>> = bin) do
-    Logger.debug("#{__MODULE__}.parse(bin) starting ObjectParser.parse(bin)...")
+    log(:debug, "#{__MODULE__}.parse(bin) starting ObjectParser.parse(bin)...")
     ObjectParser.parse(bin)
   end
   def parse(<<?", _::binary>> = bin) do
-    Logger.debug("#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
+    log(:debug, "#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)...")
     StringParser.parse(bin)
   end
 
   def parse(<<?-, number::utf8, _::binary>> = bin) when number in ?0..?9 do
-    Logger.debug("#{__MODULE__}.parse(bin) starting negative NumberParser.parse(bin)...")
+    log(:debug, "#{__MODULE__}.parse(bin) starting negative NumberParser.parse(bin)...")
     NumberParser.parse(bin)
   end
   def parse(<<number::utf8, _::binary>> = bin) when number in ?0..?9 do
-    Logger.debug("#{__MODULE__}.parse(bin) starting NumberParser.parse(bin)...")
+    log(:debug, "#{__MODULE__}.parse(bin) starting NumberParser.parse(bin)...")
     NumberParser.parse(bin)
   end
   def parse(<<?n, ?u, ?l, ?l, rest::binary>>) do
-    Logger.debug("#{__MODULE__}.parse(bin) parsed `null` token.")
+    log(:debug, "#{__MODULE__}.parse(bin) parsed `null` token.")
     {:ok, nil, rest}
   end
   def parse(<<?t, ?r, ?u, ?e, rest::binary>>) do
-    Logger.debug("#{__MODULE__}.parse(bin) parsed `true` token.")
+    log(:debug, "#{__MODULE__}.parse(bin) parsed `true` token.")
     {:ok, true, rest}
   end
   def parse(<<?f, ?a, ?l, ?s, ?e, rest::binary>>) do
-    Logger.debug("#{__MODULE__}.parse(bin) parsed `false` token.")
+    log(:debug, "#{__MODULE__}.parse(bin) parsed `false` token.")
     {:ok, false, rest}
   end
   def parse(<<>>) do
-    Logger.debug("#{__MODULE__}.parse(<<>>) unexpected end of buffer.")
+    log(:debug, "#{__MODULE__}.parse(<<>>) unexpected end of buffer.")
     {:error, :unexpected_end_of_buffer}
   end
   def parse(json) do
-    Logger.debug("#{__MODULE__}.parse(json) unexpected token: #{inspect json}")
+    log(:debug, "#{__MODULE__}.parse(json) unexpected token: #{inspect json}")
     {:error, {:unexpected_token, json}}
   end
 end
