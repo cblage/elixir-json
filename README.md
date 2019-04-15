@@ -133,5 +133,18 @@ Decoding a list from a string that contains JSON
   # "this will be a value"
 ```
 
+At any time, you can turn on verbose logging for this library only. 
+To do so, head to config file of your application and add below lines:
+
+```elixir
+use Mix.Config
+
+config :logger, level: :debug
+
+config :json, log_level: :debug
+```
+
+Note that, changing only `:logger` level to `:info`, `:warn` or `:error` will silent `:json` too.
+
 # License
 The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)

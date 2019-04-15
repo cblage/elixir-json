@@ -4,7 +4,7 @@ defmodule JSON do
   """
 
   require Logger
-  import Json.Logger
+  import JSON.Logger
 
   alias JSON.Encoder, as: Encoder
   alias JSON.Decoder, as: Decoder
