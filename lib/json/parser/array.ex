@@ -6,7 +6,7 @@ defmodule JSON.Parser.Array do
   alias JSON.Parser, as: Parser
 
   require Logger
-  import Json.Logger
+  import JSON.Logger
 
   @doc """
   parses a valid JSON array value, returns its elixir list representation

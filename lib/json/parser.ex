@@ -10,7 +10,7 @@ defmodule JSON.Parser do
   alias Parser.String, as: StringParser
 
   require Logger
-  import Json.Logger
+  import JSON.Logger
 
   @doc """
   parses a valid JSON value, returns its elixir representation

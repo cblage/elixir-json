@@ -12,7 +12,7 @@ end
 
 defmodule JSON.Decoder.DefaultImplementations do
   require Logger
-  import Json.Logger
+  import JSON.Logger
 
   defimpl JSON.Decoder, for: BitString do
     @moduledoc """
