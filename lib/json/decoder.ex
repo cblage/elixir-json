@@ -37,23 +37,23 @@ defmodule JSON.Decoder.DefaultImplementations do
 
     """
     def decode(bitstring) do
-      debug("#{__MODULE__}.decode(#{inspect bitstring}) starting...")
+      log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring}) starting..." end)
       bitstring
       |> String.trim()
       |> Parser.parse()
       |> case do
            {:error, error_info} ->
-              debug("#{__MODULE__}.decode(#{inspect bitstring}} failed with errror: #{inspect error_info}")
+              log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring}} failed with errror: #{inspect error_info}" end)
               {:error, error_info}
            {:ok, value, rest} ->
-             debug("#{__MODULE__}.decode(#{inspect bitstring}) trimming remainder of JSON payload #{inspect rest}...")
+             log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring}) trimming remainder of JSON payload #{inspect rest}..." end)
              case rest |> String.trim() do
                <<>> ->
-                 debug("#{__MODULE__}.decode(#{inspect bitstring}) successfully trimmed remainder JSON payload!")
-                 debug("#{__MODULE__}.decode(#{inspect bitstring}) returning {:ok. #{inspect value}}")
+                 log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring}) successfully trimmed remainder JSON payload!" end)
+                 log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring}) returning {:ok. #{inspect value}}" end)
                  {:ok, value}
                rest ->
-                 debug("#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}")
+                 log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring}} failed consume entire buffer: #{rest}" end)
                  {:error, {:unexpected_token, rest}}
              end
          end
@@ -89,13 +89,13 @@ defmodule JSON.Decoder.DefaultImplementations do
         case do
           {:ok, value} -> {:ok, value}
           {:error, error_info} when is_binary(error_info)  ->
-            debug("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect error_info}")
+            log(:debug, fn -> "#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect error_info}" end)
             {:error, error_info |> to_charlist()}
           {:error, {:unexpected_token, bin}} when is_binary(bin)  ->
-            debug("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect bin}")
+            log(:debug, fn -> "#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect bin}" end)
             {:error, {:unexpected_token, bin |> to_charlist()}}
           e = {:error, error_info} ->
-            debug("#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect e}")
+            log(:debug, fn -> "#{__MODULE__}.decode(#{inspect charlist}} failed with errror: #{inspect e}" end)
             {:error, error_info}
         end
     end
