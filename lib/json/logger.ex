@@ -26,7 +26,6 @@ defmodule Json.Logger do
                   end)
                   |> Enum.reverse()
 
-  @doc false
   @spec allowed_levels() :: [:debug | :error | :info | :warn, ...]
   def allowed_levels(), do: @allowed_levels
 
@@ -45,5 +44,9 @@ defmodule Json.Logger do
         Logger.log(level, message)
       end
     end
+  end
+
+  def debug(message) do
+    log(:debug, fn -> message end)
   end
 end
