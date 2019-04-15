@@ -45,8 +45,4 @@ defmodule Json.Logger do
       end
     end
   end
-
-  def debug(message) do
-    log(:debug, fn -> message end)
-  end
 end
