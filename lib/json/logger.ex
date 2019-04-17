@@ -3,7 +3,7 @@ defmodule JSON.Logger do
   Exposes separate log level configuration so developers can set logging
   verbosity for json library
 
-  To configure log level only for json library, add folowing line in config file
+  To configure log level only for json library, add following line in config file
 
       use Mix.Config
       # to make json be very verbose
@@ -12,6 +12,7 @@ defmodule JSON.Logger do
       config :json, log_level: :error
   """
   require Logger
+
   @levels [:debug, :info, :warn, :error]
   @level Application.get_env(:json, :log_level, :info)
 
@@ -26,7 +27,7 @@ defmodule JSON.Logger do
                   end)
                   |> Enum.reverse()
 
-  @spec allowed_levels() :: [:debug | :error | :info | :warn, ...]
+  @spec allowed_levels() :: [:error | :info | :warn, ...]
   def allowed_levels(), do: @allowed_levels
 
   @doc """

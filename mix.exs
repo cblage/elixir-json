@@ -1,25 +1,27 @@
-defmodule ElixirJSON_130_SNAPSHOT.Mixfile do
+defmodule ElixirJSON_140_SNAPSHOT.Mixfile do
   use Mix.Project
 
-  @version "1.3.0"
+  @version "1.4.0"
 
   def project do
     [
       app: :json,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.7",
       deps: deps(Mix.env()),
-      description: "Native Elixir library for JSON encoding and decoding",
+      description: "The First Native Elixir library for JSON encoding and decoding",
       package: package(),
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "https://hex.pm/packages/json",
       test_coverage: [tool: ExCoveralls],
-      dialyzer: dialyzer(),
       docs: docs(),
       preferred_cli_env: [
         docs: :docs,
         coveralls: :test,
         test: :test
+      ],
+      dialyzer_ignored_warnings: [
+        {:warn_umatched_return, {:_, :_}, {:unmatched_return, :_}}
       ]
     ]
   end
@@ -33,16 +35,9 @@ defmodule ElixirJSON_130_SNAPSHOT.Mixfile do
 
   def deps(_) do
     [
+      {:dialyzex, "~> 1.2", only: [:dev]},
       {:excoveralls, "~> 0.8", only: :test, optional: true, runtime: false},
-      {:credo, "~> 1.0", only: [:dev, :test], runtime: false, optional: true},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true}
-    ]
-  end
-
-
-  defp dialyzer() do
-    [
-      ignore_warnings: "dialyzer.ignore"
     ]
   end
 
