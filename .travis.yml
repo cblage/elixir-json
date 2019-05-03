@@ -6,7 +6,10 @@ notifications:
   recipients:
     - carlos@carloslage.net
 elixir:
+  - 1.6
   - 1.7
+  - 1.8
+  - 1.9
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
