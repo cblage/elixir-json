@@ -37,7 +37,6 @@ defmodule ElixirJSON_140_SNAPSHOT.Mixfile do
     [
       {:dialyzex, "~> 1.2", only: [:dev]},
       {:excoveralls, "~> 0.8", only: :test, optional: true, runtime: false},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true}
     ]
   end
 
