@@ -18,10 +18,10 @@ defmodule JSON.Encoder.Helpers do
   """
   def dict_encode(coll) do
     {:ok,
-      "{" <>
-      Enum.map_join(coll, ",", fn {key, object} ->
-        encode_item(key) <> ":" <> encode_item(object)
-      end) <> "}"}
+     "{" <>
+       Enum.map_join(coll, ",", fn {key, object} ->
+         encode_item(key) <> ":" <> encode_item(object)
+       end) <> "}"}
   end
 
   defp encode_item(item) do

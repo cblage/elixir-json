@@ -18,7 +18,8 @@ defprotocol JSON.Encoder do
       iex> JSON.Encoder.encode(%{a: 1, b: 2})
       {:ok, "{\\\"a\\\":1,\\\"b\\\":2}"}
   """
-  @spec encode(tuple|HashDict.t|list|integer|float|map|list|atom|term) :: {atom, bitstring}
+  @spec encode(tuple | HashDict.t() | list | integer | float | map | list | atom | term) ::
+          {atom, bitstring}
   def encode(term)
 
   @doc """

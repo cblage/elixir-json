@@ -6,8 +6,8 @@ defmodule JSON do
   require Logger
   import JSON.Logger
 
-  alias JSON.Encoder, as: Encoder
-  alias JSON.Decoder, as: Decoder
+  alias JSON.Encoder
+  alias JSON.Decoder
 
   @vsn "1.0.2"
 
@@ -21,7 +21,7 @@ defmodule JSON do
 
   """
   @spec encode(term) :: {atom, bitstring}
-  def encode(term), do: Encoder.encode(term)
+  defdelegate encode(term), to: Encoder
 
   @doc """
   Returns a JSON string representation of the Elixir term, raises errors when something bad happens
@@ -34,7 +34,7 @@ defmodule JSON do
   """
   @spec encode!(term) :: bitstring
   def encode!(term) do
-    case Encoder.encode(term) do
+    case encode(term) do
       {:ok, value} -> value
       {:error, error_info} -> raise JSON.Encoder.Error, error_info: error_info
       _ -> raise JSON.Encoder.Error
@@ -51,23 +51,7 @@ defmodule JSON do
   """
   @spec decode(bitstring) :: {atom, term}
   @spec decode(charlist) :: {atom, term}
-  def decode(bitstring_or_char_list) do
-    bitstring_or_char_list |>
-      Decoder.decode() |>
-      case  do
-       res = {:ok, _} ->
-        log(:debug, fn -> "#{__MODULE__}.decode(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect res}" end)
-         res
-       e = {:error, {:unexpected_token, tok}} ->
-         log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}" end)
-         e
-       e = {:error, :unexpected_end_of_buffer} ->
-         log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer" end)
-         e
-       e ->
-         log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}" end)
-     end
-  end
+  defdelegate decode(bitstring_or_char_list), to: Decoder
 
   @doc """
   Converts a valid JSON string into an Elixir term, raises errors when something bad happens
@@ -80,18 +64,36 @@ defmodule JSON do
   @spec decode!(bitstring) :: term
   @spec decode!(charlist) :: term
   def decode!(bitstring_or_char_list) do
-    case Decoder.decode(bitstring_or_char_list) do
+    case decode(bitstring_or_char_list) do
       {:ok, value} ->
-        log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} was sucesfull: #{inspect value}" end)
+        log(:debug, fn ->
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} was sucesfull: #{
+            inspect(value)
+          }"
+        end)
+
         value
+
       {:error, {:unexpected_token, tok}} ->
-        log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} unexpected token #{tok}" end)
+        log(:debug, fn ->
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} unexpected token #{tok}"
+        end)
+
         raise JSON.Decoder.UnexpectedTokenError, token: tok
+
       {:error, :unexpected_end_of_buffer} ->
-        log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} end of buffer" end)
+        log(:debug, fn ->
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} end of buffer"
+        end)
+
         raise JSON.Decoder.UnexpectedEndOfBufferError
+
       e ->
-        log(:debug, fn -> "#{__MODULE__}.decode!(#{inspect bitstring_or_char_list}} an unknown problem occurred #{inspect e}" end)
+        log(:debug, fn ->
+          "#{__MODULE__}.decode!(#{inspect(bitstring_or_char_list)}} an unknown problem occurred #{
+            inspect(e)
+          }"
+        end)
     end
   end
 end

@@ -73,10 +73,12 @@ defmodule JSON.Parser do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)..." end)
     ArrayParser.parse(bin)
   end
+
   def parse(<<?{, _::binary>> = bin) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting ObjectParser.parse(bin)..." end)
     ObjectParser.parse(bin)
   end
+
   def parse(<<?", _::binary>> = bin) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting ArrayParser.parse(bin)..." end)
     StringParser.parse(bin)
@@ -86,28 +88,34 @@ defmodule JSON.Parser do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting negative NumberParser.parse(bin)..." end)
     NumberParser.parse(bin)
   end
+
   def parse(<<number::utf8, _::binary>> = bin) when number in ?0..?9 do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) starting NumberParser.parse(bin)..." end)
     NumberParser.parse(bin)
   end
+
   def parse(<<?n, ?u, ?l, ?l, rest::binary>>) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) parsed `null` token." end)
     {:ok, nil, rest}
   end
+
   def parse(<<?t, ?r, ?u, ?e, rest::binary>>) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) parsed `true` token." end)
     {:ok, true, rest}
   end
+
   def parse(<<?f, ?a, ?l, ?s, ?e, rest::binary>>) do
     log(:debug, fn -> "#{__MODULE__}.parse(bin) parsed `false` token." end)
     {:ok, false, rest}
   end
+
   def parse(<<>>) do
     log(:debug, fn -> "#{__MODULE__}.parse(<<>>) unexpected end of buffer." end)
     {:error, :unexpected_end_of_buffer}
   end
+
   def parse(json) do
-    log(:debug, fn -> "#{__MODULE__}.parse(json) unexpected token: #{inspect json}" end)
+    log(:debug, fn -> "#{__MODULE__}.parse(json) unexpected token: #{inspect(json)}" end)
     {:error, {:unexpected_token, json}}
   end
 end

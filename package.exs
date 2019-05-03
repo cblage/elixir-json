@@ -1,8 +1,8 @@
 Expm.Package.new(
   name: "json",
   description: "Native Elixir library for JSON encoding and decoding",
-  version: "1.3.0",
-  keywords: ["Elixir", "json", "encoder", "decoder", "encode", "decode"],
+  version: "1.4.0",
+  keywords: ["Elixir", "json", "encoder", "decoder", "encode", "decode", "protocol"],
   licenses: [[name: "BSD 3-Clause"]],
   maintainers: [
     [name: "Carlos Brito Lage",  email: "carlos@carloslage.net"]],
