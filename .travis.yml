@@ -18,7 +18,6 @@ script:
   - MIX_ENV=test mix test
 after_script:
   - mix deps.get --only docs
-  - MIX_ENV=docs mix inch.report
   - MIX_ENV=test mix credo --strict
   - MIX_ENV=test mix coveralls --verbose
   - MIX_ENV=test mix coveralls.json --verbose
