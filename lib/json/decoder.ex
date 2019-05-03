@@ -45,9 +45,7 @@ defmodule JSON.Decoder.DefaultImplementations do
       |> case do
         {:error, error_info} ->
           log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with error: #{
-              inspect(error_info)
-            }"
+            "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with error: #{inspect(error_info)}"
           end)
 
           {:error, error_info}

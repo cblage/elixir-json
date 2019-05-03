@@ -7,13 +7,10 @@
         excluded: []
       },
       checks: [
-        {Credo.Check.Warning.LazyLogging, ignore: [:debug]},
+        {Credo.Check.Readability.ParenthesesOnZeroArityDefs, false},
         {Credo.Check.Consistency.TabsOrSpaces},
-
-        # For some checks, like AliasUsage, you can only customize the priority
-        # Priority values are: `low, normal, high, higher`
-        {Credo.Check.Design.AliasUsage, priority: :low},
-
+        {Credo.Check.Refactor.Nesting, max_nesting: 3},
+        {Credo.Check.Design.AliasUsage, false},
         # For others you can also set parameters
         {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 120},
 

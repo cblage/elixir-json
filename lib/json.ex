@@ -4,10 +4,11 @@ defmodule JSON do
   """
 
   require Logger
+
   import JSON.Logger
 
-  alias JSON.Encoder
   alias JSON.Decoder
+  alias JSON.Encoder
 
   @vsn "1.0.2"
 
