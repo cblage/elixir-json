@@ -16,8 +16,7 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
       test_coverage: [tool: ExCoveralls],
       dialyzer: dialyzer(),
       docs: docs(),
-      aliases: aliases(),
-      preferred_cli_env: ["bench.encode": :bench, "bench.decode": :bench, docs: :docs, coveralls: :test, test: :test],
+      preferred_cli_env: [docs: :docs, coveralls: :test, test: :test],
     ]
   end
 
@@ -30,26 +29,11 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
 
   def deps(_) do
     [
-      {:inch_ex, ">=0.0.0", only: [:dev, :test], optional: true},
-      {:benchee, "~> 0.8", only: [:bench, :dev, :test], optional: true},
-      {:benchee_html, "~> 0.1", only: [:bench, :dev, :test], optional: true},
-      {:poison, "~> 3.0", only: [:bench, :dev, :test], optional: true,},
-      {:exjsx, "~> 4.0", only: [:bench, :test, :dev], optional: true},
-      {:tiny, "~> 1.0", only: [:bench, :dev, :test], optional: true, runtime: false},
-      {:jsone, "~> 1.4", only: [:bench, :dev,:test], optional: true, runtime: false},
-      {:jason, "~> 1.0", only: [:bench, :dev, :test], optional: true, runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false, optional: true},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false, optional: true},
       {:excoveralls, "~> 0.8", only: :test, optional: true, runtime: false},
-      {:credo, "~> 0.9.0-rc1", only: [:dev, :test], runtime: false, optional: true},
+      {:credo, "~> 1.0", only: [:dev, :test], runtime: false, optional: true},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true},
-    ]
-  end
-
-  defp aliases() do
-    [
-      "bench.encode": ["run bench/encode.exs"],
-      "bench.decode": ["run bench/decode.exs"],
     ]
   end
 
