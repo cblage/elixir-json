@@ -15,7 +15,7 @@ However, with often unusually large `file.json > 5MB` payloads, and if the proce
 paramount to you (ie, processing them in a real-time manner vs using them in migration scripts or whatever), `JSON v1` 
 currently significantly slower when compared to `Jason`.
 
-#### Small payload `bench/data/utf-8-unescaped.json < 30KB` benchmark results for `JSON v1` and `Jason`
+#### Small payload (~ 30KB) benchmark results for `JSON v1` and `Jason`
 
 As you can see below, both libraries handle "regular" small `json` payloads beautifully.
 
@@ -33,12 +33,8 @@ For `JSON.encode` vs `Jason.encode`, the difference is so minimal, it's not wort
 | `JSON.encode`  	| 1.32 ms  	| ±225.81%  	| 0.58 ms  	| 0.28 ms  	| 103.70 ms 	|
 | `Jason.encode` 	| 0.30 ms  	| ±316.71%  	| 0.163 ms 	| 0.147 ms 	| 82.68 ms  	|
 
-#### Full `benchee` reports for `bench/data/utf-8-unescaped.json < 30KB`:
- - `decode`: https://bit.ly/2GVV8dy
- - `encode`: https://bit.ly/2v5W0H0
 
-
-#### Large payload `bench/data/issue-90.json ~ 8MB` benchmark results for `JSON v1` and `Jason`
+#### Large payload (~ 8MB) benchmark results for `JSON v1` and `Jason`
 
 However, with often unusually large `file.json > 5MB` payloads, and if the processing speed for those payloads is paramount to you 
 (ie, processing them in a real-time manner vs using them in migration scripts or whatever), then 
@@ -50,10 +46,6 @@ However, with often unusually large `file.json > 5MB` payloads, and if the proce
 | `Jason.decode` 	| 0.182 s	| ±21.60%		| 0.171 s	| 0.139 s 	| 0.42 s	  	|
 | `JSON.encode`  	| 5.51 s	| ±18.10%	  	| 5.24 s 	| 4.32 s 	| 7.36 s 	    |
 | `Jason.encode` 	| 0.186 s 	| ±26.41%   	| 0.173 s	| 0.122 s	| 0.38 s	  	|
-
-### Full `benchee` reports for `bench/data/issue-90.json ~ 8MB`:
- - `decode`: https://bit.ly/2HxReEP
- - `encode`: https://bit.ly/2HuR0OM
 
 # Plan of action for `Elixir JSON v2`
 
