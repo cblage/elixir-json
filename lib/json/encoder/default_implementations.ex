@@ -170,9 +170,6 @@ defimpl JSON.Encoder, for: Any do
     |> JSON.Encoder.Helpers.dict_encode()
   end
 
-  @doc """
-  Fallback method
-  """
   def encode(x) do
     x
     |> Kernel.inspect()
