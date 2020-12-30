@@ -86,22 +86,24 @@ defmodule JSONDecodeTest do
     decodes(
       "simple object",
       "{\"result\": \"this is awesome\"}",
-      Enum.into([{"result", "this is awesome"}, ], Map.new())
+      Enum.into([{"result", "this is awesome"}], Map.new())
     )
 
     decodes("empty array", "  [ ] ", [])
-    decodes("simple array", "[1, 2, \"three\", 4]", [1, 2, "three", 4, ])
+    decodes("simple array", "[1, 2, \"three\", 4]", [1, 2, "three", 4])
 
     decodes("nested array", " [null, [false, \"five\"], [3, true]] ", [
       nil,
       [false, "five"],
-      [3, true],
+      [3, true]
     ])
 
-    decodes("simple object with string keys" , "{\"foo\" : 123}", %{"foo" => 123})
+    decodes("simple object with string keys", "{\"foo\" : 123}", %{"foo" => 123})
 
-    decodes("simple object containing array" , "{\"foo\" : [1,2,3]}", %{"foo" => [1, 2, 3, ]})
-    decodes("simple object containing big array" ,
+    decodes("simple object containing array", "{\"foo\" : [1,2,3]}", %{"foo" => [1, 2, 3]})
+
+    decodes(
+      "simple object containing big array",
       "{
            \"foo\" : [
                        1,
@@ -109,7 +111,7 @@ defmodule JSONDecodeTest do
                        3
                      ]
       }",
-      %{"foo" => [1, 2, 3, ]}
+      %{"foo" => [1, 2, 3]}
     )
 
     decodes(
@@ -140,7 +142,11 @@ defmodule JSONDecodeTest do
       )
     )
 
-    cannot_decode("simple object with char keys" , "{'foo' : 123}'", {:unexpected_token, "'foo' : 123}'"})
+    cannot_decode(
+      "simple object with char keys",
+      "{'foo' : 123}'",
+      {:unexpected_token, "'foo' : 123}'"}
+    )
 
     cannot_decode("bad literal", "nul", {:unexpected_token, "nul"})
 
@@ -166,7 +172,11 @@ defmodule JSONDecodeTest do
       :unexpected_end_of_buffer
     )
 
-    cannot_decode("object with missing colon", "{\"foo\" \"bar\"}", {:unexpected_token, "\"bar\"}"})
+    cannot_decode(
+      "object with missing colon",
+      "{\"foo\" \"bar\"}",
+      {:unexpected_token, "\"bar\"}"}
+    )
   end
 
   defmodule CharlistCases do
@@ -204,22 +214,23 @@ defmodule JSONDecodeTest do
     decodes(
       "simple object",
       '{"result": "this is awesome"}',
-      Enum.into([{"result", "this is awesome"}, ], Map.new())
+      Enum.into([{"result", "this is awesome"}], Map.new())
     )
 
     decodes("empty array", '  [ ] ', [])
-    decodes("simple array", ' [1, 2, "three", 4] ', [1, 2, "three", 4, ])
+    decodes("simple array", ' [1, 2, "three", 4] ', [1, 2, "three", 4])
 
     decodes("nested array", '      [null, [false, "five"], [3, true]]       ', [
       nil,
       [false, "five"],
       [3, true]
     ])
-    
 
-    decodes("simple object string keys" , '{"foo" : 123}', %{"foo" => 123})
-    decodes("simple object containing array" , '{"foo" : [1,2,3]}', %{"foo" => [1,2,3,]})
-    decodes("simple object containing big array" ,
+    decodes("simple object string keys", '{"foo" : 123}', %{"foo" => 123})
+    decodes("simple object containing array", '{"foo" : [1,2,3]}', %{"foo" => [1, 2, 3]})
+
+    decodes(
+      "simple object containing big array",
       '{
            "foo" : [
                        1,
@@ -227,7 +238,7 @@ defmodule JSONDecodeTest do
                        3
                      ]
       }',
-      %{"foo" => [1,2,3,]}
+      %{"foo" => [1, 2, 3]}
     )
 
     decodes(
@@ -251,14 +262,18 @@ defmodule JSONDecodeTest do
           {"children",
            [
              Enum.into([{"name", "Penny"}], Map.new()),
-             Enum.into([{"name", "Elga"}], Map.new()),
+             Enum.into([{"name", "Elga"}], Map.new())
            ]}
         ],
         Map.new()
       )
     )
 
-    cannot_decode("simple object with char keys" , '{\'foo\' : 123}', {:unexpected_token, '\'foo\' : 123}'})
+    cannot_decode(
+      "simple object with char keys",
+      '{\'foo\' : 123}',
+      {:unexpected_token, '\'foo\' : 123}'}
+    )
 
     cannot_decode("bad literal", 'nul', {:unexpected_token, 'nul'})
 

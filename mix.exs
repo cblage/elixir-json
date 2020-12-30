@@ -1,7 +1,7 @@
 defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
   use Mix.Project
 
-  @version "1.2.5"
+  @version "1.3.1"
 
   def project do
     [
@@ -16,15 +16,15 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
       test_coverage: [tool: ExCoveralls],
       dialyzer: dialyzer(),
       docs: docs(),
-      preferred_cli_env: [docs: :docs, coveralls: :test, test: :test],
+      preferred_cli_env: [docs: :docs, coveralls: :test, test: :test]
     ]
   end
 
   def application do
-    [applications: applications(Mix.env)]
+    [applications: applications(Mix.env())]
   end
 
-  defp applications(:dev), do:  [] ++ applications(:default)
+  defp applications(:dev), do: [] ++ applications(:default)
   defp applications(_all), do: [:logger]
 
   def deps(_) do
@@ -33,7 +33,7 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false, optional: true},
       {:excoveralls, "~> 0.8", only: :test, optional: true, runtime: false},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false, optional: true},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true}
     ]
   end
 
@@ -51,8 +51,8 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
       canonical: "http://hexdocs.pm/json",
       source_url: "https://github.com/cblage/elixir-json",
       extras: [
-        "README.md",
-      ],
+        "README.md"
+      ]
     ]
   end
 
@@ -60,7 +60,7 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
     [
       maintainers: ["cblage"],
       licenses: ["BSD 3-Clause"],
-      links: %{"GitHub" => "https://github.com/cblage/elixir-json"},
+      links: %{"GitHub" => "https://github.com/cblage/elixir-json"}
     ]
   end
 end

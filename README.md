@@ -162,7 +162,7 @@ Carlos Brito Lage
  [
    {:cowboy, "~> 1.0.0"},
    {:plug, "~> 1.0"},
-   {:json, "~> 1.2"},
+   {:json, "~> 1.3"},
    {:jason, "~> 1.0"},
  ]
 ```
@@ -171,7 +171,7 @@ You can find its documentation here: https://hexdocs.pm/jason/readme.html
 
 # Installing
 
-Simply add ```{:json, "~> 1.2"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
+Simply add ```{:json, "~> 1.3"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
 
 ## Example for a project that already uses [Plug](https://github.com/elixir-plug/plug):
 
@@ -179,7 +179,7 @@ Simply add ```{:json, "~> 1.2"}``` to your project's ```mix.exs``` file, in the 
 [
   {:cowboy, "~> 1.0.0"},
   {:plug, "~> 1.0"},
-  {:json, "~> 1.2"},
+  {:json, "~> 1.3"},
 ]
 ```
 

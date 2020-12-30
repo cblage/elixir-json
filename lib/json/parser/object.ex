@@ -40,13 +40,17 @@ defmodule JSON.Parser.Object do
   # Object Parsing
   defp parse_object_key(json) do
     case Parser.String.parse(json) do
-      {:error, error_info} -> {:error, error_info}
+      {:error, error_info} ->
+        {:error, error_info}
+
       {:ok, key, after_key} ->
         case String.trim(after_key) do
           <<?:, after_colon::binary>> ->
             {:ok, key, String.trim(after_colon)}
+
           <<>> ->
             {:error, :unexpected_end_of_buffer}
+
           _ ->
             {:error, {:unexpected_token, String.trim(after_key)}}
         end
@@ -57,15 +61,19 @@ defmodule JSON.Parser.Object do
     case Parser.parse(after_key) do
       {:error, error_info} ->
         {:error, error_info}
+
       {:ok, value, after_value} ->
         acc = Map.put(acc, key, value)
-        after_value |> String.trim() |>
-          case do
-            <<?,, after_comma::binary>> ->
-              parse_object_contents(acc, String.trim(after_comma))
-            rest ->
-              parse_object_contents(acc, rest)
-          end
+
+        after_value
+        |> String.trim()
+        |> case do
+          <<?,, after_comma::binary>> ->
+            parse_object_contents(acc, String.trim(after_comma))
+
+          rest ->
+            parse_object_contents(acc, rest)
+        end
     end
   end
 

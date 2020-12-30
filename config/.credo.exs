@@ -24,8 +24,7 @@
 
         # To deactivate a check:
         # Put `false` as second element:
-        {Credo.Check.Design.TagFIXME, false},
-
+        {Credo.Check.Design.TagFIXME, false}
 
         # ... several checks omitted for readability ...
       ]
