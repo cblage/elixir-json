@@ -10,7 +10,7 @@ All contributions are welcome!
 
 # Installing
 
-Simply add ```{:json, "~> 1.4"}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get```.
+Simply add ```{:json, "~> 1.4"}``` to your project's ```mix.exs``` and run ```mix deps.get```.
 
 # Usage
 
