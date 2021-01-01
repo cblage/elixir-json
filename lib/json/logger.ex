@@ -3,7 +3,7 @@ defmodule JSON.Logger do
   Exposes separate log level configuration so developers can set logging
   verbosity for json library
 
-  To configure log level only for json library, add folowing line in config file
+  To configure log level only for json library, add following line in config file
 
       use Mix.Config
       # to make json be very verbose
@@ -12,22 +12,23 @@ defmodule JSON.Logger do
       config :json, log_level: :error
   """
   require Logger
-  @levels [:debug, :info, :warn, :error]
-  @level Application.get_env(:json, :log_level, :info)
 
-  @allowed_levels @levels
-                  |> Enum.reverse()
-                  |> Enum.reduce_while([], fn l, acc ->
-                    if l == @level do
-                      {:halt, [@level | acc]}
-                    else
-                      {:cont, [l | acc]}
-                    end
-                  end)
-                  |> Enum.reverse()
+  @log_levels [:error, :warn, :info, :debug]
 
-  @spec allowed_levels() :: [:debug | :error | :info | :warn, ...]
-  def allowed_levels(), do: @allowed_levels
+  @spec allowed_levels() :: [Logger.level()]
+  def allowed_levels() do
+    json_log_level = Application.get_env(:json, :log_level, :info)
+
+    @log_levels
+    |> Enum.reduce_while([], fn
+      ^json_log_level, acc ->
+        {:halt, [json_log_level | acc]}
+
+      l, acc ->
+        {:cont, [l | acc]}
+    end)
+    |> Enum.reverse()
+  end
 
   @doc """
   Logs given message to logger at given log level
@@ -42,6 +43,8 @@ defmodule JSON.Logger do
     quote bind_quoted: [level: level, message: message] do
       if level in JSON.Logger.allowed_levels() do
         Logger.log(level, message)
+      else
+        :ok
       end
     end
   end

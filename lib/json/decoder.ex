@@ -45,9 +45,7 @@ defmodule JSON.Decoder.DefaultImplementations do
       |> case do
         {:error, error_info} ->
           log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with errror: #{
-              inspect(error_info)
-            }"
+            "#{__MODULE__}.decode(#{inspect(bitstring)}} failed with error: #{inspect(error_info)}"
           end)
 
           {:error, error_info}
@@ -114,21 +112,21 @@ defmodule JSON.Decoder.DefaultImplementations do
 
         {:error, error_info} when is_binary(error_info) ->
           log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(error_info)}"
+            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with error: #{inspect(error_info)}"
           end)
 
           {:error, error_info |> to_charlist()}
 
         {:error, {:unexpected_token, bin}} when is_binary(bin) ->
           log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(bin)}"
+            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with error: #{inspect(bin)}"
           end)
 
           {:error, {:unexpected_token, bin |> to_charlist()}}
 
         e = {:error, error_info} ->
           log(:debug, fn ->
-            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with errror: #{inspect(e)}"
+            "#{__MODULE__}.decode(#{inspect(charlist)}} failed with error: #{inspect(e)}"
           end)
 
           {:error, error_info}

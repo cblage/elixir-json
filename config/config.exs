@@ -4,6 +4,8 @@ use Mix.Config
 
 config :logger,
   level: :info,
-  compile_time_purge_level: :debug
+  compile_time_purge_matching: [
+    [level_lower_than: :info]
+  ]
 
 config :json, log_level: :info

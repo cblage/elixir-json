@@ -1,22 +1,30 @@
-defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
+defmodule ElixirJSON_3140_SNAPSHOT.Mixfile do
   use Mix.Project
 
-  @version "1.3.1"
+  @version "3.0.0-SNAPSHOT"
 
   def project do
     [
       app: :json,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.7",
       deps: deps(Mix.env()),
-      description: "Native Elixir library for JSON encoding and decoding",
+      description: "The First Native Elixir library for JSON encoding and decoding",
       package: package(),
       source_url: "https://github.com/cblage/elixir-json",
       homepage_url: "https://hex.pm/packages/json",
       test_coverage: [tool: ExCoveralls],
-      dialyzer: dialyzer(),
       docs: docs(),
-      preferred_cli_env: [docs: :docs, coveralls: :test, test: :test]
+      dialyzer: dialyzer(),
+      preferred_cli_env: [
+        docs: :docs,
+        coveralls: :test,
+        test: :test,
+        dialyzer: :test
+      ],
+      dialyzer_ignored_warnings: [
+        {:warn_umatched_return, {:_, :_}, {:unmatched_return, :_}}
+      ]
     ]
   end
 
@@ -31,9 +39,9 @@ defmodule ElixirJSON_125_SNAPSHOT.Mixfile do
     [
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false, optional: true},
       {:mix_test_watch, "~> 0.3", only: :dev, runtime: false, optional: true},
-      {:excoveralls, "~> 0.8", only: :test, optional: true, runtime: false},
-      {:credo, "~> 1.0", only: [:dev, :test], runtime: false, optional: true},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false, optional: true}
+      {:excoveralls, "~> 0.13.4", only: :test, optional: true, runtime: false},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
     ]
   end
 
