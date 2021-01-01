@@ -8,7 +8,9 @@ defmodule JSON.Parser do
   alias Parser.Number, as: NumberParser
   alias Parser.Object, as: ObjectParser
   alias Parser.String, as: StringParser
-  alias Parser.Record.Chunk, as: ParserChunk
+
+  # TODO: finish me
+  # alias Parser.Record.Chunk, as: ParserChunk
 
   require Logger
   import JSON.Logger
@@ -72,38 +74,64 @@ defmodule JSON.Parser do
       {:ok, Enum.into([{"result", "this will be a elixir result"}], Map.new), " lalal"}
   """
   def parse(bin) when is_binary(bin) do
-    Logger.debug("#{__MODULE__}.parse(#{inspect bin}) starting Stream.resource...")
+    Logger.debug("#{__MODULE__}.parse(#{inspect(bin)}) starting Stream.resource...")
+
     Stream.resource(
       fn ->
         chunked = bin |> Stream.chunk_every(@chunk_size)
-        Logger.debug("#{__MODULE__}.parse(bin).resource.init() initalized Stream.chunk_every(#{inspect bin}, #{inspect @chunk_size}) = #{inspect chunked}")
+
+        Logger.debug(
+          "#{__MODULE__}.parse(bin).resource.init() initalized Stream.chunk_every(#{inspect(bin)}, #{
+            inspect(@chunk_size)
+          }) = #{inspect(chunked)}"
+        )
+
         chunked
       end,
       fn chunked_stream ->
-        Logger.debug("#{__MODULE__}.parse(bin).resource.chunk(#{inspect chunked_stream})....")
-        chunked_stream |> case do
+        Logger.debug("#{__MODULE__}.parse(bin).resource.chunk(#{inspect(chunked_stream)})....")
+
+        chunked_stream
+        |> case do
           stream = %Stream{} ->
-            Logger.debug("#{__MODULE__}.parse(bin).resource.chunk(#{inspect chunked_stream}) received stream #{inspect stream}")
-            transform = stream |> Stream.transform(nil, fn(c, acc) ->
-              Logger.debug("Stream.transform.reducer(#{inspect c}, #{inspect acc})...")
-              c |> case do
-               data when is_bitstring(data) -> {data, acc}
-                _ -> {:halt, acc}
-              end
-            end)
-            Logger.debug("#{__MODULE__}.parse(bin).resource() transform = #{inspect transform}")
+            Logger.debug(
+              "#{__MODULE__}.parse(bin).resource.chunk(#{inspect(chunked_stream)}) received stream #{
+                inspect(stream)
+              }"
+            )
+
+            transform =
+              stream
+              |> Stream.transform(nil, fn c, acc ->
+                Logger.debug("Stream.transform.reducer(#{inspect(c)}, #{inspect(acc)})...")
+
+                c
+                |> case do
+                  data when is_bitstring(data) -> {data, acc}
+                  _ -> {:halt, acc}
+                end
+              end)
+
+            Logger.debug("#{__MODULE__}.parse(bin).resource() transform = #{inspect(transform)}")
             {:halt, transform}
+
           other ->
-            Logger.debug("#{__MODULE__}.parse(bin).resource() received unexpected result from parse: #{inspect other}")
+            Logger.debug(
+              "#{__MODULE__}.parse(bin).resource() received unexpected result from parse: #{
+                inspect(other)
+              }"
+            )
+
             err = {:error, {:unexpected_token, other}}
-            Logger.debug("#{__MODULE__}.parse(bin).resource() returning #{inspect err}")
+            Logger.debug("#{__MODULE__}.parse(bin).resource() returning #{inspect(err)}")
             {:halt, err}
         end
       end,
       fn res ->
-        Logger.debug("#{__MODULE__}.parse(#{inspect bin}).finally() res = #{inspect res}")
+        Logger.debug("#{__MODULE__}.parse(#{inspect(bin)}).finally() res = #{inspect(res)}")
         res
-      end)
+      end
+    )
   end
 
   def parse(<<?[, _::binary>> = bin) do

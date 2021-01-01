@@ -20,7 +20,8 @@ defmodule JSON.Decoder.DefaultImplementations do
     """
 
     alias JSON.Parser, as: Parser
-    alias Parser.Record.Chunk, as: ParserChunk
+    # TODO: finish me
+    # alias Parser.Record.Chunk, as: ParserChunk
 
     @doc """
     decodes json in BitString format
@@ -127,7 +128,7 @@ defmodule JSON.Decoder.DefaultImplementations do
 
     ## Examples
 
-        iex> JSON.Decoder.decode ""
+          iex> JSON.Decoder.decode ""
         {:error, :unexpected_end_of_buffer}
 
         iex> JSON.Decoder.decode "face0ff"

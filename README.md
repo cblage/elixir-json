@@ -1,39 +1,25 @@
-# Elixir JSON v2.5
+# [Elixir JSON](https://hex.pm/packages/json)
 
-[![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Coverage Status](https://coveralls.io/repos/github/cblage/elixir-json/badge.svg?branch=master)](https://coveralls.io/github/cblage/elixir-json?branch=master) [![Hex.pm](https://img.shields.io/hexpm/v/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json)
-                                                                                                                                     
-This library provides a blazing fast (todo: link to benchmarks) 100% Elixir natively implemented JSON encoder and decoder.
+[![Build Status](https://travis-ci.org/cblage/elixir-json.svg?branch=master)](https://travis-ci.org/cblage/elixir-json) [![Hex.pm](https://img.shields.io/hexpm/dt/json.svg?style=flat-square)](https://hex.pm/packages/json) [![Coverage Status](https://coveralls.io/repos/github/cblage/elixir-json/badge.svg?branch=master)](https://coveralls.io/github/cblage/elixir-json?branch=master) [![Inline docs](http://inch-ci.org/github/cblage/elixir-json.svg)](http://inch-ci.org/github/cblage/elixir-json)
 
-Internally the we use the `Stream` api to ensure top performance.
+This library provides a natively implemented JSON encoder and decoder for Elixir.
 
-Besides simple `JSON.encode`/`JSON.decode` functionality, it also provides a Streaming API `JSON.Stream` so you can stream the parsing of JSON payloads (for example processing a json array you could stream the individual elements of that array, etc). 
+You can find the package in [hex.pm](https://hex.pm/packages/json) and the documentation in [hexdocs.pm](https://hexdocs.pm/json/readme.html).
 
-We also use custom-made heuristic to allow parallel processing of the json payload (again for example when processing arrays or deeply nested objects). You can fine tune the parallelization parameters in the config file. 
-
-All contributions are welcome.
-
+All contributions are welcome!
 
 # Installing
 
-Simply add ```{:json, "~> 2.5}``` to your project's ```mix.exs``` file, in the dependencies list and run ```mix deps.get json```.
-
-## Example for a project that already uses [Plug](https://github.com/elixir-plug/plug):
-
-```elixir
-[
-  {:cowboy, "~> 1.0.0"},
-  {:plug, "~> 1.0"},
-  {:json, "~> 2.5"},
-]
-```
+Simply add `{:json, "~> 1.4"}` to your project's `mix.exs` and run `mix deps.get`.
 
 # Simple Usaage
 
 Encoding an Elixir type
+
 ```elixir
   @doc "
 	JSON encode an Elixir list
-  "	
+  "
   list = [key: "this will be a value"]
   is_list(list)
   # true
@@ -46,6 +32,7 @@ Encoding an Elixir type
 ```
 
 Decoding a list from a string that contains JSON
+
 ```elixir
   @doc "
 	JSON decode a string into an Elixir list
@@ -59,8 +46,7 @@ Decoding a list from a string that contains JSON
   # "this will be a value"
 ```
 
-
-At any time, you can turn on verbose logging for this library only. 
+At any time, you can turn on verbose logging for this library only.
 To do so, head to config file of your application and add below lines:
 
 ```elixir
@@ -73,12 +59,10 @@ config :json, log_level: :debug
 
 Note that, changing only `:logger` level to `:info`, `:warn` or `:error` will silent `:json` too.
 
-
 # Using `JSON.Stream`
 
 ## TODO: write me
 
-
-
 # License
+
 The Elixir JSON library is available under the [BSD 3-Clause aka "BSD New" license](http://www.tldrlegal.com/l/BSD3)

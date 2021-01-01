@@ -1,22 +1,37 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=a669f9b84dcb893c8df72d85c56658c03e59c523ef619714d37b6523d35698aa
-language: elixir
 notifications:
-  recipients:
-    - carlos@carloslage.net
-elixir:
-  - 1.5
-  - 1.6
-  - 1.7
-  - 1.8
-  - 1.9
+  email:
+    recipients:
+      - carlos@carloslage.net
+language: elixir
+matrix:
+  include:
+    - elixir: "1.7"
+      otp_release: "19.0"
+    - elixir: "1.8"
+      otp_release: "20.0"
+    - elixir: "1.9"
+      otp_release: "20.0"
+    - elixir: "1.10"
+      otp_release: "21.0"
+    - elixir: "1.10"
+      otp_release: "22.0"
+    - elixir: "1.10"
+      otp_release: "23.0"
+    - elixir: "1.11"
+      otp_release: "21.0"
+    - elixir: "1.11"
+      otp_release: "22.0"
+    - elixir: "1.11"
+      otp_release: "23.0"
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script:
-  - MIX_ENV=dev mix dialyzer
+  - MIX_ENV=test mix dialyzer
   - MIX_ENV=test mix test
 after_script:
   - mix deps.get --only docs

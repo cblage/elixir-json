@@ -13,22 +13,22 @@ defmodule JSON.Logger do
   """
   require Logger
 
-  @levels [:debug, :info, :warn, :error]
-  @level Application.get_env(:json, :log_level, :info)
+  @log_levels [:error, :warn, :info, :debug]
 
-  @allowed_levels @levels
-                  |> Enum.reverse()
-                  |> Enum.reduce_while([], fn l, acc ->
-                    if l == @level do
-                      {:halt, [@level | acc]}
-                    else
-                      {:cont, [l | acc]}
-                    end
-                  end)
-                  |> Enum.reverse()
+  @spec allowed_levels() :: [Logger.level()]
+  def allowed_levels() do
+    json_log_level = Application.get_env(:json, :log_level, :info)
 
-  @spec allowed_levels() :: [:error | :info | :warn, ...]
-  def allowed_levels(), do: @allowed_levels
+    @log_levels
+    |> Enum.reduce_while([], fn
+      ^json_log_level, acc ->
+        {:halt, [json_log_level | acc]}
+
+      l, acc ->
+        {:cont, [l | acc]}
+    end)
+    |> Enum.reverse()
+  end
 
   @doc """
   Logs given message to logger at given log level
@@ -43,6 +43,8 @@ defmodule JSON.Logger do
     quote bind_quoted: [level: level, message: message] do
       if level in JSON.Logger.allowed_levels() do
         Logger.log(level, message)
+      else
+        :ok
       end
     end
   end
